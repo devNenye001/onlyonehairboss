@@ -3,8 +3,9 @@
 .shop-page {
   font-family: 'DM Sans', sans-serif;
   letter-spacing: -4%;
-  background-color: #FFF1EA; /* Exact elegant cream base background from screenshot */
+  background-color: #FFF1EA;
   min-height: 100vh;
+  overflow: hidden;
 }
 
 .shop-container {

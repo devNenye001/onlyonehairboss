@@ -1,0 +1,39 @@
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500&display=swap');
+
+.search-page { background: #FFF1EA; font-family: 'DM Sans', sans-serif; min-height: 100vh; }
+.search-container { max-width: 1100px; margin: 0 auto; padding: 48px 5% 80px; }
+
+.search-tag { font-size: 0.8rem; font-weight: 500; color: #995544; margin: 0 0 6px; }
+.search-headline {
+  font-family: 'Taprom', serif; font-size: clamp(2rem, 4vw, 2.8rem);
+  font-weight: 400; color: #000; margin: 0 0 36px;
+}
+
+.search-bar {
+  display: flex; max-width: 560px; margin-bottom: 36px;
+  border: 1px solid rgba(153,85,68,0.35);
+}
+.search-input {
+  flex: 1; padding: 14px 16px; border: none; background: transparent;
+  font-family: 'DM Sans', sans-serif; font-size: 1rem; color: #000; outline: none;
+}
+.search-input::placeholder { color: #bbb; }
+.search-btn {
+  padding: 0 20px; background: #995544; border: none; color: #FFF1EA;
+  font-size: 1.3rem; cursor: pointer; display: flex; align-items: center;
+  transition: opacity 0.2s;
+}
+.search-btn:hover { opacity: 0.85; }
+
+.search-status { font-size: 0.92rem; color: #666; margin-bottom: 28px; }
+
+.search-grid {
+  display: grid; grid-template-columns: repeat(4, 1fr);
+  column-gap: 24px; row-gap: 40px;
+}
+
+.search-empty { text-align: center; padding: 60px 0; color: #888; font-size: 0.97rem; }
+
+@media (max-width: 1024px) { .search-grid { grid-template-columns: repeat(3, 1fr); } }
+@media (max-width: 768px) { .search-grid { grid-template-columns: repeat(2, 1fr); column-gap: 16px; } }
+@media (max-width: 480px) { .search-grid { grid-template-columns: 1fr; } }

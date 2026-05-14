@@ -1,0 +1,68 @@
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500&display=swap');
+
+.ap-page { padding:36px 36px 60px; font-family:'DM Sans',sans-serif; }
+
+.ap-header { display:flex; justify-content:space-between; align-items:flex-end; margin-bottom:28px; flex-wrap:wrap; gap:16px; }
+.ap-tag { font-size:0.75rem; font-weight:500; color:#995544; letter-spacing:0.05em; text-transform:uppercase; margin:0 0 4px; }
+.ap-headline { font-family:'Taprom',serif; font-size:1.8rem; font-weight:400; color:#000; margin:0; }
+
+.ap-add-btn {
+  display:inline-flex; align-items:center; gap:8px; padding:10px 22px;
+  background:#995544; border:1px solid #995544; color:#FFF1EA;
+  font-family:'DM Sans',sans-serif; font-size:0.9rem; font-weight:500; cursor:pointer; transition:all 0.25s;
+}
+.ap-add-btn:hover { background:transparent; color:#995544; }
+
+.ap-msg { background:rgba(153,85,68,0.1); color:#995544; padding:10px 16px; margin-bottom:20px; font-size:0.9rem; }
+.ap-loading { color:#888; padding:40px 0; }
+
+/* Table */
+.ap-table-wrap { overflow-x:auto; }
+.ap-table { width:100%; border-collapse:collapse; font-size:0.9rem; }
+.ap-table th {
+  text-align:left; padding:10px 14px; background:#1a1a1a; color:rgba(255,255,255,0.7);
+  font-size:0.78rem; font-weight:500; letter-spacing:0.04em; white-space:nowrap;
+}
+.ap-table td { padding:12px 14px; border-bottom:1px solid rgba(0,0,0,0.05); vertical-align:middle; color:#333; }
+.ap-table tr:hover td { background:rgba(153,85,68,0.04); }
+
+.ap-thumb { width:50px; height:60px; object-fit:cover; display:block; }
+.ap-name { font-weight:500; color:#000; max-width:200px; }
+.ap-badge { display:inline-block; padding:3px 10px; border-radius:20px; font-size:0.78rem; font-weight:500; }
+.ap-badge.in { background:rgba(153,85,68,0.1); color:#995544; }
+.ap-badge.out { background:#f2f2f2; color:#888; }
+
+.ap-actions-cell { display:flex; gap:8px; }
+.ap-icon-btn { background:none; border:1px solid rgba(153,85,68,0.2); color:#995544; width:32px; height:32px; display:flex; align-items:center; justify-content:center; cursor:pointer; transition:all 0.2s; font-size:1rem; }
+.ap-icon-btn:hover { background:#995544; color:#FFF1EA; border-color:#995544; }
+.ap-icon-btn.danger:hover { background:#c0392b; border-color:#c0392b; }
+.star-filled { color:#f39c12; }
+
+/* Modal */
+.ap-modal-backdrop { position:fixed; inset:0; background:rgba(0,0,0,0.5); z-index:300; display:flex; align-items:center; justify-content:center; padding:20px; }
+.ap-modal { background:#FFF1EA; width:100%; max-width:600px; max-height:90vh; overflow-y:auto; padding:32px; }
+.ap-modal-header { display:flex; justify-content:space-between; align-items:center; margin-bottom:24px; }
+.ap-modal-header h2 { font-family:'Taprom',serif; font-size:1.4rem; font-weight:400; color:#000; margin:0; }
+.ap-close-btn { background:none; border:none; font-size:1.5rem; color:#995544; cursor:pointer; padding:0; line-height:1; }
+
+.ap-form { display:flex; flex-direction:column; gap:16px; }
+.ap-form-row { display:grid; grid-template-columns:1fr 1fr; gap:16px; }
+.ap-form-field { display:flex; flex-direction:column; gap:6px; }
+.ap-form-field label { font-size:0.87rem; font-weight:500; color:#333; }
+.ap-form-field input, .ap-form-field textarea, .ap-form-field select {
+  padding:11px 13px; border:1px solid rgba(153,85,68,0.3); background:transparent;
+  font-family:'DM Sans',sans-serif; font-size:0.93rem; color:#000; outline:none; transition:border-color 0.2s;
+}
+.ap-form-field input:focus, .ap-form-field textarea:focus, .ap-form-field select:focus { border-color:#995544; }
+.ap-form-field textarea { resize:vertical; }
+.ap-field-hint { font-size:0.78rem; color:#888; margin:4px 0 0; }
+
+.ap-checkboxes { display:flex; gap:24px; }
+.ap-checkbox { display:flex; align-items:center; gap:8px; font-size:0.9rem; color:#333; cursor:pointer; }
+.ap-checkbox input { width:16px; height:16px; cursor:pointer; accent-color:#995544; }
+
+.ap-save-btn { padding:13px; background:#995544; border:1px solid #995544; color:#FFF1EA; font-family:'DM Sans',sans-serif; font-size:0.97rem; font-weight:500; cursor:pointer; transition:all 0.3s; }
+.ap-save-btn:hover { background:transparent; color:#995544; }
+.ap-save-btn:disabled { opacity:0.6; cursor:not-allowed; }
+
+@media (max-width:480px) { .ap-form-row { grid-template-columns:1fr; } .ap-page { padding:24px 20px 48px; } }

@@ -1,6 +1,6 @@
 
 import { motion as Motion } from 'framer-motion';
-import { HiOutlineStar, HiOutlineSparkles, HiOutlineTruck } from 'react-icons/hi2';
+import { HiOutlineStar, HiOutlineColorSwatch, HiOutlineTruck } from 'react-icons/hi';
 import './WhyUs.css';
 
 const WhyUs = () => {
@@ -32,7 +32,7 @@ const WhyUs = () => {
     },
     {
       id: 2,
-      icon: <HiOutlineSparkles />,
+      icon: <HiOutlineColorSwatch />,
       title: "Custom Installations",
       description: "We also help you style and install it professionally."
     },

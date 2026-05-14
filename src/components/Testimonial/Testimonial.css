@@ -2,10 +2,11 @@
 
 /* Main system section parameters */
 .reviews-section {
-  background-color: #FFF1EA; /* Cream backdrop mirroring context screenshot files */
+  background-color: #FFF1EA;
   font-family: 'DM Sans', sans-serif;
   letter-spacing: -4%;
   width: 100%;
+  overflow: hidden;
 }
 
 /* Master container aligning elements, clamping top/bottom padding to 20px */

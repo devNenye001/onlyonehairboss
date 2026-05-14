@@ -1,10 +1,34 @@
 
+import { useState, useEffect } from 'react';
 import { motion as Motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import { HiOutlineArrowRight } from 'react-icons/hi';
 import './FeaturedCollection.css';
+import { supabase } from '../../../utils/supabase/client';
+
+const FALLBACK = {
+  id: 'luxury-deep-wave',
+  name: 'Luxury Deep Wave Wig',
+  description:
+    'Soft, full, and effortlessly beautiful — our Luxury Deep Wave Wig is crafted to give you a flawless, natural look with rich volume and a silky finish. Perfect for everyday elegance or special occasions, this wig is designed for confident women who love luxury, comfort, and attention-grabbing beauty.',
+};
 
 const FeaturedCollection = () => {
+  const [featured, setFeatured] = useState(FALLBACK);
+
+  useEffect(() => {
+    supabase
+      .from('products')
+      .select('id, name, description, images')
+      .eq('is_featured', true)
+      .eq('in_stock', true)
+      .limit(1)
+      .maybeSingle()
+      .then(({ data }) => {
+        if (data) setFeatured(data);
+      });
+  }, []);
+
   const fadeUp = {
     hidden: { opacity: 0, y: 20 },
     visible: (i = 0) => ({
@@ -37,7 +61,7 @@ const FeaturedCollection = () => {
           variants={fadeUp}
           custom={1}
         >
-          Luxury Deep Wave Wig
+          {featured.name}
         </Motion.h2>
 
         <Motion.div
@@ -48,15 +72,18 @@ const FeaturedCollection = () => {
           variants={fadeUp}
           custom={2}
         >
-          <video
-            className="featured-video"
-            autoPlay
-            loop
-            playsInline
-            muted
-            src="/featured1.mp4"
-
-          />
+          {featured.images?.[0] ? (
+            <img src={featured.images[0]} alt={featured.name} className="featured-video" />
+          ) : (
+            <video
+              className="featured-video"
+              autoPlay
+              loop
+              playsInline
+              muted
+              src="/featured1.mp4"
+            />
+          )}
         </Motion.div>
 
         <Motion.p
@@ -67,11 +94,7 @@ const FeaturedCollection = () => {
           variants={fadeUp}
           custom={3}
         >
-          Soft, full, and effortlessly beautiful — our Luxury Deep Wave Wig
-          is crafted to give you a flawless, natural look with rich volume
-          and a silky finish. Perfect for everyday elegance or special
-          occasions, this wig is designed for confident women who love
-          luxury, comfort, and attention-grabbing beauty.
+          {featured.description || FALLBACK.description}
         </Motion.p>
 
         <Motion.div
@@ -82,7 +105,7 @@ const FeaturedCollection = () => {
           variants={fadeUp}
           custom={4}
         >
-          <Link to="/product/luxury-deep-wave" className="order-now-btn">
+          <Link to={`/product/${featured.id}`} className="order-now-btn">
             Order Now <HiOutlineArrowRight className="btn-arrow-icon" />
           </Link>
         </Motion.div>

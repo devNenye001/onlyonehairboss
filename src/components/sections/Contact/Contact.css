@@ -4,6 +4,7 @@
   background-color: #FFF1EA;
   font-family: 'DM Sans', sans-serif;
   width: 100%;
+  overflow: hidden;
 }
 
 .contact-container {

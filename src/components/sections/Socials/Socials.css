@@ -2,10 +2,11 @@
 
 /* Master section structural parameters */
 .socials-section {
-  background-color: #FFF1EA; /* Consistent cream skin backdrop theme */
+  background-color: #FFF1EA;
   font-family: 'DM Sans', sans-serif;
   letter-spacing: -4%;
   width: 100%;
+  overflow: hidden;
 }
 
 /* Master content constraint block ensuring vertical padded limits stay inside 20px boundary */

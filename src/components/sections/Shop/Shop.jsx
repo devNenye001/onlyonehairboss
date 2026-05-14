@@ -1,40 +1,54 @@
 
+import { useState, useEffect } from 'react';
 import { motion as Motion } from 'framer-motion';
 import './Shop.css';
 import ProductCard from '../../ProductCard/ProductCard';
+import { supabase } from '../../../utils/supabase/client';
+
+const FALLBACK = [
+  { id: '1', name: "Layered bone straight", price: 270000, image: "/wig1.svg" },
+  { id: '2', name: "Short wavy", price: 270000, image: "/wig2.svg" },
+  { id: '3', name: "Pixie Curls", price: 270000, image: "/wig3.svg" },
+  { id: '4', name: "Bone Straight", price: 270000, image: "/wig4.svg" },
+  { id: '5', name: "Layered bone straight", price: 270000, image: "/wig5.svg" },
+  { id: '6', name: "Short wavy", price: 270000, image: "/wig6.svg" },
+  { id: '7', name: "Pixie Curls", price: 270000, image: "/wig7.svg" },
+  { id: '8', name: "Bone Straight", price: 270000, image: "/wig8.svg" },
+];
 
 const Shop = () => {
-  // Inventory updated to match image pricing and names
-  const products = [
-    { id: 1, name: "Layered bone straight", price: 270000, image: "/wig1.svg" },
-    { id: 2, name: "Short wavy", price: 270000, image: "/wig2.svg" },
-    { id: 3, name: "Pixie Curls", price: 270000, image: "/wig3.svg" },
-    { id: 4, name: "Bone Straight", price: 270000, image: "/wig4.svg" },
-    { id: 5, name: "Layered bone straight", price: 270000, image: "/wig5.svg" },
-    { id: 6, name: "Short wavy", price: 270000, image: "/wig6.svg" },
-    { id: 7, name: "Pixie Curls", price: 270000, image: "/wig7.svg" },
-    { id: 8, name: "Bone Straight", price: 270000, image: "/wig8.svg" },
-  ];
+  const [products, setProducts] = useState(FALLBACK);
+
+  useEffect(() => {
+    supabase
+      .from('products')
+      .select('id, name, price, images')
+      .eq('in_stock', true)
+      .order('created_at', { ascending: false })
+      .limit(8)
+      .then(({ data }) => {
+        if (data && data.length > 0) {
+          setProducts(data.map(p => ({ ...p, image: p.images?.[0] || '/wig1.svg' })));
+        }
+      });
+  }, []);
 
   return (
     <div className="shop-page">
       <main className="shop-container">
-        {/* Header matched perfectly with image layout */}
         <div className="shop-header">
           <p className="shop-tag" style={{color:"#995544"}}>Shop</p>
           <h1 className="taprom-headline">Our Collection</h1>
         </div>
 
-        {/* Product Grid */}
         <div className="product-grid">
           {products.map(product => (
             <ProductCard key={product.id} product={product} />
           ))}
         </div>
 
-        {/* Leopard Banner at the bottom */}
         <section className="shop-banner">
-          <Motion.div 
+          <Motion.div
             className="banner-content"
             initial={{ opacity: 0, y: 15 }}
             whileInView={{ opacity: 1, y: 0 }}

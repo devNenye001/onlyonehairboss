@@ -2,10 +2,11 @@
 
 /* Section Backdrop styling */
 .new-in-section {
-  background-color: #FFF1EA; /* Exact cream/skin-tone background */
+  background-color: #FFF1EA;
   font-family: 'DM Sans', sans-serif;
   letter-spacing: -4%;
   width: 100%;
+  overflow: hidden;
 }
 
 /* Master alignment container keeping top/bottom padding clamped to 20px */

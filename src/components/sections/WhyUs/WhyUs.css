@@ -2,10 +2,11 @@
 
 /* Main layout setup */
 .whyus-section {
-  background-color: #FFF1EA; /* Cream skin tone from image_929cb5.png */
+  background-color: #FFF1EA;
   font-family: 'DM Sans', sans-serif;
   letter-spacing: -4%;
   width: 100%;
+  overflow: hidden;
 }
 
 /* Outer layout frame with strict top/bottom 20px padding constraints */

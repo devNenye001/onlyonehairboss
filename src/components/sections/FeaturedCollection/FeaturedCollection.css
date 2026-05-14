@@ -5,6 +5,7 @@
   font-family: 'DM Sans', sans-serif;
   width: 100%;
   padding: 56px 0 64px;
+  overflow: hidden;
 }
 
 .featured-container {

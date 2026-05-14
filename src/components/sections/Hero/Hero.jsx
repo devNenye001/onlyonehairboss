@@ -1,17 +1,22 @@
 import { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { motion as Motion, AnimatePresence } from 'framer-motion';
 import { HiOutlineShoppingBag, HiOutlineSearch, HiOutlineUser, HiMenu, HiX } from 'react-icons/hi';
+import { useCart } from '../../../context/CartContext';
+import { useAuth } from '../../../context/AuthContext';
 import './Hero.css';
 
 const Hero = () => {
   const [isOpen, setIsOpen] = useState(false);
+  const { cartCount } = useCart();
+  const { user } = useAuth();
+  const navigate = useNavigate();
 
   const navLinks = [
     { name: 'Home', path: '/' },
     { name: 'Shop', path: '/shop' },
-    { name: 'About Us', path: '/about' },
-    { name: 'Contact', path: '/contact' },
+    { name: 'About Us', path: '/#about' },
+    { name: 'Contact', path: '/#contact' },
   ];
 
   const variants = {
@@ -85,11 +90,11 @@ const Hero = () => {
         </AnimatePresence>
 
         <div className="nav-icons">
-          <HiOutlineSearch className="icon hide-mobile" />
-          <HiOutlineUser className="icon hide-mobile" />
-          <div className="cart-icon">
+          <HiOutlineSearch className="icon hide-mobile" onClick={() => navigate('/search')} />
+          <HiOutlineUser className="icon hide-mobile" onClick={() => navigate(user ? '/account' : '/auth')} />
+          <div className="cart-icon" onClick={() => navigate('/cart')}>
             <HiOutlineShoppingBag className="icon" />
-            <span className="cart-count">3</span>
+            {cartCount > 0 && <span className="cart-count">{cartCount}</span>}
           </div>
           <div className="mobile-toggle" onClick={() => setIsOpen(true)}>
             <HiMenu />

@@ -1,0 +1,53 @@
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500&display=swap');
+
+.oc-page { background:#FFF1EA; font-family:'DM Sans',sans-serif; min-height:100vh; }
+.oc-container { max-width:600px; margin:0 auto; padding:60px 5% 80px; }
+
+.oc-card { display:flex; flex-direction:column; align-items:center; text-align:center; gap:12px; }
+
+.oc-check-icon { font-size:4rem; color:#995544; margin-bottom:4px; }
+.oc-tag { font-size:0.8rem; font-weight:500; color:#995544; letter-spacing:0.05em; text-transform:uppercase; margin:0; }
+.oc-headline { font-family:'Taprom',serif; font-size:clamp(2.2rem,5vw,3rem); font-weight:400; color:#000; margin:0; }
+.oc-sub { font-size:0.97rem; color:#555; line-height:1.6; margin:0 0 8px; max-width:380px; }
+
+.oc-details {
+  width:100%; border:1px solid rgba(153,85,68,0.12);
+  background:rgba(255,255,255,0.5); padding:20px 24px;
+  display:flex; flex-direction:column; gap:12px; text-align:left; margin-top:8px;
+}
+.oc-detail-row { display:flex; justify-content:space-between; font-size:0.9rem; color:#555; }
+.oc-detail-row span:last-child { color:#000; font-weight:500; }
+.oc-mono { font-family:monospace; letter-spacing:0.05em; }
+.oc-status { color:#995544; text-transform:capitalize; }
+
+.oc-items { width:100%; text-align:left; margin-top:8px; }
+.oc-items-title { font-family:'Taprom',serif; font-size:1.15rem; font-weight:400; color:#000; margin:0 0 12px; }
+.oc-item { display:flex; align-items:center; gap:14px; padding:12px 0; border-bottom:1px solid rgba(153,85,68,0.1); }
+.oc-item:last-child { border-bottom:none; }
+.oc-item-img { width:52px; height:64px; object-fit:cover; flex-shrink:0; }
+.oc-item-name { font-size:0.92rem; font-weight:500; color:#000; margin:0 0 4px; }
+.oc-item-meta { font-size:0.83rem; color:#888; margin:0; }
+
+.oc-payment-reminder {
+  width:100%; background:rgba(153,85,68,0.07); border:1px solid rgba(153,85,68,0.18);
+  padding:20px 24px; display:flex; flex-direction:column; gap:12px; align-items:center;
+  text-align:center; margin-top:8px;
+}
+.oc-payment-reminder p { font-size:0.92rem; color:#555; margin:0; }
+.oc-whatsapp-btn {
+  padding:12px 28px; background:#25D366; color:#fff;
+  text-decoration:none; font-weight:500; font-size:0.92rem;
+  transition:opacity 0.2s;
+}
+.oc-whatsapp-btn:hover { opacity:0.85; }
+
+.oc-actions { margin-top:8px; }
+.oc-shop-btn {
+  padding:13px 36px; background:#995544; color:#FFF1EA;
+  text-decoration:none; font-weight:500; font-size:0.95rem;
+  display:inline-block; transition:all 0.3s ease;
+  border:1px solid #995544;
+}
+.oc-shop-btn:hover { background:transparent; color:#995544; }
+
+@media (max-width:480px) { .oc-container { padding:40px 5% 60px; } }

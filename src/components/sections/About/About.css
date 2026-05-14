@@ -2,10 +2,11 @@
 
 /* Main component wrapper */
 .about-section {
-  background-color: #FFF1EA; /* Subtle luxury cream color from screenshot */
+  background-color: #FFF1EA;
   font-family: 'DM Sans', sans-serif;
   letter-spacing: -4%;
   width: 100%;
+  overflow: hidden;
 }
 
 /* Constrained interior container matching the original 20px up/down padding requirement */

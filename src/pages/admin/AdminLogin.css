@@ -1,0 +1,45 @@
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500&display=swap');
+
+.admin-login-page {
+  min-height:100vh; background:#1a1a1a;
+  font-family:'DM Sans',sans-serif;
+  display:flex; align-items:center; justify-content:center; padding:40px 5%;
+}
+.admin-login-card {
+  background:#FFF1EA; padding:44px 40px; width:100%; max-width:420px;
+  display:flex; flex-direction:column; align-items:center; gap:4px;
+}
+.admin-login-logo { height:44px; margin-bottom:12px; }
+.admin-login-tag { font-size:0.78rem; font-weight:500; color:#995544; letter-spacing:0.05em; text-transform:uppercase; margin:0; }
+.admin-login-headline { font-family:'Taprom',serif; font-size:2rem; font-weight:400; color:#000; margin:0 0 24px; }
+.admin-login-form { width:100%; display:flex; flex-direction:column; gap:16px; }
+.admin-field { display:flex; flex-direction:column; gap:6px; }
+.admin-field label { font-size:0.88rem; font-weight:500; color:#333; }
+.password-wrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+.password-wrap input { flex: 1; padding-right: 44px; }
+.pw-toggle {
+  position: absolute; right: 12px;
+  background: none; border: none; color: #995544;
+  font-size: 1.1rem; cursor: pointer; display: flex;
+  align-items: center; padding: 0; opacity: 0.7; transition: opacity 0.2s;
+}
+.pw-toggle:hover { opacity: 1; }
+
+.admin-field input {
+  padding:12px 14px; border:1px solid rgba(153,85,68,0.3); background:transparent;
+  font-family:'DM Sans',sans-serif; font-size:0.95rem; color:#000; outline:none; transition:border-color 0.2s;
+}
+.admin-field input:focus { border-color:#995544; }
+.admin-error { font-size:0.87rem; color:#c0392b; background:rgba(192,57,43,0.08); padding:10px 14px; margin:0; }
+.admin-login-btn {
+  padding:14px; background:#995544; border:1px solid #995544; color:#FFF1EA;
+  font-family:'DM Sans',sans-serif; font-size:0.97rem; font-weight:500; cursor:pointer; transition:all 0.3s ease;
+}
+.admin-login-btn:hover { background:transparent; color:#995544; }
+.admin-login-btn:disabled { opacity:0.6; cursor:not-allowed; }
+.admin-back-link { font-size:0.85rem; color:#995544; text-decoration:none; margin-top:16px; }
+.admin-back-link:hover { text-decoration:underline; }
