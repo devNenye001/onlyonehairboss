@@ -1,0 +1,141 @@
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500&display=swap');
+
+/* Main system background layout block styling */
+.cta-section {
+  background-color: #FFF1EA; /* Cream backdrop theme copied perfectly from your reference mockup */
+  font-family: 'DM Sans', sans-serif;
+  letter-spacing: -4%;
+  width: 100%;
+  overflow: hidden;
+}
+
+/* Master container defining flex layout flow with tight padding restrictions */
+.cta-container {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 60px 4%; /* Top and bottom explicitly locked to 20px framework parameter specifications */
+  display: grid;
+  grid-template-columns: 1.2fr 0.8fr; /* Balanced layout split ratio sizing matching the layout mock */
+  align-items: center;
+  gap: 40px;
+  position: relative;
+}
+
+/* Left block content typography styling maps */
+.cta-content {
+  display: flex;
+  flex-direction: column;
+  text-align: left;
+  z-index: 2;
+}
+
+.cta-tag {
+  font-size: 0.9rem;
+  font-weight: 500; /* Any font weight representing bold values is restricted to 500 limits */
+  color: #995544; /* Specific brand brown color implementation token */
+  margin: 0 0 4px 0;
+}
+
+.cta-headline {
+  font-family: 'Taprom', serif; /* Script header typography choice assignment rules */
+  font-size: clamp(2.2rem, 5vw, 3.6rem);
+  font-weight: 500;
+  color: #000000;
+  margin: 0 0 24px 0;
+  line-height: 1.15;
+}
+
+.cta-description {
+  font-size: clamp(1rem, 1.8vw, 1.15rem);
+  color: #000000;
+  line-height: 1.5;
+  font-weight: 400;
+  margin: 0 0 30px 0;
+  max-width: 620px;
+}
+
+/* CTA Navigation button alignment frameworks */
+.cta-action-wrap {
+  display: flex;
+  justify-content: flex-start;
+}
+
+/* Solid design look button structure — strictly NO shadows allowed across layout */
+.cta-order-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 14px 44px;
+  background-color: #995544; /* Filled block styling using signature user requested brown token */
+  border: 1px solid #995544;
+  color: #FFF1EA;
+  font-weight: 500;
+  font-size: 0.95rem;
+  text-decoration: none;
+  letter-spacing: -4%;
+  transition: all 0.3s cubic-bezier(0.25, 1, 0.5, 1);
+  box-shadow: none !important; /* Total validation checks safety protection against drop shadows */
+}
+
+.cta-order-btn:hover {
+  background-color: transparent;
+  color: #995544;
+}
+
+.cta-btn-arrow {
+  font-size: 1.1rem;
+}
+
+/* Right media section rendering parameters */
+.cta-media-wrap {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  position: relative;
+}
+
+.cta-showcase-img {
+  width: 100%;
+  max-width: 380px; /* Precise size framing boundaries for the right-side product model portrait */
+  height: auto;
+  object-fit: contain;
+  display: block;
+}
+
+/* Responsive Grid System Media Breakpoint Hooks */
+@media (max-width: 992px) {
+  .cta-container {
+    grid-template-columns: 1fr; /* Stacks column layers safely down across tablet form factor screens */
+    gap: 30px;
+    padding: 20px 5%;
+  }
+
+  .cta-content {
+    text-align: center;
+    align-items: center;
+  }
+
+  .cta-description {
+    text-align: center;
+  }
+
+  .cta-action-wrap {
+    justify-content: center;
+  }
+  
+  .cta-showcase-img {
+    max-width: 300px;
+  }
+}
+
+@media (max-width: 480px) {
+  .cta-headline {
+    font-size: 2.2rem;
+  }
+
+  .cta-order-btn {
+    width: 100%; /* Spans full local inline margins on compact display viewports */
+  }
+}

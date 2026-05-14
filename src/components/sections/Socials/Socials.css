@@ -1,0 +1,149 @@
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500&display=swap');
+
+/* Master section structural parameters */
+.socials-section {
+  background-color: #FFF1EA; /* Consistent cream skin backdrop theme */
+  font-family: 'DM Sans', sans-serif;
+  letter-spacing: -4%;
+  width: 100%;
+}
+
+/* Master content constraint block ensuring vertical padded limits stay inside 20px boundary */
+.socials-container {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 20px 4%; /* Strict 20px top/bottom tracking padding applied */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* Header Text layout elements */
+.socials-header {
+  text-align: center;
+  margin-bottom: 30px;
+}
+
+.socials-tag {
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: #995544; /* Signature brown identifier text color */
+  margin: 0 0 2px 0;
+}
+
+.socials-headline {
+  font-family: 'Taprom', serif; /* Script accent line styling */
+  font-size: clamp(2rem, 5vw, 3.2rem);
+  font-weight: 500;
+  color: #000000;
+  margin: 0;
+}
+
+/* Four column content presentation matrix structure */
+.socials-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 20px;
+  width: 100%;
+  margin-bottom: 35px;
+}
+
+/* Single media tracking block components */
+.video-card {
+  width: 100%;
+  position: relative;
+}
+
+.video-wrapper {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 9 / 16; /* Portrait presentation layout replicating TikTok mobile viewports */
+  background-color: #000000;
+  overflow: hidden;
+}
+
+.social-video-player {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+/* Play button aesthetic overlay styling precisely matched from image_922fa2.jpg */
+.play-overlay-icon {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background-color: rgba(58, 58, 58, 0.75); /* Dark graphite tinted circle backing alpha */
+  color: #ffffff;
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.2rem;
+  padding-left: 4px; /* Tiny spatial nudge to visual-center alignment of triangle glyph */
+  pointer-events: none; /* Allows click logic interactions to fall through transparently into native controls */
+  z-index: 2;
+  transition: opacity 0.3s ease;
+}
+
+/* Auto hides custom indicator decoration overlays when user interfaces with embedded media controllers */
+.video-wrapper:hover .play-overlay-icon {
+  opacity: 0;
+}
+
+/* Action frame row layouts */
+.socials-action-wrap {
+  display: flex;
+  justify-content: center;
+  width: 100%;
+}
+
+/* Solid frame tracking action redirect elements — strictly NO shadow layers */
+.tiktok-follow-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 14px 44px;
+  background-color: #995544; /* Filled solid design using signature custom brown block token */
+  border: 1px solid #995544;
+  color: #FFF1EA;
+  font-weight: 500;
+  font-size: 0.95rem;
+  text-decoration: none;
+  letter-spacing: -4%;
+  transition: all 0.3s cubic-bezier(0.25, 1, 0.5, 1);
+  box-shadow: none !important; /* Total absence of decorative box shadows safely retained */
+}
+
+.tiktok-follow-btn:hover {
+  background-color: transparent;
+  color: #995544;
+}
+
+.btn-arrow {
+  font-size: 1.1rem;
+}
+
+/* Responsive Adaptive Viewport Matrix */
+@media (max-width: 1024px) {
+  .socials-grid {
+    grid-template-columns: repeat(2, 1fr); /* Two stacked columns across middle screen devices */
+    gap: 16px;
+  }
+}
+
+@media (max-width: 520px) {
+  .socials-grid {
+    grid-template-columns: 1fr; /* Pure vertical unified portrait column stack on mobile handsets */
+    gap: 14px;
+  }
+  
+  .tiktok-follow-btn {
+    width: 100%; /* Spans full local column width bounds on mobile */
+  }
+}

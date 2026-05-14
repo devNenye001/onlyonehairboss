@@ -1,0 +1,132 @@
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500&display=swap');
+
+/* Section Backdrop styling */
+.new-in-section {
+  background-color: #FFF1EA; /* Exact cream/skin-tone background */
+  font-family: 'DM Sans', sans-serif;
+  letter-spacing: -4%;
+  width: 100%;
+}
+
+/* Master alignment container keeping top/bottom padding clamped to 20px */
+.new-in-container {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 20px 4%; /* Strict 20px top and bottom padding applied */
+}
+
+/* Header Text elements grouping */
+.new-in-header {
+  text-align: center;
+  margin-bottom: 35px;
+}
+
+.new-in-tag {
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: #995544; /* Specific brown color token */
+  margin: 0 0 2px 0;
+  text-transform: capitalize;
+}
+
+.new-in-headline {
+  font-family: 'Taprom', serif;
+  font-size: clamp(2rem, 5vw, 3.2rem);
+  font-weight: 500;
+  color: #000000;
+  margin: 0;
+}
+
+/* Standardized Product Flex-Grid Framework */
+.new-in-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  column-gap: 24px;
+  row-gap: 35px;
+}
+
+/* Individual Card Structural Elements */
+.new-in-card {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+
+.new-in-img-wrap {
+  width: 100%;
+  aspect-ratio: 1 / 1; /* Crisp square aspect ratio framing your assets */
+  overflow: hidden;
+  background-color: #f2f2f2;
+}
+
+.new-in-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.new-in-details {
+  padding-top: 14px;
+  display: flex;
+  flex-direction: column;
+}
+
+.new-in-title {
+  font-size: 1.05rem;
+  font-weight: 500; /* Any text variant indicating bold is limited to 500 */
+  color: #000000;
+  margin: 0 0 6px 0;
+  letter-spacing: -4%;
+}
+
+.new-in-price {
+  font-size: 1.15rem;
+  font-weight: 500;
+  color: #000000;
+  margin: 0 0 14px 0;
+  letter-spacing: -4%;
+}
+
+/* Clean transparent card CTA layout — strictly NO shadows */
+.order-now-btn {
+  width: 100%;
+  padding: 12px 0;
+  background-color: transparent;
+  border: 1px solid #995544; /* Framed border line using your brown token */
+  color: #995544; 
+  font-weight: 500;
+  font-size: 0.95rem;
+  text-align: center;
+  text-decoration: none;
+  letter-spacing: -4%;
+  transition: all 0.25s ease-in-out;
+  box-shadow: none !important; /* Strict formatting constraint safely isolated */
+}
+
+.order-now-btn:hover {
+  background-color: #995544; /* Swaps background filled on active interaction */
+  color: #FFF1EA;
+}
+
+/* Complete Responsive Device Breaks */
+@media (max-width: 1024px) {
+  .new-in-grid {
+    grid-template-columns: repeat(3, 1fr);
+    column-gap: 20px;
+  }
+}
+
+@media (max-width: 768px) {
+  .new-in-grid {
+    grid-template-columns: repeat(2, 1fr);
+    column-gap: 15px;
+    row-gap: 25px;
+  }
+}
+
+@media (max-width: 480px) {
+  .new-in-grid {
+    grid-template-columns: 1fr;
+    row-gap: 20px;
+  }
+}

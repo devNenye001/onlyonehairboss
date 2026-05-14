@@ -1,0 +1,197 @@
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500&display=swap');
+
+/* Main system container framework using your brown branding token */
+.main-footer {
+  background-color: #995544; /* Specific solid brown brand tone background */
+  color: #ffffff;
+  font-family: 'DM Sans', sans-serif;
+  letter-spacing: -4%;
+  width: 100%;
+}
+
+/* Internal layout balancing container capping padding top/bottom explicitly to 20px */
+.footer-container {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 20px 4%; /* Top/bottom constrained tightly at 20px boundary constraints */
+  display: flex;
+  flex-direction: column;
+}
+
+/* Master content presentation split framework row */
+.footer-row {
+  display: grid;
+  grid-template-columns: 1.2fr 0.8fr 0.8fr 1.4fr 0.8fr; /* Accurate layout weights proportions */
+  gap: 30px;
+  align-items: flex-start;
+  padding-bottom: 15px;
+}
+
+.footer-col {
+  display: flex;
+  flex-direction: column;
+  text-align: left;
+}
+
+/* Brand Identity column handling logo boundaries */
+.brand-col {
+  justify-content: center;
+}
+
+.footer-logo-link {
+  display: inline-block;
+  max-width: 160px;
+}
+
+.footer-logo-img {
+  width: 100%;
+  height: auto;
+  object-fit: contain;
+}
+
+/* Column heading configuration labels */
+.footer-heading {
+  font-size: 0.9rem;
+  font-weight: 500; /* Bold variants limited strictly to 500 weight limits */
+  letter-spacing: 0.5px;
+  color: #ffffff;
+  margin: 0 0 16px 0;
+  text-transform: uppercase;
+}
+
+/* Layout lists mappings templates reset links elements styles */
+.footer-links-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.footer-links-list a {
+  color: rgba(255, 255, 255, 0.85);
+  font-size: 0.95rem;
+  text-decoration: none;
+  font-weight: 400;
+  transition: color 0.25s ease;
+}
+
+.footer-links-list a:hover {
+  color: #FFF1EA; /* Subtle transition tint value swap on user focus */
+}
+
+/* Meta Data Information layouts elements rows */
+.footer-meta-info {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.footer-meta-info li {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  color: rgba(255, 255, 255, 0.85);
+  font-size: 0.95rem;
+  line-height: 1.4;
+}
+
+.meta-icon {
+  font-size: 1rem;
+  margin-top: 3px;
+  flex-shrink: 0;
+}
+
+.address-text {
+  text-align: left;
+}
+
+/* Round Circular Social Follow Icons parameters matched cleanly */
+.social-icon-row {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+
+.social-circle-link {
+  background-color: rgba(255, 255, 255, 0.25); /* Elegant translucent white backing circle overlay alpha */
+  color: #ffffff;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.1rem;
+  text-decoration: none;
+  transition: all 0.25s ease-in-out;
+  box-shadow: none !important; /* Total restriction guarantee against drop shadow layers */
+}
+
+.social-circle-link:hover {
+  background-color: #ffffff;
+  color: #995544; /* Inverse theme values perfectly on active mouse interaction states */
+}
+
+/* Clean Divider line separating layers */
+.footer-divider {
+  border: 0;
+  height: 1px;
+  background-color: rgba(255, 255, 255, 0.2); /* Soft blended contrast rules tracking design layout line */
+  margin: 15px 0 12px 0;
+}
+
+/* Copyright footer text baseline alignments styles */
+.footer-copyright-row {
+  text-align: center;
+}
+
+.footer-copyright-row p {
+  font-size: 0.85rem;
+  color: rgba(255, 255, 255, 0.7);
+  margin: 0;
+  font-weight: 400;
+}
+
+/* Screen Size Adaptive Media Breakdown Layout Adjustments */
+@media (max-width: 1100px) {
+  .footer-row {
+    grid-template-columns: repeat(3, 1fr); /* Collapses smoothly into three tracking sections */
+    row-gap: 30px;
+  }
+  
+  .brand-col {
+    grid-column: span 3;
+    align-items: left;
+    margin-bottom: 10px;
+  }
+}
+
+@media (max-width: 768px) {
+  .footer-row {
+    grid-template-columns: repeat(2, 1fr); /* Dual column split track for tablets handles */
+  }
+
+  .brand-col {
+    grid-column: span 2;
+  }
+
+  .contact-col {
+    grid-column: span 2;
+  }
+}
+
+@media (max-width: 480px) {
+  .footer-row {
+    grid-template-columns: 1fr; /* Pure vertical stack layout structural response logic on tiny handheld phone screen lines */
+    row-gap: 24px;
+  }
+
+  .brand-col, .contact-col {
+    grid-column: span 1;
+  }
+}

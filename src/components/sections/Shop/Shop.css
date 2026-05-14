@@ -1,0 +1,108 @@
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500&display=swap');
+
+.shop-page {
+  font-family: 'DM Sans', sans-serif;
+  letter-spacing: -4%;
+  background-color: #FFF1EA; /* Exact elegant cream base background from screenshot */
+  min-height: 100vh;
+}
+
+.shop-container {
+  padding: 20px 4%; /* Kept top/down at 20px */
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+.shop-header {
+  text-align: center;
+  padding: 20px 0;
+}
+
+.shop-tag {
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: #000000;
+  margin-bottom: 2px;
+  text-transform: capitalize;
+}
+
+.taprom-headline {
+  font-family: 'Taprom', serif;
+  font-size: clamp(2rem, 5vw, 3.2rem);
+  font-weight: 500;
+  color: #000000;
+  margin: 0 0 35px 0;
+}
+
+/* Product Grid */
+.product-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  column-gap: 24px;
+  row-gap: 40px;
+  margin-bottom: 60px;
+}
+
+/* Leopard Banner Styling */
+.shop-banner {
+  position: relative;
+  width: 100%;
+  height: 220px;
+  background-image: url('/banner.svg'); /* Leopard print asset */
+  background-size: cover;
+  background-position: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  margin-top: 40px;
+}
+
+.banner-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+
+.banner-logo {
+  height: 40px;
+  width: auto;
+  margin-bottom: 12px;
+  object-fit: contain;
+}
+
+.banner-text {
+  color: #ffffff;
+  font-size: clamp(1.8rem, 6vw, 2.2rem);
+  font-weight: 500;
+  letter-spacing: -4%;
+  margin: 0;
+}
+
+/* Responsiveness */
+@media (max-width: 1024px) {
+  .product-grid {
+    grid-template-columns: repeat(3, 1fr);
+    column-gap: 20px;
+  }
+}
+
+@media (max-width: 768px) {
+  .product-grid {
+    grid-template-columns: repeat(2, 1fr);
+    column-gap: 15px;
+    row-gap: 30px;
+  }
+  .shop-banner {
+    height: 160px;
+  }
+}
+
+@media (max-width: 480px) {
+  .product-grid {
+    grid-template-columns: 1fr;
+    row-gap: 25px;
+  }
+}

@@ -1,0 +1,124 @@
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500&display=swap');
+
+/* Main layout setup */
+.whyus-section {
+  background-color: #FFF1EA; /* Cream skin tone from image_929cb5.png */
+  font-family: 'DM Sans', sans-serif;
+  letter-spacing: -4%;
+  width: 100%;
+}
+
+/* Outer layout frame with strict top/bottom 20px padding constraints */
+.whyus-container {
+  max-width: 1300px;
+  margin: 0 auto;
+  padding: 20px 6%; /* Top/bottom fixed strictly at 20px */
+  display: grid;
+  grid-template-columns: 1.1fr 0.9fr; /* Left-weighted split layout symmetry */
+  align-items: center;
+  gap: 50px;
+}
+
+/* Left Intro Column Elements */
+.whyus-intro {
+  display: flex;
+  flex-direction: column;
+  text-align: left;
+}
+
+.whyus-tag {
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: #995544; /* Exact brown token specification */
+  margin: 0 0 6px 0;
+}
+
+.whyus-headline {
+  font-family: 'Taprom', serif;
+  font-size: clamp(2.2rem, 5.2vw, 3.5rem);
+  font-weight: 500;
+  color: #000000;
+  margin: 0 0 24px 0;
+  line-height: 1.15;
+}
+
+.whyus-subtext {
+  font-size: clamp(1.05rem, 2vw, 1.2rem);
+  color: #000000;
+  line-height: 1.5;
+  font-weight: 400;
+  margin: 0;
+}
+
+/* Right Feature Stack List */
+.whyus-features-list {
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+}
+
+.feature-item {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  text-align: left;
+}
+
+/* Icon containers styled identically to your reference images */
+.feature-icon-box {
+  background-color: #995544; /* Filled block design utilizing your brown tone */
+  color: #FFF1EA;
+  width: 52px;
+  height: 52px;
+  min-width: 52px;
+  border-radius: 8px; /* Slightly softened square corners */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.45rem;
+  box-shadow: none !important; /* Enforcing absolute lack of drop shadows globally */
+}
+
+/* Internal typography parameters for each row entry */
+.feature-text {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.feature-title {
+  font-family: 'Taprom', serif; /* Script typography choice matching the item list headers */
+  font-size: clamp(1.25rem, 2.5vw, 1.6rem);
+  font-weight: 500;
+  color: #000000;
+  margin: 0;
+}
+
+.feature-desc {
+  font-size: 0.95rem;
+  font-weight: 400;
+  color: #666666; /* Muted gray text color matching sample design screenshot */
+  margin: 0;
+  line-height: 1.4;
+}
+
+/* Screen Size Adaptive Media Breakpoints */
+@media (max-width: 992px) {
+  .whyus-container {
+    grid-template-columns: 1fr; /* Stacks seamlessly on smaller devices */
+    gap: 40px;
+    padding: 20px 5%;
+  }
+
+  .whyus-features-list {
+    gap: 26px;
+  }
+}
+
+@media (max-width: 480px) {
+  .feature-item {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 14px;
+  }
+}

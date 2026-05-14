@@ -1,0 +1,101 @@
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500&display=swap');
+
+/* Main component wrapper */
+.about-section {
+  background-color: #FFF1EA; /* Subtle luxury cream color from screenshot */
+  font-family: 'DM Sans', sans-serif;
+  letter-spacing: -4%;
+  width: 100%;
+}
+
+/* Constrained interior container matching the original 20px up/down padding requirement */
+.about-container {
+  max-width: 950px;
+  margin: 0 auto;
+  padding: 20px 6%; /* Top and bottom explicitly locked to 20px */
+  text-align: center;
+}
+
+/* Small tag text styling */
+.about-tag {
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: #995544; /* Applied the exact brown requested */
+  margin: 0 0 4px 0;
+}
+
+/* Large display script font */
+.about-headline {
+  font-family: 'Taprom', serif;
+  font-size: clamp(2rem, 5.5vw, 3.5rem);
+  font-weight: 500;
+  color: #000000;
+  margin: 0 0 28px 0;
+  line-height: 1.2;
+}
+
+/* Main typography layout paragraphs */
+.about-content {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+.about-content p {
+  font-size: clamp(1rem, 2vw, 1.15rem);
+  color: #000000;
+  line-height: 1.55;
+  font-weight: 400;
+  margin: 0;
+    text-align: center; /* Alignment perfectly tracking the screenshot style */
+}
+
+/* Interactive navigation CTA wrapper */
+.about-action-wrap {
+  margin-top: 30px;
+  display: flex;
+  justify-content: flex-start; /* Aligned along the left margin line with body text */
+}
+
+/* Solid frame button styling */
+.about-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 28px;
+  background-color: transparent;
+  border: 1px solid #995544; /* Clean crisp line structure using the brown token */
+  color: #995544;
+  font-weight: 500;
+  font-size: 0.95rem;
+  text-decoration: none;
+  letter-spacing: -4%;
+  transition: all 0.3s ease;
+  box-shadow: none !important; /* Strict constraint enforced across all logic */
+}
+
+.about-btn:hover {
+  background-color: #995544;
+  color: #FFF1EA;
+}
+
+.btn-icon {
+  font-size: 1.1rem;
+}
+
+/* Breakpoint responsiveness scaling */
+@media (max-width: 768px) {
+  .about-container {
+    padding: 20px 5%;
+  }
+  
+  .about-content {
+    gap: 14px;
+  }
+  
+  .about-content p {
+    text-align: left; /* Retains left read pattern across viewports */
+  }
+}

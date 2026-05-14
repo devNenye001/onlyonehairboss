@@ -1,0 +1,139 @@
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500&display=swap');
+
+/* Main system section parameters */
+.reviews-section {
+  background-color: #FFF1EA; /* Cream backdrop mirroring context screenshot files */
+  font-family: 'DM Sans', sans-serif;
+  letter-spacing: -4%;
+  width: 100%;
+}
+
+/* Master container aligning elements, clamping top/bottom padding to 20px */
+.reviews-container {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 20px 4%; /* Explicit top and bottom constraints locked to 20px */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* Header Text formatting wrappers */
+.reviews-header {
+  text-align: center;
+  margin-bottom: 30px;
+}
+
+.reviews-tag {
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: #995544; /* Specific brand tone */
+  margin: 0 0 2px 0;
+}
+
+.reviews-headline {
+  font-family: 'Taprom', serif; /* Script title alignment rule */
+  font-size: clamp(2rem, 5vw, 3.2rem);
+  font-weight: 500;
+  color: #000000;
+  margin: 0;
+}
+
+/* Sliding Window and Layout Grid Framework */
+.reviews-window {
+  width: 100%;
+  overflow: hidden;
+}
+
+.reviews-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+  width: 100%;
+}
+
+/* Solid Brown Individual Card Component — Absolutely NO shadows */
+.review-card {
+  background-color: #995544; /* Matches the color specified */
+  border-radius: 12px; /* Smooth rounded corners matching your layout reference */
+  padding: 35px 25px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  text-align: left;
+  min-height: 220px;
+  box-shadow: none !important; /* Strict constraint against drop shadow layers */
+}
+
+/* Star Array Parameters */
+.star-rating-row {
+  display: flex;
+  gap: 4px;
+  margin-bottom: 24px;
+}
+
+.star-icon {
+  color: #FFC107; /* Crisp gold tone */
+  font-size: 1.35rem;
+}
+
+/* Typography elements within the cards */
+.review-quote {
+  color: #ffffff;
+  font-size: 1.05rem;
+  line-height: 1.5;
+  font-weight: 400;
+  margin: 0 0 24px 0;
+}
+
+.review-author {
+  color: rgba(255, 255, 255, 0.75); /* Softened color for client name track */
+  font-size: 0.95rem;
+  font-weight: 400;
+  margin: 0;
+}
+
+/* Control Buttons Assembly — Matches the precise dark layout circle buttons */
+.reviews-controls {
+  display: flex;
+  gap: 12px;
+  margin-top: 25px;
+}
+
+.control-btn {
+  background-color: #3A3A3A; /* Dark graphite tone cloned from screenshot */
+  color: #ffffff;
+  border: none;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.4rem;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+  box-shadow: none !important; /* Strict formatting parameter guardrail */
+}
+
+.control-btn:hover {
+  background-color: #995544; /* Flips color profile on hover interaction */
+}
+
+/* Full device adaptability layouts */
+@media (max-width: 1024px) {
+  .reviews-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 680px) {
+  .reviews-grid {
+    grid-template-columns: 1fr; /* Compresses to a tidy single vertical grid card loop */
+  }
+  
+  .review-card {
+    padding: 30px 20px;
+    min-height: auto;
+  }
+}
