@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { motion as Motion, AnimatePresence } from 'framer-motion';
 import { HiOutlineShoppingBag, HiOutlineSearch, HiOutlineUser, HiMenu, HiX } from 'react-icons/hi';
@@ -8,6 +8,14 @@ import './Hero.css';
 
 const Hero = () => {
   const [isOpen, setIsOpen] = useState(false);
+  const videoRef = useRef(null);
+
+  useEffect(() => {
+    if (videoRef.current) {
+      videoRef.current.muted = true;
+      videoRef.current.play().catch(() => {});
+    }
+  }, []);
   const { cartCount } = useCart();
   const { user } = useAuth();
   const navigate = useNavigate();
@@ -37,7 +45,7 @@ const Hero = () => {
   return (
     <section className="hero-container">
       <div className="video-overlay"></div>
-      <video autoPlay loop muted playsInline className="bg-video">
+      <video ref={videoRef} autoPlay loop muted playsInline className="bg-video">
         <source src="/video.mp4" type="video/mp4" />
       </video>
 
