@@ -11,6 +11,7 @@ import Search from './pages/Search/Search';
 import Checkout from './pages/Checkout/Checkout';
 import OrderConfirmation from './pages/OrderConfirmation/OrderConfirmation';
 import Account from './pages/Account/Account';
+import ResetPassword from './pages/ResetPassword/ResetPassword';
 import NotFound from './pages/NotFound/NotFound';
 
 import AdminLogin from './pages/admin/AdminLogin';
@@ -38,6 +39,7 @@ function App() {
         <Route path="/checkout" element={<Checkout />} />
         <Route path="/order/:id" element={<OrderConfirmation />} />
         <Route path="/account" element={<Account />} />
+        <Route path="/reset-password" element={<ResetPassword />} />
 
         {/* Admin */}
         <Route path="/admin/login" element={<AdminLogin />} />
