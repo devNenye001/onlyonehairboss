@@ -72,8 +72,8 @@ const FeaturedCollection = () => {
           variants={fadeUp}
           custom={2}
         >
-          {featured.images?.[0] ? (
-            <img src={featured.images[0]} alt={featured.name} className="featured-video" />
+          {featured.images ? (
+            <img src={featured.images} alt={featured.name} className="featured-video" />
           ) : (
             <video
               className="featured-video"

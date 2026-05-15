@@ -35,7 +35,7 @@ const Search = () => {
     if (input.trim()) setSearchParams({ q: input.trim() });
   };
 
-  const toCard = p => ({ id: p.id, name: p.name, price: p.price, image: p.images?.[0] ?? '' });
+  const toCard = p => ({ id: p.id, name: p.name, price: p.price, image: p.images ?? '' });
 
   return (
     <div className="search-page">

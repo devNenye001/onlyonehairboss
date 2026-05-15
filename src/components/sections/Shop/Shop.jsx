@@ -28,7 +28,7 @@ const Shop = () => {
       .limit(8)
       .then(({ data }) => {
         if (data && data.length > 0) {
-          setProducts(data.map(p => ({ ...p, image: p.images?.[0] || '/wig1.svg' })));
+          setProducts(data.map(p => ({ ...p, image: p.images || '/wig1.svg' })));
         }
       });
   }, []);

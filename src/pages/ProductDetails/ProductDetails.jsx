@@ -42,7 +42,7 @@ const ProductDetails = () => {
       id: product.id,
       name: product.name,
       price: product.price,
-      image: product.images?.[0] ?? product.image ?? '',
+      image: (Array.isArray(product.images) ? product.images[0] : product.images) ?? product.image ?? '',
     });
     setAdded(true);
     setTimeout(() => setAdded(false), 2000);
@@ -56,7 +56,9 @@ const ProductDetails = () => {
     </div>
   );
 
-  const images = Array.isArray(product.images) && product.images.length ? product.images : [product.image ?? '/wig1.svg'];
+  const images = Array.isArray(product.images) ? product.images
+    : product.images ? [product.images]
+    : [product.image ?? '/wig1.svg'];
 
   return (
     <div className="pd-page">

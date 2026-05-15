@@ -46,7 +46,7 @@ const ShopPage = () => {
     id: p.id,
     name: p.name,
     price: p.price,
-    image: Array.isArray(p.images) ? p.images[0] : p.image,
+    image: p.images || p.image,
   });
 
   return (

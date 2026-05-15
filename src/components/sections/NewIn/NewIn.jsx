@@ -23,7 +23,7 @@ const NewIn = () => {
       .limit(4)
       .then(({ data }) => {
         if (data && data.length > 0) {
-          setNewArrivals(data.map(p => ({ ...p, image: p.images?.[0] || '/wig1.svg' })));
+          setNewArrivals(data.map(p => ({ ...p, image: p.images || '/wig1.svg' })));
         }
       });
   }, []);
