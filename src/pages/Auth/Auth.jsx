@@ -27,8 +27,19 @@ const Auth = () => {
       ? await signIn(form.email, form.password)
       : await signUp(form.email, form.password, form.fullName);
     setLoading(false);
-    if (err) setError(err.message);
-    else navigate(redirect);
+    if (err) {
+      const msg = err.message || '';
+      if (msg.toLowerCase().includes('invalid login credentials'))
+        setError('Incorrect email or password. If you don\'t have an account, click Sign Up below.');
+      else if (msg.toLowerCase().includes('email not confirmed'))
+        setError('Please check your email and confirm your account first.');
+      else if (msg.toLowerCase().includes('user already registered'))
+        setError('An account with this email already exists. Try signing in instead.');
+      else
+        setError(msg);
+    } else {
+      navigate(redirect);
+    }
   };
 
   const handleGoogle = async () => {
