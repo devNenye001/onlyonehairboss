@@ -38,7 +38,7 @@ const Hero = () => {
     <section className="hero-container">
       <div className="video-overlay"></div>
       <video autoPlay loop muted playsInline className="bg-video">
-        <source  mute src="/video.mp4" type="video/mp4" />
+        <source src="/video.mp4" type="video/mp4" />
       </video>
 
       <div className="announcement-bar">
