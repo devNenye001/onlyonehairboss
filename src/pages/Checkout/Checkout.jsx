@@ -7,6 +7,7 @@ import Footer from '../../components/Footer/Footer';
 import { useCart } from '../../context/CartContext';
 import { useAuth } from '../../context/AuthContext';
 import { supabase } from '../../utils/supabase/client';
+import { sendEmail } from '../../utils/email';
 import './Checkout.css';
 
 const PAYSTACK_KEY = import.meta.env.VITE_PAYSTACK_PUBLIC_KEY;
@@ -86,6 +87,18 @@ const Checkout = () => {
     }));
 
     await supabase.from('order_items').insert(items);
+
+    sendEmail('order_confirmation', {
+      email: form.email,
+      name: form.fullName,
+      orderId: order.id.slice(0, 8).toUpperCase(),
+      total: cartTotal,
+      items: cart.map(i => ({ name: i.name, quantity: i.quantity, price: i.price })),
+      address: form.address,
+      city: form.city,
+      state: form.state,
+    });
+
     clearCart();
     navigate(`/order/${order.id}`);
   };

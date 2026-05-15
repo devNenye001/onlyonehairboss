@@ -1,6 +1,7 @@
 import { createContext, useContext, useEffect, useState } from 'react';
 import { supabase } from '../utils/supabase/client';
 import { syncSignupMetadata } from '../utils/supabase/billingApi';
+import { sendEmail } from '../utils/email';
 
 const AuthContext = createContext(null);
 
@@ -53,8 +54,9 @@ export const AuthProvider = ({ children }) => {
       password,
       options: { data: { full_name: fullName } },
     });
-    if (!error && data.session) {
+    if (!error && data.user) {
       syncSignupMetadata({ full_name: fullName }).catch(() => {});
+      sendEmail('welcome', { email: data.user.email, name: fullName || data.user.email });
     }
     return { data, error };
   };

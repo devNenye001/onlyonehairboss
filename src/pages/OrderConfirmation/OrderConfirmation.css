@@ -28,18 +28,11 @@
 .oc-item-name { font-size:0.92rem; font-weight:500; color:#000; margin:0 0 4px; }
 .oc-item-meta { font-size:0.83rem; color:#888; margin:0; }
 
-.oc-payment-reminder {
-  width:100%; background:rgba(153,85,68,0.07); border:1px solid rgba(153,85,68,0.18);
-  padding:20px 24px; display:flex; flex-direction:column; gap:12px; align-items:center;
-  text-align:center; margin-top:8px;
+.oc-processing-note {
+  width:100%; background:rgba(39,174,96,0.07); border:1px solid rgba(39,174,96,0.2);
+  padding:16px 24px; text-align:center; margin-top:8px;
 }
-.oc-payment-reminder p { font-size:0.92rem; color:#555; margin:0; }
-.oc-whatsapp-btn {
-  padding:12px 28px; background:#25D366; color:#fff;
-  text-decoration:none; font-weight:500; font-size:0.92rem;
-  transition:opacity 0.2s;
-}
-.oc-whatsapp-btn:hover { opacity:0.85; }
+.oc-processing-note p { font-size:0.92rem; color:#27ae60; margin:0; }
 
 .oc-actions { margin-top:8px; }
 .oc-shop-btn {

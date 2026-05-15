@@ -1,0 +1,95 @@
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500&display=swap');
+
+.account-page { background: #FFF1EA; font-family: 'DM Sans', sans-serif; min-height: 100vh; }
+.account-container { max-width: 800px; margin: 0 auto; padding: 48px 5% 80px; }
+
+.account-header {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  background: rgba(255,255,255,0.5);
+  border: 1px solid rgba(153,85,68,0.12);
+  padding: 28px 32px;
+  margin-bottom: 40px;
+  flex-wrap: wrap;
+}
+
+.account-avatar-lg {
+  width: 60px; height: 60px; border-radius: 50%;
+  background: #995544; color: #FFF1EA;
+  font-size: 1.5rem; font-weight: 600;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+}
+
+.account-info { flex: 1; min-width: 0; }
+.account-tag { font-size: 0.78rem; font-weight: 500; color: #995544; text-transform: uppercase; letter-spacing: 0.06em; margin: 0 0 4px; }
+.account-name { font-family: 'Taprom', serif; font-size: clamp(1.3rem, 3vw, 1.9rem); font-weight: 400; color: #000; margin: 0 0 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.account-email { font-size: 0.9rem; color: #666; margin: 0 0 2px; }
+.account-since { font-size: 0.82rem; color: #aaa; margin: 0; }
+
+.account-signout-btn {
+  display: flex; align-items: center; gap: 8px;
+  padding: 10px 22px;
+  border: 1px solid rgba(153,85,68,0.3);
+  background: transparent; color: #995544;
+  font-family: 'DM Sans', sans-serif; font-size: 0.9rem; font-weight: 500;
+  cursor: pointer; transition: all 0.2s ease;
+  white-space: nowrap;
+}
+.account-signout-btn:hover { background: #995544; color: #FFF1EA; }
+
+.account-section-title { font-family: 'Taprom', serif; font-size: 1.5rem; font-weight: 400; color: #000; margin: 0 0 20px; }
+
+.account-loading { font-size: 0.95rem; color: #888; }
+
+.account-empty-orders {
+  display: flex; flex-direction: column; align-items: center; gap: 14px;
+  padding: 56px 0; color: #888; font-size: 0.95rem;
+}
+.account-empty-icon { font-size: 2.8rem; color: rgba(153,85,68,0.25); }
+.account-shop-link {
+  display: flex; align-items: center; gap: 6px;
+  color: #995544; text-decoration: none; font-weight: 500; font-size: 0.92rem;
+  transition: opacity 0.2s;
+}
+.account-shop-link:hover { opacity: 0.7; }
+
+.account-orders-list { display: flex; flex-direction: column; gap: 2px; }
+
+.account-order-row {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 18px 22px;
+  background: rgba(255,255,255,0.5);
+  border: 1px solid rgba(153,85,68,0.1);
+  text-decoration: none;
+  transition: background 0.2s ease;
+}
+.account-order-row:hover { background: rgba(255,255,255,0.85); }
+
+.account-order-id { font-size: 0.93rem; font-weight: 500; color: #000; margin: 0 0 4px; font-family: monospace; letter-spacing: 0.05em; }
+.account-order-date { font-size: 0.82rem; color: #888; margin: 0; }
+
+.account-order-right { display: flex; align-items: center; gap: 14px; }
+
+.account-order-status {
+  font-size: 0.78rem; font-weight: 500; text-transform: capitalize;
+  padding: 3px 10px; border-radius: 20px;
+}
+.account-status-paid      { background: rgba(39,174,96,0.12);  color: #27ae60; }
+.account-status-pending   { background: rgba(230,126,34,0.12); color: #e67e22; }
+.account-status-processing { background: rgba(52,152,219,0.12); color: #3498db; }
+.account-status-shipped   { background: rgba(52,152,219,0.12); color: #3498db; }
+.account-status-delivered { background: rgba(39,174,96,0.12);  color: #27ae60; }
+.account-status-cancelled { background: rgba(192,57,43,0.12);  color: #c0392b; }
+
+.account-order-total { font-size: 0.92rem; font-weight: 500; color: #000; }
+.account-order-arrow { font-size: 1rem; color: #995544; flex-shrink: 0; }
+
+@media (max-width: 600px) {
+  .account-header { padding: 20px; gap: 16px; }
+  .account-signout-btn { width: 100%; justify-content: center; }
+  .account-order-row { padding: 14px 16px; }
+  .account-order-right { gap: 10px; }
+  .account-order-status { display: none; }
+}

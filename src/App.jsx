@@ -10,6 +10,7 @@ import Auth from './pages/Auth/Auth';
 import Search from './pages/Search/Search';
 import Checkout from './pages/Checkout/Checkout';
 import OrderConfirmation from './pages/OrderConfirmation/OrderConfirmation';
+import Account from './pages/Account/Account';
 import NotFound from './pages/NotFound/NotFound';
 
 import AdminLogin from './pages/admin/AdminLogin';
@@ -36,6 +37,7 @@ function App() {
         <Route path="/search" element={<Search />} />
         <Route path="/checkout" element={<Checkout />} />
         <Route path="/order/:id" element={<OrderConfirmation />} />
+        <Route path="/account" element={<Account />} />
 
         {/* Admin */}
         <Route path="/admin/login" element={<AdminLogin />} />

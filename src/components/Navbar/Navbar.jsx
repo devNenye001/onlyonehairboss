@@ -47,7 +47,7 @@ const Navbar = () => {
         <div className="page-nav-icons">
           <HiOutlineSearch className="page-icon hide-mobile" onClick={() => navigate('/search')} />
           {user ? (
-            <div className="nav-avatar hide-mobile" onClick={() => navigate('/auth')} title={user.user_metadata?.full_name || user.email}>
+            <div className="nav-avatar hide-mobile" onClick={() => navigate('/account')} title={user.user_metadata?.full_name || user.email}>
               {userInitial}
             </div>
           ) : (

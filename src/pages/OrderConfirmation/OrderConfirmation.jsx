@@ -79,16 +79,8 @@ const OrderConfirmation = () => {
             </div>
           )}
 
-          <div className="oc-payment-reminder">
-            <p>Please complete your payment via bank transfer and send proof to our WhatsApp.</p>
-            <a
-              href="https://wa.me/2349069303261"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="oc-whatsapp-btn"
-            >
-              Send Payment Proof on WhatsApp
-            </a>
+          <div className="oc-processing-note">
+            <p>Payment received via Paystack. Your order will be processed within 3 working days — check your email for confirmation.</p>
           </div>
 
           <div className="oc-actions">
