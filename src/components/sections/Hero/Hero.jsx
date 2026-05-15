@@ -12,6 +12,11 @@ const Hero = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
 
+  const userInitial = user
+    ? (user.user_metadata?.full_name || user.user_metadata?.name || user.email || 'U')
+        .trim().charAt(0).toUpperCase()
+    : null;
+
   const navLinks = [
     { name: 'Home', path: '/' },
     { name: 'Shop', path: '/shop' },
@@ -91,7 +96,13 @@ const Hero = () => {
 
         <div className="nav-icons">
           <HiOutlineSearch className="icon hide-mobile" onClick={() => navigate('/search')} />
-          <HiOutlineUser className="icon hide-mobile" onClick={() => navigate(user ? '/account' : '/auth')} />
+          {user ? (
+            <div className="hero-avatar hide-mobile" onClick={() => navigate('/account')} title={user.user_metadata?.full_name || user.email}>
+              {userInitial}
+            </div>
+          ) : (
+            <HiOutlineUser className="icon hide-mobile" onClick={() => navigate('/auth')} />
+          )}
           <div className="cart-icon" onClick={() => navigate('/cart')}>
             <HiOutlineShoppingBag className="icon" />
             {cartCount > 0 && <span className="cart-count">{cartCount}</span>}

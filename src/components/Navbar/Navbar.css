@@ -94,6 +94,23 @@
   line-height: 1;
 }
 
+.nav-avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: #995544;
+  color: #FFF1EA;
+  font-size: 0.88rem;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: opacity 0.2s ease;
+  flex-shrink: 0;
+}
+.nav-avatar:hover { opacity: 0.8; }
+
 .page-mobile-toggle {
   display: none;
   font-size: 1.8rem;

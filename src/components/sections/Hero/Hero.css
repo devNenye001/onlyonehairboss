@@ -187,6 +187,24 @@
   line-height: 1;
 }
 
+.hero-avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.5);
+  color: var(--white);
+  font-size: 0.88rem;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: opacity 0.2s ease;
+  flex-shrink: 0;
+}
+.hero-avatar:hover { opacity: 0.75; }
+
 /* Mobile hamburger */
 .mobile-toggle {
   display: none;

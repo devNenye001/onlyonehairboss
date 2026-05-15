@@ -12,6 +12,11 @@ const Navbar = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
 
+  const userInitial = user
+    ? (user.user_metadata?.full_name || user.user_metadata?.name || user.email || 'U')
+        .trim().charAt(0).toUpperCase()
+    : null;
+
   const navLinks = [
     { name: 'Home', path: '/' },
     { name: 'Shop', path: '/shop' },
@@ -41,7 +46,13 @@ const Navbar = () => {
 
         <div className="page-nav-icons">
           <HiOutlineSearch className="page-icon hide-mobile" onClick={() => navigate('/search')} />
-          <HiOutlineUser className="page-icon hide-mobile" onClick={() => navigate(user ? '/account' : '/auth')} />
+          {user ? (
+            <div className="nav-avatar hide-mobile" onClick={() => navigate('/auth')} title={user.user_metadata?.full_name || user.email}>
+              {userInitial}
+            </div>
+          ) : (
+            <HiOutlineUser className="page-icon hide-mobile" onClick={() => navigate('/auth')} />
+          )}
           <div className="page-cart-icon" onClick={() => navigate('/cart')}>
             <HiOutlineShoppingBag className="page-icon" />
             {cartCount > 0 && <span className="page-cart-count">{cartCount}</span>}

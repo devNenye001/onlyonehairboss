@@ -1,12 +1,15 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { motion as Motion } from 'framer-motion';
+import { usePaystackPayment } from 'react-paystack';
 import Navbar from '../../components/Navbar/Navbar';
 import Footer from '../../components/Footer/Footer';
 import { useCart } from '../../context/CartContext';
 import { useAuth } from '../../context/AuthContext';
 import { supabase } from '../../utils/supabase/client';
 import './Checkout.css';
+
+const PAYSTACK_KEY = import.meta.env.VITE_PAYSTACK_PUBLIC_KEY;
 
 const Checkout = () => {
   const { cart, cartTotal, clearCart } = useCart();
@@ -15,55 +18,95 @@ const Checkout = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [form, setForm] = useState({
-    fullName: user?.user_metadata?.full_name ?? '',
-    email: user?.email ?? '',
-    phone: '',
-    address: '',
-    city: '',
-    state: '',
-    notes: '',
+    fullName: user?.user_metadata?.full_name ?? user?.user_metadata?.name ?? '',
+    email:    user?.email ?? '',
+    phone:    '',
+    address:  '',
+    city:     '',
+    state:    '',
+    notes:    '',
   });
 
   const handleChange = e => setForm(f => ({ ...f, [e.target.name]: e.target.value }));
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    if (!cart.length) return;
+  // Paystack config — amount is in kobo (1 NGN = 100 kobo)
+  const paystackConfig = {
+    reference:  `ohb_${Date.now()}`,
+    email:      form.email || 'guest@onlyonehairboss.com',
+    amount:     cartTotal * 100,
+    publicKey:  PAYSTACK_KEY || '',
+    currency:   'NGN',
+    label:      form.fullName,
+    metadata: {
+      custom_fields: [
+        { display_name: 'Customer Name', variable_name: 'full_name', value: form.fullName },
+        { display_name: 'Phone',         variable_name: 'phone',     value: form.phone   },
+      ],
+    },
+  };
+
+  const initializePayment = usePaystackPayment(paystackConfig);
+
+  const saveOrder = async (paymentRef) => {
     setLoading(true);
     setError('');
 
     const { data: order, error: orderErr } = await supabase
       .from('orders')
       .insert({
-        user_id: user?.id ?? null,
-        full_name: form.fullName,
-        email: form.email,
-        phone: form.phone,
-        address: form.address,
-        city: form.city,
-        state: form.state,
-        notes: form.notes,
-        total: cartTotal,
-        status: 'pending',
-        payment_method: 'transfer',
+        user_id:        user?.id ?? null,
+        full_name:      form.fullName,
+        email:          form.email,
+        phone:          form.phone,
+        address:        form.address,
+        city:           form.city,
+        state:          form.state,
+        notes:          form.notes,
+        total:          cartTotal,
+        status:         'paid',
+        payment_method: 'paystack',
+        payment_proof:  paymentRef,
       })
       .select()
       .single();
 
-    if (orderErr) { setError('Failed to place order. Please try again.'); setLoading(false); return; }
+    if (orderErr) {
+      setError('Payment received but order save failed. Contact support with ref: ' + paymentRef);
+      setLoading(false);
+      return;
+    }
 
     const items = cart.map(i => ({
-      order_id: order.id,
-      product_id: typeof i.id === 'string' && i.id.includes('-') ? i.id : null,
-      product_name: i.name,
+      order_id:      order.id,
+      product_id:    typeof i.id === 'string' && i.id.includes('-') ? i.id : null,
+      product_name:  i.name,
       product_image: i.image ?? '',
-      quantity: i.quantity,
-      price: i.price,
+      quantity:      i.quantity,
+      price:         i.price,
     }));
 
     await supabase.from('order_items').insert(items);
     clearCart();
     navigate(`/order/${order.id}`);
+  };
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    if (!cart.length) return;
+    if (!PAYSTACK_KEY) {
+      setError('Payment is not configured yet. Contact the store owner.');
+      return;
+    }
+    setError('');
+
+    initializePayment({
+      onSuccess: (response) => {
+        saveOrder(response.reference || response.trxref);
+      },
+      onClose: () => {
+        // User closed the Paystack modal — do nothing
+      },
+    });
   };
 
   if (!cart.length) return (
@@ -125,23 +168,15 @@ const Checkout = () => {
               <textarea name="notes" value={form.notes} onChange={handleChange} rows="3" placeholder="Any special instructions..." />
             </div>
 
-            <div className="co-payment-info">
-              <h3 className="form-section-title">Payment — Bank Transfer</h3>
-              <p>After placing your order, transfer the total amount to:</p>
-              <div className="bank-details">
-                <p><strong>Bank:</strong> Access Bank</p>
-                <p><strong>Account Name:</strong> OnlyOne Hairboss</p>
-                <p><strong>Account Number:</strong> 0123456789</p>
-                <p><strong>Amount:</strong> ₦{cartTotal.toLocaleString()}</p>
-              </div>
-              <p className="payment-note">Send your payment proof via WhatsApp after checkout.</p>
-            </div>
-
             {error && <p className="co-error">{error}</p>}
 
             <button type="submit" className="co-place-btn" disabled={loading}>
-              {loading ? 'Placing Order...' : `Place Order — ₦${cartTotal.toLocaleString()}`}
+              {loading ? 'Saving order...' : `Pay ₦${cartTotal.toLocaleString()} with Paystack`}
             </button>
+
+            <p className="co-secure-note">
+              Secured by Paystack · Cards, Bank Transfer, USSD accepted
+            </p>
           </Motion.form>
 
           {/* Order Summary */}
