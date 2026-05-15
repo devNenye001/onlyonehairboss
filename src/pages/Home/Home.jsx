@@ -16,9 +16,13 @@ const Home = () => {
   const { hash } = useLocation();
 
   useEffect(() => {
-    if (hash) {
+    // Skip OAuth callback hashes — they contain tokens, not section IDs
+    if (!hash || hash.includes('access_token') || hash.includes('refresh_token')) return;
+    try {
       const el = document.querySelector(hash);
       if (el) setTimeout(() => el.scrollIntoView({ behavior: 'smooth' }), 100);
+    } catch {
+      // Ignore invalid selectors
     }
   }, [hash]);
 
