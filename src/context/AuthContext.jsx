@@ -5,7 +5,7 @@ import { syncSignupMetadata } from '../utils/supabase/billingApi';
 const AuthContext = createContext(null);
 
 export const AuthProvider = ({ children }) => {
-  const [user, setUser] = useState(null);
+  const [user, setUser]       = useState(null);
   const [profile, setProfile] = useState(null);
   const [loading, setLoading] = useState(true);
 
@@ -15,29 +15,34 @@ export const AuthProvider = ({ children }) => {
       .select('*')
       .eq('id', userId)
       .single();
-    setProfile(data);
+    setProfile(data ?? null);
   };
 
   useEffect(() => {
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setUser(session?.user ?? null);
-      if (session?.user) fetchProfile(session.user.id);
-      setLoading(false);
-    });
+    // Register onAuthStateChange FIRST.
+    // Supabase always fires INITIAL_SESSION when this is registered, which
+    // covers existing sessions (page refresh) and OAuth redirects
+    // (the #access_token fragment is processed before this callback fires).
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(
+      (event, session) => {
+        const currentUser = session?.user ?? null;
+        setUser(currentUser);
 
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
-      setUser(session?.user ?? null);
-      if (session?.user) {
-        fetchProfile(session.user.id);
-        // For Google OAuth (and any first SIGNED_IN), sync full_name server-side.
-        // The call is fire-and-forget; errors are silently ignored here.
-        if (event === 'SIGNED_IN') {
-          syncSignupMetadata({}).catch(() => {});
+        if (currentUser) {
+          fetchProfile(currentUser.id);
+          // SIGNED_IN fires for both email/password and Google OAuth logins
+          if (event === 'SIGNED_IN') {
+            syncSignupMetadata({}).catch(() => {});
+          }
+        } else {
+          setProfile(null);
         }
-      } else {
-        setProfile(null);
+
+        // Stop loading after the first auth event regardless of outcome.
+        // This covers: no session, existing session, and OAuth redirect.
+        setLoading(false);
       }
-    });
+    );
 
     return () => subscription.unsubscribe();
   }, []);
@@ -48,7 +53,6 @@ export const AuthProvider = ({ children }) => {
       password,
       options: { data: { full_name: fullName } },
     });
-    // Sync metadata server-side after successful signup
     if (!error && data.session) {
       syncSignupMetadata({ full_name: fullName }).catch(() => {});
     }
@@ -63,7 +67,11 @@ export const AuthProvider = ({ children }) => {
   const signInWithGoogle = async () => {
     const { data, error } = await supabase.auth.signInWithOAuth({
       provider: 'google',
-      options: { redirectTo: `${window.location.origin}/` },
+      options: {
+        // After Google authenticates, Supabase redirects here.
+        // This URL must be in: Supabase Dashboard → Auth → URL Configuration → Redirect URLs
+        redirectTo: window.location.origin,
+      },
     });
     return { data, error };
   };
