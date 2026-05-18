@@ -1,10 +1,9 @@
 
 import { useState, useEffect } from 'react';
 import { motion as Motion } from 'framer-motion';
-import { Link } from 'react-router-dom';
-import { HiOutlineArrowRight } from 'react-icons/hi';
 import './FeaturedCollection.css';
 import { supabase } from '../../../utils/supabase/client';
+import { useCart } from '../../../context/CartContext';
 
 const FALLBACK = {
   id: 'luxury-deep-wave',
@@ -15,11 +14,19 @@ const FALLBACK = {
 
 const FeaturedCollection = () => {
   const [featured, setFeatured] = useState(FALLBACK);
+  const [added, setAdded] = useState(false);
+  const { addItem } = useCart();
+
+  const handleAddToCart = () => {
+    addItem({ id: featured.id, name: featured.name, price: featured.price, image: featured.images });
+    setAdded(true);
+    setTimeout(() => setAdded(false), 1800);
+  };
 
   useEffect(() => {
     supabase
       .from('products')
-      .select('id, name, description, images')
+      .select('id, name, description, images, price')
       .eq('is_featured', true)
       .eq('in_stock', true)
       .limit(1)
@@ -105,9 +112,9 @@ const FeaturedCollection = () => {
           variants={fadeUp}
           custom={4}
         >
-          <Link to={`/product/${featured.id}`} className="order-now-btn">
-            Order Now <HiOutlineArrowRight className="btn-arrow-icon" />
-          </Link>
+          <button onClick={handleAddToCart} className="order-now-btn">
+            {added ? 'Added to Cart!' : 'Add to Cart'}
+          </button>
         </Motion.div>
 
       </div>
