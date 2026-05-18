@@ -34,12 +34,24 @@
   font-family:'DM Sans',sans-serif; font-size:0.95rem; color:#000; outline:none; transition:border-color 0.2s;
 }
 .admin-field input:focus { border-color:#995544; }
+.admin-label-row { display:flex; justify-content:space-between; align-items:center; }
+.admin-forgot-link {
+  background:none; border:none; color:#995544; font-size:0.82rem;
+  font-family:'DM Sans',sans-serif; cursor:pointer; padding:0;
+  text-decoration:underline; opacity:0.8;
+}
+.admin-forgot-link:hover { opacity:1; }
+.admin-back-link {
+  font-size:0.85rem; color:#995544; text-decoration:none;
+  margin-top:16px; background:none; border:none; cursor:pointer;
+  font-family:'DM Sans',sans-serif;
+}
+.admin-back-link:hover { text-decoration:underline; }
 .admin-error { font-size:0.87rem; color:#c0392b; background:rgba(192,57,43,0.08); padding:10px 14px; margin:0; }
+.admin-success { font-size:0.87rem; color:#27ae60; background:rgba(39,174,96,0.08); padding:10px 14px; margin:0; }
 .admin-login-btn {
   padding:14px; background:#995544; border:1px solid #995544; color:#FFF1EA;
   font-family:'DM Sans',sans-serif; font-size:0.97rem; font-weight:500; cursor:pointer; transition:all 0.3s ease;
 }
 .admin-login-btn:hover { background:transparent; color:#995544; }
 .admin-login-btn:disabled { opacity:0.6; cursor:not-allowed; }
-.admin-back-link { font-size:0.85rem; color:#995544; text-decoration:none; margin-top:16px; }
-.admin-back-link:hover { text-decoration:underline; }
