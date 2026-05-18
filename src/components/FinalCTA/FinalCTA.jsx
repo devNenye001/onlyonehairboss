@@ -35,7 +35,7 @@ const FinalCTA = () => {
           </p>
           
           <div className="cta-action-wrap">
-            <Link to="/contact" className="cta-order-btn">
+            <Link to="/shop" className="cta-order-btn">
               Order Now <HiOutlineArrowRight className="cta-btn-arrow" />
             </Link>
           </div>
