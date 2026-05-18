@@ -44,7 +44,7 @@ const Cart = () => {
                 <img src={item.image} alt={item.name} className="cart-item-img" />
                 <div className="cart-item-info">
                   <p className="cart-item-name">{item.name}</p>
-                  <p className="cart-item-price">₦{item.price.toLocaleString()}</p>
+                  <p className="cart-item-price">₦{(item.price ?? 0).toLocaleString()}</p>
                   <div className="cart-qty-row">
                     <button className="qty-btn" onClick={() => updateQty(item.id, item.quantity - 1)}>−</button>
                     <span className="qty-val">{item.quantity}</span>
@@ -52,7 +52,7 @@ const Cart = () => {
                   </div>
                 </div>
                 <div className="cart-item-right">
-                  <p className="cart-item-subtotal">₦{(item.price * item.quantity).toLocaleString()}</p>
+                  <p className="cart-item-subtotal">₦{((item.price ?? 0) * item.quantity).toLocaleString()}</p>
                   <button className="cart-remove-btn" onClick={() => removeItem(item.id)}>
                     <HiOutlineTrash />
                   </button>
