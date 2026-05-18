@@ -16,11 +16,26 @@ const ResetPassword = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    // Supabase fires PASSWORD_RECOVERY when the reset link is visited
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((event) => {
-      if (event === 'PASSWORD_RECOVERY') setReady(true);
+    let mounted = true;
+
+    // Case 1: token already processed before component mounted — check hash + session
+    const params = new URLSearchParams(window.location.hash.replace('#', '?').slice(1));
+    if (params.get('type') === 'recovery') {
+      setReady(true);
+      return;
+    }
+
+    // Case 2: session already exists (token was processed just before mount)
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      if (mounted && session) setReady(true);
     });
-    return () => subscription.unsubscribe();
+
+    // Case 3: event fires after mount
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event) => {
+      if (mounted && event === 'PASSWORD_RECOVERY') setReady(true);
+    });
+
+    return () => { mounted = false; subscription.unsubscribe(); };
   }, []);
 
   const handleSubmit = async (e) => {
