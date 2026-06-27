@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { motion as Motion, AnimatePresence } from 'framer-motion';
 import { HiOutlineShoppingBag, HiOutlineSearch, HiOutlineUser, HiMenu, HiX } from 'react-icons/hi';
@@ -8,14 +8,6 @@ import './Hero.css';
 
 const Hero = () => {
   const [isOpen, setIsOpen] = useState(false);
-  const videoRef = useRef(null);
-
-  useEffect(() => {
-    if (videoRef.current) {
-      videoRef.current.muted = true;
-      videoRef.current.play().catch(() => {});
-    }
-  }, []);
   const { cartCount } = useCart();
   const { user } = useAuth();
   const navigate = useNavigate();
@@ -45,9 +37,7 @@ const Hero = () => {
   return (
     <section className="hero-container">
       <div className="video-overlay"></div>
-      <video ref={videoRef} autoPlay loop muted playsInline className="bg-video">
-        <source src="/video.mp4" type="video/mp4" />
-      </video>
+      <img src="/slideshow1.png" alt="Hero Background" className="bg-video" />
 
       <div className="announcement-bar">
         Please note that order processing takes 3 working days.

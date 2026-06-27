@@ -4,7 +4,8 @@
 
 import { supabase } from './client'
 
-const FUNCTIONS_URL = import.meta.env.VITE_SUPABASE_URL + '/functions/v1'
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
+const FUNCTIONS_URL = `${API_URL}/functions`;
 
 // ── Internal: get the current user's JWT for Authorization header ─────────────
 const getBearerToken = async () => {

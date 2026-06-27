@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { motion as Motion } from 'framer-motion';
-import { usePaystackPayment } from 'react-paystack';
+import { useFlutterwave, closePaymentModal } from 'flutterwave-react-v3';
 import Navbar from '../../components/Navbar/Navbar';
 import Footer from '../../components/Footer/Footer';
 import { useCart } from '../../context/CartContext';
@@ -10,7 +10,7 @@ import { supabase } from '../../utils/supabase/client';
 import { sendEmail } from '../../utils/email';
 import './Checkout.css';
 
-const PAYSTACK_KEY = import.meta.env.VITE_PAYSTACK_PUBLIC_KEY;
+const FLUTTERWAVE_KEY = import.meta.env.VITE_FLUTTERWAVE_PUBLIC_KEY;
 
 const Checkout = () => {
   const { cart, cartTotal, clearCart } = useCart();
@@ -30,23 +30,26 @@ const Checkout = () => {
 
   const handleChange = e => setForm(f => ({ ...f, [e.target.name]: e.target.value }));
 
-  // Paystack config — amount is in kobo (1 NGN = 100 kobo)
-  const paystackConfig = {
-    reference:  `ohb_${Date.now()}`,
-    email:      form.email || 'guest@onlyonehairboss.com',
-    amount:     cartTotal * 100,
-    publicKey:  PAYSTACK_KEY || '',
+  // Flutterwave config
+  const flutterwaveConfig = {
+    public_key: FLUTTERWAVE_KEY || '',
+    tx_ref:     `ohb_${Date.now()}`,
+    amount:     cartTotal,
     currency:   'NGN',
-    label:      form.fullName,
-    metadata: {
-      custom_fields: [
-        { display_name: 'Customer Name', variable_name: 'full_name', value: form.fullName },
-        { display_name: 'Phone',         variable_name: 'phone',     value: form.phone   },
-      ],
+    payment_options: 'card,ussd,account',
+    customer: {
+      email:        form.email || 'guest@onlyonehairboss.com',
+      phone_number: form.phone,
+      name:         form.fullName,
+    },
+    customizations: {
+      title:       'OnlyOne Hairboss',
+      description: 'Payment for wigs order',
+      logo:        window.location.origin + '/logo1.svg',
     },
   };
 
-  const initializePayment = usePaystackPayment(paystackConfig);
+  const handleFlutterPayment = useFlutterwave(flutterwaveConfig);
 
   const saveOrder = async (paymentRef) => {
     setLoading(true);
@@ -65,7 +68,7 @@ const Checkout = () => {
         notes:          form.notes,
         total:          cartTotal,
         status:         'paid',
-        payment_method: 'paystack',
+        payment_method: 'flutterwave',
         payment_proof:  paymentRef,
       })
       .select()
@@ -106,18 +109,23 @@ const Checkout = () => {
   const handleSubmit = (e) => {
     e.preventDefault();
     if (!cart.length) return;
-    if (!PAYSTACK_KEY) {
+    if (!FLUTTERWAVE_KEY) {
       setError('Payment is not configured yet. Contact the store owner.');
       return;
     }
     setError('');
 
-    initializePayment({
-      onSuccess: (response) => {
-        saveOrder(response.reference || response.trxref);
+    handleFlutterPayment({
+      callback: (response) => {
+        if (response.status === 'successful' || response.status === 'completed') {
+          saveOrder(response.transaction_id?.toString() || response.tx_ref);
+        } else {
+          setError('Payment was not successful. Status: ' + response.status);
+        }
+        closePaymentModal();
       },
       onClose: () => {
-        // User closed the Paystack modal — do nothing
+        // User closed the Flutterwave modal — do nothing
       },
     });
   };
@@ -184,11 +192,11 @@ const Checkout = () => {
             {error && <p className="co-error">{error}</p>}
 
             <button type="submit" className="co-place-btn" disabled={loading}>
-              {loading ? 'Saving order...' : `Pay ₦${cartTotal.toLocaleString()} with Paystack`}
+              {loading ? 'Saving order...' : `Pay ₦${cartTotal.toLocaleString()} with Flutterwave`}
             </button>
 
             <p className="co-secure-note">
-              Secured by Paystack · Cards, Bank Transfer, USSD accepted
+              Secured by Flutterwave · Cards, Bank Transfer, USSD accepted
             </p>
           </Motion.form>
 

@@ -80,7 +80,7 @@ const OrderConfirmation = () => {
           )}
 
           <div className="oc-processing-note">
-            <p>Payment received via Paystack. Your order will be processed within 3 working days — check your email for confirmation.</p>
+            <p>Payment received via {order?.payment_method === 'flutterwave' ? 'Flutterwave' : order?.payment_method === 'paystack' ? 'Paystack' : 'payment gateway'}. Your order will be processed within 3 working days — check your email for confirmation.</p>
           </div>
 
           <div className="oc-actions">

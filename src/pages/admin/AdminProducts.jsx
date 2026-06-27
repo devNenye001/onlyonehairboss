@@ -5,7 +5,7 @@ import AdminLayout from './AdminLayout';
 import { supabase } from '../../utils/supabase/client';
 import './AdminProducts.css';
 
-const EMPTY_FORM = { name: '', price: '', description: '', featured: false, stock: 0 };
+const EMPTY_FORM = { name: '', price: '', description: '', featured: false, stock: 0, category: 'General' };
 
 const AdminProducts = () => {
   const [products, setProducts] = useState([]);
@@ -19,14 +19,14 @@ const AdminProducts = () => {
 
   const fetchProducts = async ({ showLoading = true } = {}) => {
     if (showLoading) setLoading(true);
-    const { data } = await supabase.from('wigs').select('*').order('created_at', { ascending: false });
+    const { data } = await supabase.from('products').select('*').order('created_at', { ascending: false });
     setProducts(data ?? []);
     setLoading(false);
   };
 
   useEffect(() => {
     let cancelled = false;
-    supabase.from('wigs').select('*').order('created_at', { ascending: false })
+    supabase.from('products').select('*').order('created_at', { ascending: false })
       .then(({ data }) => {
         if (!cancelled) { setProducts(data ?? []); setLoading(false); }
       });
@@ -35,7 +35,14 @@ const AdminProducts = () => {
 
   const openNew = () => { setForm(EMPTY_FORM); setEditing(null); setImageFiles([]); setShowForm(true); };
   const openEdit = (p) => {
-    setForm({ name: p.name, price: p.price, description: p.description ?? '', featured: p.featured ?? false, stock: p.stock ?? 0 });
+    setForm({
+      name: p.name,
+      price: p.price,
+      description: p.description ?? '',
+      featured: p.is_featured ?? false,
+      stock: p.stock_count ?? 0,
+      category: p.category ?? 'General'
+    });
     setEditing(p.id);
     setImageFiles([]);
     setShowForm(true);
@@ -62,17 +69,26 @@ const AdminProducts = () => {
       name: form.name,
       price: parseFloat(form.price),
       description: form.description,
-      featured: form.featured,
-      stock: parseInt(form.stock, 10),
-      ...(imageUrl && { image_url: imageUrl }),
+      category: form.category,
+      is_featured: form.featured,
+      stock_count: parseInt(form.stock, 10),
+      in_stock: parseInt(form.stock, 10) > 0,
     };
 
     if (editing) {
-      await supabase.from('wigs').update(payload).eq('id', editing);
-      setMsg('Product updated.');
+      if (imageUrl) {
+        payload.images = [imageUrl];
+      }
+      const { error } = await supabase.from('products').update(payload).eq('id', editing);
+      if (error) setMsg(`Error: ${error.message}`);
+      else setMsg('Product updated.');
     } else {
-      await supabase.from('wigs').insert({ ...payload, image_url: imageUrl || '' });
-      setMsg('Product added.');
+      const { error } = await supabase.from('products').insert({
+        ...payload,
+        images: imageUrl ? [imageUrl] : [],
+      });
+      if (error) setMsg(`Error: ${error.message}`);
+      else setMsg('Product added.');
     }
 
     setSaving(false);
@@ -82,12 +98,14 @@ const AdminProducts = () => {
 
   const handleDelete = async (id) => {
     if (!window.confirm('Delete this product?')) return;
-    await supabase.from('wigs').delete().eq('id', id);
+    const { error } = await supabase.from('products').delete().eq('id', id);
+    if (error) setMsg(`Error: ${error.message}`);
     fetchProducts({ showLoading: false });
   };
 
   const toggleFeatured = async (p) => {
-    await supabase.from('wigs').update({ featured: !p.featured }).eq('id', p.id);
+    const { error } = await supabase.from('products').update({ is_featured: !p.is_featured }).eq('id', p.id);
+    if (error) setMsg(`Error: ${error.message}`);
     fetchProducts({ showLoading: false });
   };
 
@@ -121,14 +139,14 @@ const AdminProducts = () => {
               <tbody>
                 {products.map(p => (
                   <tr key={p.id}>
-                    <td><img src={p.image_url || '/wig1.svg'} alt={p.name} className="ap-thumb" /></td>
+                    <td><img src={p.images?.[0] || '/wig1.svg'} alt={p.name} className="ap-thumb" /></td>
                     <td className="ap-name">{p.name}</td>
                     <td>₦{p.price?.toLocaleString()}</td>
-                    <td>{p.stock ?? 0}</td>
-                    <td><span className={`ap-badge ${p.stock > 0 ? 'in' : 'out'}`}>{p.stock > 0 ? 'In Stock' : 'Out'}</span></td>
+                    <td>{p.stock_count ?? 0}</td>
+                    <td><span className={`ap-badge ${p.stock_count > 0 ? 'in' : 'out'}`}>{p.stock_count > 0 ? 'In Stock' : 'Out'}</span></td>
                     <td>
                       <button className="ap-icon-btn" onClick={() => toggleFeatured(p)}>
-                        {p.featured ? <HiStar className="star-filled" /> : <HiOutlineStar />}
+                        {p.is_featured ? <HiStar className="star-filled" /> : <HiOutlineStar />}
                       </button>
                     </td>
                     <td className="ap-actions-cell">
@@ -166,13 +184,27 @@ const AdminProducts = () => {
                     <input name="price" type="number" value={form.price} onChange={handleChange} required placeholder="270000" />
                   </div>
                 </div>
+                <div className="ap-form-row">
+                  <div className="ap-form-field">
+                    <label>Category</label>
+                    <select name="category" value={form.category} onChange={handleChange} required>
+                      <option value="General">General</option>
+                      <option value="Frontal">Frontal</option>
+                      <option value="Bob">Bob</option>
+                      <option value="Deep Wave">Deep Wave</option>
+                      <option value="Bone Straight">Bone Straight</option>
+                      <option value="Curly">Curly</option>
+                      <option value="Wavy">Wavy</option>
+                    </select>
+                  </div>
+                  <div className="ap-form-field">
+                    <label>Stock Quantity</label>
+                    <input name="stock" type="number" value={form.stock} onChange={handleChange} min="0" placeholder="0" />
+                  </div>
+                </div>
                 <div className="ap-form-field">
                   <label>Description</label>
                   <textarea name="description" value={form.description} onChange={handleChange} rows="3" placeholder="Product description..." />
-                </div>
-                <div className="ap-form-field">
-                  <label>Stock Quantity</label>
-                  <input name="stock" type="number" value={form.stock} onChange={handleChange} min="0" placeholder="0" />
                 </div>
                 <div className="ap-form-field">
                   <label>Product Image</label>

@@ -11,41 +11,69 @@ export const AuthProvider = ({ children }) => {
   const [loading, setLoading] = useState(true);
 
   const fetchProfile = async (userId) => {
-    const { data } = await supabase
-      .from('profiles')
-      .select('*')
-      .eq('id', userId)
-      .single();
-    setProfile(data ?? null);
+    try {
+      const { data, error } = await supabase
+        .from('profiles')
+        .select('*')
+        .eq('id', userId)
+        .single();
+      if (error) {
+        console.error('Error fetching profile:', error.message);
+        return null;
+      }
+      return data;
+    } catch (err) {
+      console.error('Error in fetchProfile:', err);
+      return null;
+    }
   };
 
   useEffect(() => {
+    // Intercept Google OAuth token from URL query params
+    const params = new URLSearchParams(window.location.search);
+    const urlToken = params.get('token');
+    if (urlToken) {
+      localStorage.setItem('hairboss_token', urlToken);
+      // Clean URL parameters
+      const newUrl = window.location.pathname + window.location.hash;
+      window.history.replaceState({}, document.title, newUrl);
+    }
+
+    let active = true;
+
     // Register onAuthStateChange FIRST.
     // Supabase always fires INITIAL_SESSION when this is registered, which
     // covers existing sessions (page refresh) and OAuth redirects
     // (the #access_token fragment is processed before this callback fires).
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      (event, session) => {
+      async (event, session) => {
         const currentUser = session?.user ?? null;
+        if (!active) return;
+
         setUser(currentUser);
 
         if (currentUser) {
-          fetchProfile(currentUser.id);
-          // SIGNED_IN fires for both email/password and Google OAuth logins
-          if (event === 'SIGNED_IN') {
-            syncSignupMetadata({}).catch(() => {});
+          setLoading(true);
+          const profileData = await fetchProfile(currentUser.id);
+          if (active) {
+            setProfile(profileData);
+            setLoading(false);
+            // SIGNED_IN fires for both email/password and Google OAuth logins
+            if (event === 'SIGNED_IN') {
+              syncSignupMetadata({}).catch(() => {});
+            }
           }
         } else {
           setProfile(null);
+          setLoading(false);
         }
-
-        // Stop loading after the first auth event regardless of outcome.
-        // This covers: no session, existing session, and OAuth redirect.
-        setLoading(false);
       }
     );
 
-    return () => subscription.unsubscribe();
+    return () => {
+      active = false;
+      subscription.unsubscribe();
+    };
   }, []);
 
   const signUp = async (email, password, fullName) => {

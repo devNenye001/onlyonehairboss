@@ -40,8 +40,12 @@ const AdminLogin = () => {
       .from('profiles').select('role').eq('id', authData.user.id).single();
 
     setLoading(false);
-    if (profileData?.role === 'admin') navigate('/admin/products');
-    else setError('Access denied. Admin account required.');
+    if (profileData?.role === 'admin') {
+      navigate('/admin/products');
+    } else {
+      await supabase.auth.signOut();
+      setError('Access denied. Admin account required.');
+    }
   };
 
   return (
