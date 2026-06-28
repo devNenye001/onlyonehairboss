@@ -102,3 +102,104 @@
   .shop-full-grid { grid-template-columns: 1fr; }
   .shop-full-container { padding: 32px 5% 60px; }
 }
+
+.shop-empty-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 60px 20px;
+  max-width: 500px;
+  margin: 40px auto;
+}
+
+.shop-empty-icon-wrap {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  background: rgba(153, 85, 68, 0.05);
+  border: 1px solid rgba(153, 85, 68, 0.15);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 24px;
+  color: #995544;
+  font-size: 2.2rem;
+}
+
+.shop-empty-title {
+  font-family: 'Taprom', serif;
+  font-size: 1.8rem;
+  color: #1a120e;
+  margin: 0 0 12px;
+  font-weight: 500;
+}
+
+.shop-empty-text {
+  color: #666;
+  font-size: 0.98rem;
+  line-height: 1.6;
+  margin: 0 0 28px;
+}
+
+.shop-empty-btn {
+  background: #995544;
+  color: #FFF1EA;
+  border: 1px solid #995544;
+  padding: 14px 28px;
+  font-weight: 600;
+  font-size: 0.95rem;
+  border-radius: 4px;
+  cursor: pointer;
+  font-family: inherit;
+  transition: all 0.2s ease;
+}
+
+.shop-empty-btn:hover {
+  background: transparent;
+  color: #995544;
+}
+
+/* Skeleton Loading Shimmer */
+.skeleton-card {
+  background: #fff;
+  border: 1px solid rgba(153, 85, 68, 0.05);
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  border-radius: 4px;
+}
+
+.skeleton-image {
+  width: 100%;
+  aspect-ratio: 3 / 4;
+  background: linear-gradient(90deg, #f0e6e2 25%, #f7efe9 50%, #f0e6e2 75%);
+  background-size: 200% 100%;
+  animation: loadingShimmer 1.5s infinite;
+}
+
+.skeleton-text {
+  height: 16px;
+  background: linear-gradient(90deg, #f0e6e2 25%, #f7efe9 50%, #f0e6e2 75%);
+  background-size: 200% 100%;
+  animation: loadingShimmer 1.5s infinite;
+  border-radius: 2px;
+}
+
+.skeleton-text.title { width: 70%; }
+.skeleton-text.price { width: 40%; }
+.skeleton-button {
+  height: 38px;
+  background: linear-gradient(90deg, #f0e6e2 25%, #f7efe9 50%, #f0e6e2 75%);
+  background-size: 200% 100%;
+  animation: loadingShimmer 1.5s infinite;
+  border-radius: 4px;
+  width: 100%;
+}
+
+@keyframes loadingShimmer {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}

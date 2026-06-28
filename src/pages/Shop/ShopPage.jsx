@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { motion as Motion } from 'framer-motion';
+import { HiOutlineShoppingBag } from 'react-icons/hi';
 import Navbar from '../../components/Navbar/Navbar';
 import Footer from '../../components/Footer/Footer';
 import ProductCard from '../../components/ProductCard/ProductCard';
@@ -19,6 +20,15 @@ const FALLBACK = [
   { id: '7', name: 'Deep Wave Curls', price: 270000, images: ['/wig7.svg'], category: 'Deep Wave' },
   { id: '8', name: 'Bone Straight Lace', price: 270000, images: ['/wig8.svg'], category: 'Bone Straight' },
 ];
+
+const SkeletonCard = () => (
+  <div className="skeleton-card">
+    <div className="skeleton-image"></div>
+    <div className="skeleton-text title"></div>
+    <div className="skeleton-text price"></div>
+    <div className="skeleton-button"></div>
+  </div>
+);
 
 const ShopPage = () => {
   const [products, setProducts] = useState([]);
@@ -71,7 +81,22 @@ const ShopPage = () => {
         </div>
 
         {loading ? (
-          <div className="shop-loading">Loading collection...</div>
+          <div className="shop-full-grid">
+            {[1, 2, 3, 4, 5, 6, 7, 8].map(i => <SkeletonCard key={i} />)}
+          </div>
+        ) : filtered.length === 0 ? (
+          <div className="shop-empty-container">
+            <div className="shop-empty-icon-wrap">
+              <HiOutlineShoppingBag />
+            </div>
+            <h2 className="shop-empty-title">No wigs in this category yet</h2>
+            <p className="shop-empty-text">
+              We’re preparing something beautiful for this collection. Check back soon or explore other styles.
+            </p>
+            <button className="shop-empty-btn" onClick={() => setSearchParams({})}>
+              Explore All Wigs
+            </button>
+          </div>
         ) : (
           <Motion.div
             className="shop-full-grid"

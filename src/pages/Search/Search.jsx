@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { useSearchParams } from 'react-router-dom';
+import { useSearchParams, Link } from 'react-router-dom';
 import { HiOutlineSearch } from 'react-icons/hi';
 import Navbar from '../../components/Navbar/Navbar';
 import Footer from '../../components/Footer/Footer';
@@ -58,7 +58,7 @@ const Search = () => {
 
         {loading && <p className="search-status">Searching...</p>}
 
-        {!loading && searched && query && (
+        {!loading && searched && query && results.length > 0 && (
           <p className="search-status">
             {results.length} result{results.length !== 1 ? 's' : ''} for &ldquo;{query}&rdquo;
           </p>
@@ -71,8 +71,17 @@ const Search = () => {
         )}
 
         {!loading && searched && results.length === 0 && (
-          <div className="search-empty">
-            <p>No wigs found for &ldquo;{query}&rdquo;. Try a different keyword.</p>
+          <div className="search-empty-container">
+            <div className="search-empty-icon-wrap">
+              <HiOutlineSearch />
+            </div>
+            <h2 className="search-empty-title">No wigs found</h2>
+            <p className="search-empty-text">
+              We couldn’t find any wigs matching your search. Try another keyword or explore our collections.
+            </p>
+            <Link to="/shop" className="search-empty-btn">
+              Continue Shopping
+            </Link>
           </div>
         )}
       </main>

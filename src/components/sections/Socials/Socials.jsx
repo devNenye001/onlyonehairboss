@@ -23,6 +23,7 @@ const Socials = () => {
           const validVideos = data.value.videos.map((v, i) => ({
             id: v.id || i + 1,
             videoUrl: v.videoUrl || FALLBACK[i].videoUrl,
+            thumbnailUrl: v.thumbnailUrl || '',
             alt: v.alt || FALLBACK[i].alt
           }));
           setSocialVideos(validVideos);
@@ -79,6 +80,8 @@ const Socials = () => {
               <div className="video-wrapper">
                 <video 
                   src={video.videoUrl} 
+                  poster={video.thumbnailUrl || undefined}
+                  preload="none"
                   autoPlay 
                   loop 
                   muted 

@@ -82,3 +82,359 @@
 @media (max-width: 480px) {
   .pd-container { padding: 28px 5% 60px; }
 }
+
+/* Related Wigs Section */
+.pd-related-section {
+  margin-top: 80px;
+  border-top: 1px solid rgba(153, 85, 68, 0.15);
+  padding-top: 48px;
+}
+
+.pd-related-headline {
+  font-family: 'Taprom', serif;
+  font-size: 1.8rem;
+  color: #1a120e;
+  margin-bottom: 28px;
+}
+
+.pd-related-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 24px;
+}
+
+.pd-related-card {
+  background: #fff;
+  border: 1px solid rgba(153, 85, 68, 0.05);
+  padding: 14px;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.pd-related-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 24px rgba(153, 85, 68, 0.08);
+}
+
+.pd-related-card-img-wrap {
+  width: 100%;
+  aspect-ratio: 3 / 4;
+  overflow: hidden;
+  background: #fcf9f7;
+  margin-bottom: 12px;
+}
+
+.pd-related-card-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.3s ease;
+}
+
+.pd-related-card:hover .pd-related-card-img {
+  transform: scale(1.04);
+}
+
+.pd-related-card-name {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: #1a120e;
+  margin: 0 0 6px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.pd-related-card-price {
+  font-size: 0.9rem;
+  color: #995544;
+  font-weight: 500;
+  margin: 0 0 14px;
+}
+
+.pd-related-card-actions {
+  display: flex;
+  gap: 8px;
+  margin-top: auto;
+}
+
+.pd-related-card-actions button {
+  flex: 1;
+  padding: 10px 8px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  border-radius: 4px;
+  cursor: pointer;
+  border: none;
+  font-family: inherit;
+  transition: all 0.2s ease;
+}
+
+.pd-btn-cart {
+  background: #995544;
+  border: 1px solid #995544;
+  color: #FFF1EA;
+}
+
+.pd-btn-cart:hover {
+  background: #b06653;
+  border-color: #b06653;
+}
+
+.pd-btn-quick {
+  background: transparent;
+  border: 1px solid rgba(153, 85, 68, 0.3) !important;
+  color: #995544;
+}
+
+.pd-btn-quick:hover {
+  background: rgba(153, 85, 68, 0.05);
+  border-color: #995544 !important;
+}
+
+/* Quick View Modal Overlay */
+.qv-modal-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(4px);
+  z-index: 1100;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+
+.qv-modal {
+  background: #FFF1EA;
+  width: 100%;
+  max-width: 800px;
+  max-height: 90vh;
+  overflow-y: auto;
+  border-radius: 8px;
+  padding: 30px;
+  position: relative;
+  box-shadow: 0 10px 40px rgba(0,0,0,0.15);
+  animation: qvScale 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes qvScale {
+  from { opacity: 0; transform: scale(0.95); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+.qv-close-btn {
+  position: absolute;
+  top: 15px;
+  right: 15px;
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  cursor: pointer;
+  color: #666;
+  padding: 6px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.2s;
+  z-index: 10;
+}
+
+.qv-close-btn:hover {
+  background: rgba(153, 85, 68, 0.08);
+  color: #995544;
+}
+
+.qv-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 32px;
+  margin-top: 10px;
+}
+
+.qv-image-wrap {
+  width: 100%;
+  aspect-ratio: 3 / 4;
+  overflow: hidden;
+  background: #f4f0ed;
+}
+
+.qv-main-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.qv-thumbs {
+  display: flex;
+  gap: 8px;
+  margin-top: 8px;
+  overflow-x: auto;
+}
+
+.qv-thumb {
+  width: 50px;
+  height: 50px;
+  object-fit: cover;
+  cursor: pointer;
+  border: 2px solid transparent;
+  transition: border-color 0.2s;
+}
+
+.qv-thumb.active {
+  border-color: #995544;
+}
+
+.qv-details {
+  display: flex;
+  flex-direction: column;
+}
+
+.qv-category {
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: #995544;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 4px;
+}
+
+.qv-name {
+  font-family: 'Taprom', serif;
+  font-size: 1.6rem;
+  color: #000;
+  margin: 0 0 10px;
+  line-height: 1.2;
+}
+
+.qv-price {
+  font-size: 1.2rem;
+  font-weight: 500;
+  color: #995544;
+  margin-bottom: 12px;
+}
+
+.qv-desc {
+  font-size: 0.9rem;
+  color: #444;
+  line-height: 1.6;
+  margin-bottom: 16px;
+}
+
+.qv-stock {
+  margin-bottom: 16px;
+}
+
+.qv-stock-badge {
+  display: inline-block;
+  padding: 3px 10px;
+  font-size: 0.75rem;
+  border-radius: 12px;
+  font-weight: 500;
+}
+
+.qv-stock-badge.in {
+  background: rgba(153, 85, 68, 0.1);
+  color: #995544;
+}
+
+.qv-stock-badge.out {
+  background: #f2f2f2;
+  color: #888;
+}
+
+.qv-cart-btn {
+  width: 100%;
+  padding: 12px;
+  background: #995544;
+  border: 1px solid #995544;
+  color: #FFF1EA;
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+.qv-cart-btn:hover {
+  background: transparent;
+  color: #995544;
+}
+
+.qv-cart-btn:disabled {
+  background: #ccc;
+  border-color: #ccc;
+  cursor: not-allowed;
+  color: #fff;
+}
+
+.qv-link {
+  text-align: center;
+  font-size: 0.88rem;
+  color: #995544;
+  text-decoration: none;
+  font-weight: 600;
+  transition: text-decoration 0.2s;
+}
+
+.qv-link:hover {
+  text-decoration: underline;
+}
+
+/* Responsiveness overrides */
+@media (max-width: 768px) {
+  .pd-related-grid {
+    display: flex;
+    overflow-x: auto;
+    gap: 20px;
+    padding-bottom: 16px;
+    scroll-snap-type: x mandatory;
+    -webkit-overflow-scrolling: touch;
+  }
+  .pd-related-card {
+    min-width: 260px;
+    scroll-snap-align: start;
+  }
+  .qv-grid {
+    grid-template-columns: 1fr;
+    gap: 20px;
+  }
+}
+
+/* Toast Alert styling */
+.pd-toast {
+  position: fixed;
+  bottom: 30px;
+  right: 30px;
+  background: #1a120e;
+  color: #FFF1EA;
+  padding: 16px 24px;
+  border-radius: 6px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
+  z-index: 2000;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-weight: 500;
+  font-size: 0.95rem;
+  border-left: 4px solid #995544;
+  animation: toastFadeIn 0.3s ease-out;
+}
+
+@keyframes toastFadeIn {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+

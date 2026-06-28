@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import AdminLayout from './AdminLayout';
 import { supabase } from '../../utils/supabase/client';
-import { HiOutlineUpload, HiOutlineSave, HiOutlineTrash, HiOutlinePlus } from 'react-icons/hi';
+import { HiOutlineUpload, HiOutlineSave, HiOutlineTrash, HiOutlinePlus, HiX } from 'react-icons/hi';
 import './AdminContent.css';
 
 const AdminContent = () => {
@@ -69,30 +69,236 @@ const AdminContent = () => {
     }
   };
 
-  // Upload helpers
+  const [uploadingSlot, setUploadingSlot] = useState(null); // 'featured' or index 0, 1, 2, 3
+  const [uploadProgress, setUploadProgress] = useState(0);
+  const [uploadTimeLeft, setUploadTimeLeft] = useState(null);
+  const [uploadError, setUploadError] = useState(null);
+  const [retryUploadFn, setRetryUploadFn] = useState(null);
+  const [previewVideoUrl, setPreviewVideoUrl] = useState(null);
+
+  // Upload helper for images (uses single-part upload since images are small)
   const handleMediaUpload = async (file, expectedType, onComplete) => {
     if (!file) return;
-    if (expectedType === 'image' && !file.type.startsWith('image/')) {
+    if (expectedType === 'image' && (!file.type || !file.type.startsWith('image/'))) {
       alert('Invalid file format. Please upload an image file (PNG, JPG, WebP, etc.).');
-      return;
-    }
-    if (expectedType === 'video' && !file.type.startsWith('video/')) {
-      alert('Invalid file format. Please upload a video file (MP4, WEBM, etc.).');
       return;
     }
     try {
       setSaving(true);
-      const ext = file.name.split('.').pop();
-      const path = `${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`;
-      const { data, error } = await supabase.storage.from('product-images').upload(path, file);
-      if (error) throw error;
-      const { data: { publicUrl } } = supabase.storage.from('product-images').getPublicUrl(data.path);
+      const formData = new FormData();
+      formData.append('image', file);
+      
+      const res = await fetch(`${supabase.API_URL}/storage/upload`, {
+        method: 'POST',
+        headers: { 'Authorization': `Bearer ${localStorage.getItem('hairboss_token')}` },
+        body: formData
+      });
+      if (!res.ok) {
+        const data = await res.json();
+        throw new Error(data.error || 'Upload failed');
+      }
+      const data = await res.json();
+      const publicUrl = `${supabase.API_URL}/storage/files/${data.path}`;
       onComplete(publicUrl);
     } catch (err) {
       alert('Upload failed: ' + err.message);
     } finally {
       setSaving(false);
     }
+  };
+
+  // Browser-side video thumbnail generator
+  const generateVideoThumbnail = (file) => {
+    return new Promise((resolve) => {
+      const video = document.createElement('video');
+      video.preload = 'metadata';
+      video.muted = true;
+      video.playsInline = true;
+      
+      const fileUrl = URL.createObjectURL(file);
+      video.src = fileUrl;
+      
+      video.onloadeddata = () => {
+        video.currentTime = 1; // Seek to 1s
+      };
+      
+      video.onseeked = () => {
+        try {
+          const canvas = document.createElement('canvas');
+          canvas.width = video.videoWidth || 320;
+          canvas.height = video.videoHeight || 240;
+          const ctx = canvas.getContext('2d');
+          ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+          canvas.toBlob((blob) => {
+            URL.revokeObjectURL(fileUrl);
+            resolve(blob);
+          }, 'image/jpeg', 0.85);
+        } catch (e) {
+          URL.revokeObjectURL(fileUrl);
+          resolve(null);
+        }
+      };
+      
+      video.onerror = () => {
+        URL.revokeObjectURL(fileUrl);
+        resolve(null);
+      };
+    });
+  };
+
+  // Chunked Resumable Video Uploader
+  const CHUNK_SIZE = 1 * 1024 * 1024; // 1MB chunks
+  
+  const uploadFileInChunks = async (file, expectedType, onProgress, onComplete, onError) => {
+    const totalSize = file.size;
+    const totalChunks = Math.ceil(totalSize / CHUNK_SIZE);
+    const fileExt = file.name.split('.').pop();
+    const fileName = `${Date.now()}-${Math.random().toString(36).slice(2)}.${fileExt}`;
+    
+    let chunkIndex = 0;
+    const startTime = Date.now();
+    
+    const token = localStorage.getItem('hairboss_token') || '';
+    const headers = {
+      'Authorization': `Bearer ${token}`
+    };
+
+    const uploadNextChunk = () => {
+      const start = chunkIndex * CHUNK_SIZE;
+      const end = Math.min(start + CHUNK_SIZE, totalSize);
+      const chunk = file.slice(start, end);
+      
+      const formData = new FormData();
+      formData.append('chunkIndex', chunkIndex);
+      formData.append('totalChunks', totalChunks);
+      formData.append('fileName', fileName);
+      formData.append('chunk', chunk);
+      
+      const xhr = new XMLHttpRequest();
+      xhr.open('POST', `${supabase.API_URL}/storage/upload/chunk`, true);
+      
+      // Set auth headers
+      Object.keys(headers).forEach(key => {
+        xhr.setRequestHeader(key, headers[key]);
+      });
+      
+      xhr.upload.addEventListener('progress', (e) => {
+        if (e.lengthComputable) {
+          const chunkProgress = e.loaded / e.total;
+          const bytesUploaded = start + (chunkProgress * (end - start));
+          const totalProgress = Math.min((bytesUploaded / totalSize) * 100, 99.9);
+          
+          // Calculate estimated remaining time
+          const elapsed = (Date.now() - startTime) / 1000; // seconds
+          const speed = bytesUploaded / elapsed; // bytes/sec
+          const remainingBytes = totalSize - bytesUploaded;
+          const remainingSecs = speed > 0 ? Math.ceil(remainingBytes / speed) : null;
+          
+          onProgress(Math.round(totalProgress), remainingSecs);
+        }
+      });
+      
+      xhr.onload = async () => {
+        if (xhr.status >= 200 && xhr.status < 300) {
+          const res = JSON.parse(xhr.responseText);
+          if (res.completed) {
+            const publicUrl = `${supabase.API_URL}/storage/files/${res.path}`;
+            onProgress(100, 0);
+            onComplete(publicUrl);
+          } else {
+            chunkIndex = res.nextIndex;
+            uploadNextChunk();
+          }
+        } else {
+          let errorMsg = 'Upload failed';
+          try {
+            const json = JSON.parse(xhr.responseText);
+            errorMsg = json.error || errorMsg;
+          } catch(e) {}
+          onError(new Error(errorMsg), uploadNextChunk);
+        }
+      };
+      
+      xhr.onerror = () => {
+        onError(new Error('Network connection failed.'), uploadNextChunk);
+      };
+      
+      xhr.send(formData);
+    };
+    
+    uploadNextChunk();
+  };
+
+  const handleChunkedVideoUpload = async (file, slotIndex, onComplete) => {
+    if (!file) return;
+    if (!file.type || !file.type.startsWith('video/')) {
+      alert('Invalid file format. Please upload a video file (MP4, WEBM, etc.).');
+      return;
+    }
+    if (file.size > 20 * 1024 * 1024) {
+      alert('Video file size exceeds maximum limit of 20MB.');
+      return;
+    }
+    
+    setUploadingSlot(slotIndex);
+    setUploadProgress(0);
+    setUploadTimeLeft(null);
+    setUploadError(null);
+    
+    try {
+      // 1. Generate and upload thumbnail in background
+      let thumbnailUrl = '';
+      const thumbBlob = await generateVideoThumbnail(file);
+      if (thumbBlob) {
+        const thumbFile = new File([thumbBlob], `thumb-${Date.now()}.jpg`, { type: 'image/jpeg' });
+        const formData = new FormData();
+        formData.append('image', thumbFile);
+        const res = await fetch(`${supabase.API_URL}/storage/upload`, {
+          method: 'POST',
+          headers: { 'Authorization': `Bearer ${localStorage.getItem('hairboss_token')}` },
+          body: formData
+        });
+        if (res.ok) {
+          const data = await res.json();
+          thumbnailUrl = `${supabase.API_URL}/storage/files/${data.path}`;
+        }
+      }
+      
+      // 2. Start chunked upload
+      await uploadFileInChunks(
+        file,
+        'video',
+        (progress, timeLeft) => {
+          setUploadProgress(progress);
+          setUploadTimeLeft(timeLeft);
+        },
+        (videoUrl) => {
+          onComplete(videoUrl, thumbnailUrl);
+          setUploadingSlot(null);
+          setUploadProgress(0);
+          setUploadTimeLeft(null);
+        },
+        (error, retryFn) => {
+          setUploadError(error.message || 'Upload failed.');
+          setRetryUploadFn(() => retryFn);
+        }
+      );
+    } catch (err) {
+      setUploadError(err.message || 'Upload failed.');
+    }
+  };
+
+  const moveVideoSlot = (index, direction) => {
+    const videos = [...socials.videos];
+    const targetIndex = index + direction;
+    if (targetIndex < 0 || targetIndex >= videos.length) return;
+    
+    const temp = videos[index];
+    videos[index] = videos[targetIndex];
+    videos[targetIndex] = temp;
+    
+    const updated = videos.map((v, idx) => ({ ...v, id: idx + 1 }));
+    setSocials({ ...socials, videos: updated });
   };
 
   const handleProductSelectForNewIns = (prodId, index) => {
@@ -288,28 +494,44 @@ const AdminContent = () => {
               <div className="field-group">
                 <label>Featured Video</label>
                 <div className="file-upload-row">
-                  <label className="upload-file-btn" style={{ flex: 1, justifyContent: 'center', opacity: uploadingFeatured ? 0.6 : 1 }}>
-                    <HiOutlineUpload /> {uploadingFeatured ? 'Uploading video, please wait...' : 'Upload Video from Device'}
+                  <input 
+                    value={featuredCol.video_url || ''} 
+                    onChange={e => setFeaturedCol({ ...featuredCol, video_url: e.target.value })} 
+                    placeholder="Upload video..."
+                    style={{ flex: 1 }}
+                  />
+                  <label className="upload-file-btn" style={{ cursor: uploadingSlot === 'featured' ? 'not-allowed' : 'pointer', opacity: uploadingSlot === 'featured' ? 0.6 : 1 }}>
+                    <HiOutlineUpload /> {featuredCol.video_url ? 'Replace' : 'Upload'}
                     <input 
                       type="file" 
                       accept="video/*" 
-                      disabled={uploadingFeatured}
-                      onChange={async (e) => {
-                        const file = e.target.files[0];
-                        if (!file) return;
-                        setUploadingFeatured(true);
-                        await handleMediaUpload(file, 'video', url => setFeaturedCol({ ...featuredCol, video_url: url }));
-                        setUploadingFeatured(false);
-                      }}
+                      disabled={uploadingSlot !== null}
+                      onChange={e => handleChunkedVideoUpload(e.target.files[0], 'featured', (vUrl) => {
+                        setFeaturedCol({ ...featuredCol, video_url: vUrl });
+                      })}
                       style={{ display: 'none' }}
                     />
                   </label>
+                  {featuredCol.video_url && (
+                    <>
+                      <button
+                        type="button"
+                        onClick={() => setPreviewVideoUrl(featuredCol.video_url)}
+                        style={{ padding: '0 12px', background: 'rgba(153, 85, 68, 0.1)', color: '#995544', border: '1px solid rgba(153, 85, 68, 0.2)', borderRadius: '6px', cursor: 'pointer' }}
+                      >
+                        Preview
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setFeaturedCol({ ...featuredCol, video_url: '' })}
+                        style={{ padding: '0 12px', background: 'rgba(192, 57, 43, 0.1)', color: '#c0392b', border: '1px solid rgba(192, 57, 43, 0.2)', borderRadius: '6px', cursor: 'pointer' }}
+                      >
+                        Delete
+                      </button>
+                    </>
+                  )}
                 </div>
-                {featuredCol.video_url && !uploadingFeatured && (
-                  <p style={{ color: '#995544', fontSize: '0.82rem', marginTop: '6px', fontWeight: '500' }}>
-                    ✓ Video uploaded successfully: {featuredCol.video_url.split('/').pop()}
-                  </p>
-                )}
+                {renderUploadProgress('featured')}
               </div>
 
               <button 
@@ -331,7 +553,13 @@ const AdminContent = () => {
                   const video = socials.videos[i] || { id: i + 1, videoUrl: '', alt: '' };
                   return (
                     <div key={i} className="video-item-box">
-                      <h4>Video Slot #{i + 1}</h4>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '15px' }}>
+                        <h4 style={{ margin: 0 }}>Video Slot #{i + 1}</h4>
+                        <div style={{ display: 'flex', gap: '6px' }}>
+                          <button type="button" disabled={i === 0} onClick={() => moveVideoSlot(i, -1)} style={{ padding: '2px 6px', fontSize: '0.75rem', cursor: 'pointer', background: 'rgba(153, 85, 68, 0.1)', border: 'none', borderRadius: '3px', color: '#995544' }}>▲</button>
+                          <button type="button" disabled={i === 3} onClick={() => moveVideoSlot(i, 1)} style={{ padding: '2px 6px', fontSize: '0.75rem', cursor: 'pointer', background: 'rgba(153, 85, 68, 0.1)', border: 'none', borderRadius: '3px', color: '#995544' }}>▼</button>
+                        </div>
+                      </div>
                       
                       <div className="field-group">
                         <label>Video URL / File Path</label>
@@ -340,19 +568,48 @@ const AdminContent = () => {
                             value={video.videoUrl} 
                             onChange={e => handleSocialVideoChange(i, 'videoUrl', e.target.value)} 
                             placeholder="/video1.mp4"
+                            style={{ flex: 1 }}
                           />
-                          <label className="upload-file-btn">
-                            <HiOutlineUpload /> Upload
+                          <label className="upload-file-btn" style={{ cursor: uploadingSlot === i ? 'not-allowed' : 'pointer', opacity: uploadingSlot === i ? 0.6 : 1 }}>
+                            <HiOutlineUpload /> {video.videoUrl ? 'Replace' : 'Upload'}
                             <input 
                               type="file" 
                               accept="video/*" 
-                              onChange={e => handleMediaUpload(e.target.files[0], 'video', url => handleSocialVideoChange(i, 'videoUrl', url))}
+                              disabled={uploadingSlot !== null}
+                              onChange={e => handleChunkedVideoUpload(e.target.files[0], i, (vUrl, tUrl) => {
+                                const videos = [...socials.videos];
+                                videos[i] = { ...videos[i], videoUrl: vUrl, thumbnailUrl: tUrl };
+                                setSocials({ ...socials, videos });
+                              })}
                               style={{ display: 'none' }}
                             />
                           </label>
+                          {video.videoUrl && (
+                            <>
+                              <button
+                                type="button"
+                                onClick={() => setPreviewVideoUrl(video.videoUrl)}
+                                style={{ padding: '0 12px', background: 'rgba(153, 85, 68, 0.1)', color: '#995544', border: '1px solid rgba(153, 85, 68, 0.2)', borderRadius: '6px', cursor: 'pointer' }}
+                              >
+                                Preview
+                              </button>
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  const videos = [...socials.videos];
+                                  videos[i] = { ...videos[i], videoUrl: '', thumbnailUrl: '' };
+                                  setSocials({ ...socials, videos });
+                                }}
+                                style={{ padding: '0 12px', background: 'rgba(192, 57, 43, 0.1)', color: '#c0392b', border: '1px solid rgba(192, 57, 43, 0.2)', borderRadius: '6px', cursor: 'pointer' }}
+                              >
+                                Delete
+                              </button>
+                            </>
+                          )}
                         </div>
+                        {renderUploadProgress(i)}
                       </div>
-
+ 
                       <div className="field-group">
                         <label>Caption / Alt Text</label>
                         <input 
@@ -365,7 +622,7 @@ const AdminContent = () => {
                   );
                 })}
               </div>
-
+ 
               <button 
                 className="save-section-btn" 
                 onClick={() => handleSaveSection('stay_connected', socials)}
@@ -374,10 +631,30 @@ const AdminContent = () => {
                 <HiOutlineSave /> Save Social Videos
               </button>
             </div>
-
+ 
           </div>
         )}
       </div>
+
+      {/* Video Preview Modal */}
+      {previewVideoUrl && (
+        <div className="qv-modal-backdrop" onClick={() => setPreviewVideoUrl(null)}>
+          <div className="qv-modal" style={{ maxWidth: '600px', display: 'flex', flexDirection: 'column', alignItems: 'center' }} onClick={e => e.stopPropagation()}>
+            <button className="qv-close-btn" onClick={() => setPreviewVideoUrl(null)}>
+              <HiX />
+            </button>
+            <h3 style={{ fontFamily: 'Taprom, serif', fontSize: '1.4rem', color: '#1a120e', margin: '0 0 20px 0' }}>Video Preview</h3>
+            <video
+              src={previewVideoUrl}
+              controls
+              autoPlay
+              loop
+              muted
+              style={{ width: '100%', maxHeight: '400px', borderRadius: '4px', background: '#000' }}
+            />
+          </div>
+        </div>
+      )}
     </AdminLayout>
   );
 };

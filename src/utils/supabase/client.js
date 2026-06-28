@@ -9,6 +9,7 @@ const getAuthHeaders = () => {
 };
 
 export const supabase = {
+  API_URL,
   auth: {
     signUp: async ({ email, password, options }) => {
       try {
