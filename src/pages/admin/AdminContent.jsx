@@ -13,7 +13,7 @@ const AdminContent = () => {
   // Sections State
   const [newIns, setNewIns] = useState({ heading: '', description: '', product_ids: [] });
   const [collections, setCollections] = useState({ title: '', description: '', image_url: '', product_ids: [] });
-  const [featuredCol, setFeaturedCol] = useState({ product_id: '', heading: '', description: '' });
+  const [featuredCol, setFeaturedCol] = useState({ product_id: '', heading: '', description: '', video_url: '' });
   const [socials, setSocials] = useState({ videos: [] });
 
   const fetchData = async () => {
@@ -274,6 +274,26 @@ const AdminContent = () => {
                   rows="3"
                   placeholder="Flawless, natural look with rich volume..."
                 />
+              </div>
+
+              <div className="field-group">
+                <label>Featured Video (URL / Upload file)</label>
+                <div className="file-upload-row">
+                  <input 
+                    value={featuredCol.video_url || ''} 
+                    onChange={e => setFeaturedCol({ ...featuredCol, video_url: e.target.value })} 
+                    placeholder="/featured1.mp4"
+                  />
+                  <label className="upload-file-btn">
+                    <HiOutlineUpload /> Upload Video
+                    <input 
+                      type="file" 
+                      accept="video/*" 
+                      onChange={e => handleMediaUpload(e.target.files[0], url => setFeaturedCol({ ...featuredCol, video_url: url }))}
+                      style={{ display: 'none' }}
+                    />
+                  </label>
+                </div>
               </div>
 
               <button 

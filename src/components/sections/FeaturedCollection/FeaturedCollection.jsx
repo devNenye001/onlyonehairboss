@@ -52,7 +52,8 @@ const FeaturedCollection = () => {
           setFeatured({
             ...targetProduct,
             name: config.heading || targetProduct.name,
-            description: config.description || targetProduct.description
+            description: config.description || targetProduct.description,
+            video_url: config.video_url || ''
           });
         }
       } catch (err) {
@@ -106,18 +107,15 @@ const FeaturedCollection = () => {
           variants={fadeUp}
           custom={2}
         >
-          {featured.images ? (
-            <img src={featured.images} alt={featured.name} className="featured-video" />
-          ) : (
-            <video
-              className="featured-video"
-              autoPlay
-              loop
-              playsInline
-              muted
-              src="/featured1.mp4"
-            />
-          )}
+          <video
+            className="featured-video"
+            autoPlay
+            loop
+            playsInline
+            muted
+            controls
+            src={featured.video_url || "/featured1.mp4"}
+          />
         </Motion.div>
 
         <Motion.p
