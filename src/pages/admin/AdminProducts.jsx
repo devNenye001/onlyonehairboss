@@ -7,6 +7,22 @@ import './AdminProducts.css';
 
 const EMPTY_FORM = { name: '', price: '', description: '', stock: 10, category: 'General' };
 
+const getProductImage = (images) => {
+  if (Array.isArray(images)) {
+    return images[0] || '/wig1.svg';
+  }
+  if (typeof images === 'string') {
+    if (images.startsWith('[')) {
+      try {
+        const parsed = JSON.parse(images);
+        return parsed[0] || '/wig1.svg';
+      } catch (e) {}
+    }
+    return images || '/wig1.svg';
+  }
+  return '/wig1.svg';
+};
+
 const AdminProducts = () => {
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -162,7 +178,7 @@ const AdminProducts = () => {
               <tbody>
                 {products.map(p => (
                   <tr key={p.id}>
-                    <td><img src={p.images?.[0] || '/wig1.svg'} alt={p.name} className="ap-thumb" /></td>
+                    <td><img src={getProductImage(p.images)} alt={p.name} className="ap-thumb" /></td>
                     <td className="ap-name">{p.name}</td>
                     <td>₦{p.price?.toLocaleString()}</td>
                     <td>{p.stock_count ?? 0}</td>
