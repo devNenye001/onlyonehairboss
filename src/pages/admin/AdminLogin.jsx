@@ -57,7 +57,7 @@ const AdminLogin = () => {
         transition={{ duration: 0.5 }}
       >
         <Link to="/">
-          <img src="/logo.svg" alt="OnlyOne Hairboss" className="admin-login-logo" />
+          <img src="/logo1.svg" alt="OnlyOne Hairboss" className="admin-login-logo" />
         </Link>
         <p className="admin-login-tag">Admin Portal</p>
         <h1 className="admin-login-headline">{mode === 'forgot' ? 'Reset Password' : 'Sign In'}</h1>
