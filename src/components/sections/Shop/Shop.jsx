@@ -18,8 +18,23 @@ const FALLBACK = [
 
 const Shop = () => {
   const [products, setProducts] = useState(FALLBACK);
+  const [colConfig, setColConfig] = useState({
+    title: 'Our Collection',
+    description: '',
+    image_url: '/logo.svg',
+    banner_text: 'Luxury Hair. Timeless Beauty.'
+  });
 
   useEffect(() => {
+    // Load config
+    supabase.from('site_content').select('*').eq('key', 'collection_section').maybeSingle()
+      .then(({ data }) => {
+        if (data?.value) {
+          setColConfig(prev => ({ ...prev, ...data.value }));
+        }
+      });
+
+    // Load products
     supabase
       .from('products')
       .select('id, name, price, images')
@@ -28,7 +43,7 @@ const Shop = () => {
       .limit(8)
       .then(({ data }) => {
         if (data && data.length > 0) {
-          setProducts(data.map(p => ({ ...p, image: p.images || '/wig1.svg' })));
+          setProducts(data.map(p => ({ ...p, image: Array.isArray(p.images) ? p.images[0] : p.images || '/wig1.svg' })));
         }
       });
   }, []);
@@ -38,7 +53,8 @@ const Shop = () => {
       <main className="shop-container">
         <div className="shop-header">
           <p className="shop-tag" style={{color:"#995544"}}>Shop</p>
-          <h1 className="taprom-headline">Our Collection</h1>
+          <h1 className="taprom-headline">{colConfig.title}</h1>
+          {colConfig.description && <p className="shop-desc" style={{ color: '#888', marginTop: '8px', fontSize: '0.95rem', textAlign: 'center' }}>{colConfig.description}</p>}
         </div>
 
         <div className="product-grid">
@@ -55,8 +71,8 @@ const Shop = () => {
             viewport={{ once: true }}
             transition={{ duration: 0.8 }}
           >
-            <img src="/logo.svg" alt="OnlyOne Hairboss" className="banner-logo" />
-            <h2 className="banner-text">Luxury Hair. Timeless Beauty.</h2>
+            <img src={colConfig.image_url || "/logo.svg"} alt="OnlyOne Hairboss" className="banner-logo" />
+            <h2 className="banner-text">{colConfig.banner_text || colConfig.description || "Luxury Hair. Timeless Beauty."}</h2>
           </Motion.div>
         </section>
       </main>

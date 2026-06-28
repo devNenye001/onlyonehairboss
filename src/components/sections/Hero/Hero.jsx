@@ -37,7 +37,7 @@ const Hero = () => {
   return (
     <section className="hero-container">
       <div className="video-overlay"></div>
-      <img src="/slideshow1.png" alt="Hero Background" className="bg-video" />
+      <img src="/hero-image.webp" alt="Hero Background" className="bg-video" />
 
       <div className="announcement-bar">
         Please note that order processing takes 3 working days.

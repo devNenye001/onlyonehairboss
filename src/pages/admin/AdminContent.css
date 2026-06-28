@@ -1,0 +1,216 @@
+.content-page {
+  padding: 30px;
+  background-color: #0c0806;
+  min-height: 100vh;
+  box-sizing: border-box;
+  color: #fff;
+}
+
+.content-header {
+  margin-bottom: 40px;
+}
+
+.content-tag {
+  color: #d4af37;
+  text-transform: uppercase;
+  font-size: 0.82rem;
+  letter-spacing: 0.2em;
+  margin: 0 0 8px 0;
+  font-weight: 600;
+}
+
+.content-headline {
+  font-family: 'Taprom', serif;
+  color: #ffffff;
+  font-size: 2.2rem;
+  margin: 0;
+  font-weight: 500;
+}
+
+.content-alert-msg {
+  background: rgba(212, 175, 55, 0.1);
+  border: 1px solid #d4af37;
+  color: #d4af37;
+  padding: 12px 20px;
+  border-radius: 8px;
+  margin-bottom: 30px;
+  font-size: 0.95rem;
+  font-weight: 600;
+}
+
+.content-loading {
+  font-size: 1.1rem;
+  color: #888;
+  padding: 40px 0;
+}
+
+.sections-container {
+  display: flex;
+  flex-direction: column;
+  gap: 40px;
+}
+
+.config-card {
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 12px;
+  padding: 30px;
+  box-sizing: border-box;
+}
+
+.config-card h2 {
+  font-size: 1.35rem;
+  color: #ffffff;
+  margin: 0 0 8px 0;
+  font-weight: 600;
+}
+
+.card-desc {
+  color: #888888;
+  font-size: 0.88rem;
+  margin: 0 0 25px 0;
+}
+
+.field-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 20px;
+}
+
+.field-group label {
+  color: #cccccc;
+  font-size: 0.85rem;
+  font-weight: 500;
+}
+
+.field-group input, 
+.field-group select, 
+.field-group textarea {
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 6px;
+  color: #ffffff;
+  padding: 12px 16px;
+  font-size: 0.92rem;
+  font-family: inherit;
+  outline: none;
+  transition: border-color 0.2s ease;
+  box-sizing: border-box;
+  width: 100%;
+}
+
+.field-group input:focus, 
+.field-group select:focus, 
+.field-group textarea:focus {
+  border-color: #d4af37;
+}
+
+/* File upload helper row */
+.file-upload-row {
+  display: flex;
+  gap: 15px;
+}
+
+.file-upload-row input {
+  flex: 1;
+}
+
+.upload-file-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 6px;
+  color: #ffffff;
+  padding: 0 20px;
+  height: 48px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background 0.2s ease;
+  box-sizing: border-box;
+}
+
+.upload-file-btn:hover {
+  background: rgba(255, 255, 255, 0.15);
+}
+
+/* Wigs product grid selectors */
+.wigs-selector-group {
+  margin-bottom: 25px;
+}
+
+.wigs-selector-group label {
+  display: block;
+  color: #cccccc;
+  font-size: 0.85rem;
+  font-weight: 500;
+  margin-bottom: 10px;
+}
+
+.sel-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 20px;
+}
+
+.sel-grid select {
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 6px;
+  color: #ffffff;
+  padding: 12px 16px;
+  outline: none;
+}
+
+/* Social videos slots */
+.videos-config-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 25px;
+  margin-bottom: 30px;
+}
+
+.video-item-box {
+  background: rgba(255, 255, 255, 0.01);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  border-radius: 8px;
+  padding: 20px;
+}
+
+.video-item-box h4 {
+  margin: 0 0 15px 0;
+  color: #d4af37;
+  font-size: 1rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  padding-bottom: 8px;
+}
+
+/* Save actions button */
+.save-section-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: #d4af37;
+  color: #0c0806;
+  border: 1px solid #d4af37;
+  border-radius: 6px;
+  padding: 12px 24px;
+  font-size: 0.95rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.2s ease, border-color 0.2s ease;
+}
+
+.save-section-btn:hover {
+  background: #e5be48;
+  border-color: #e5be48;
+}
+
+.save-section-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}

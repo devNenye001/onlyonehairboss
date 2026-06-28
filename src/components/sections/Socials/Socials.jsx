@@ -1,17 +1,37 @@
 
+import { useState, useEffect } from 'react';
 import { motion as Motion } from 'framer-motion';
 import { HiOutlineArrowRight } from 'react-icons/hi';
 import { FaPlay } from 'react-icons/fa';
+import { supabase } from '../../../utils/supabase/client';
 import './Socials.css';
 
+const FALLBACK = [
+  { id: 1, videoUrl: "/video1.mp4", alt: "TikTok Look 1" },
+  { id: 2, videoUrl: "/video2.mp4", alt: "TikTok Look 2" },
+  { id: 3, videoUrl: "/video3.mp4", alt: "TikTok Look 3" },
+  { id: 4, videoUrl: "/video4.mp4", alt: "TikTok Look 4" },
+];
+
 const Socials = () => {
-  // TikTok video data array with placeholder paths for your localized loops
-  const socialVideos = [
-    { id: 1, videoUrl: "/video1.mp4", alt: "TikTok Look 1" },
-    { id: 2, videoUrl: "/video2.mp4", alt: "TikTok Look 2" },
-    { id: 3, videoUrl: "/video3.mp4", alt: "TikTok Look 3" },
-    { id: 4, videoUrl: "/video4.mp4", alt: "TikTok Look 4" },
-  ];
+  const [socialVideos, setSocialVideos] = useState(FALLBACK);
+
+  useEffect(() => {
+    supabase.from('site_content').select('*').eq('key', 'stay_connected').maybeSingle()
+      .then(({ data }) => {
+        if (data?.value && data.value.videos && data.value.videos.length > 0) {
+          const validVideos = data.value.videos.map((v, i) => ({
+            id: v.id || i + 1,
+            videoUrl: v.videoUrl || FALLBACK[i].videoUrl,
+            alt: v.alt || FALLBACK[i].alt
+          }));
+          setSocialVideos(validVideos);
+        }
+      })
+      .catch(err => {
+        console.error('Failed to load stay_connected config:', err);
+      });
+  }, []);
 
   const containerVariants = {
     hidden: { opacity: 0 },

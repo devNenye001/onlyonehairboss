@@ -1,0 +1,248 @@
+.overview-page {
+  padding: 30px;
+  background-color: #0c0806;
+  min-height: 100vh;
+  box-sizing: border-box;
+}
+
+.overview-header {
+  margin-bottom: 40px;
+}
+
+.overview-tag {
+  color: #d4af37;
+  text-transform: uppercase;
+  font-size: 0.82rem;
+  letter-spacing: 0.2em;
+  margin: 0 0 8px 0;
+  font-weight: 600;
+}
+
+.overview-headline {
+  font-family: 'Taprom', serif;
+  color: #ffffff;
+  font-size: 2.2rem;
+  margin: 0;
+  font-weight: 500;
+}
+
+/* Metrics Cards */
+.overview-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 25px;
+  margin-bottom: 40px;
+}
+
+.metric-card {
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 12px;
+  padding: 24px;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  transition: border-color 0.3s ease, transform 0.3s ease;
+}
+
+.metric-card:hover {
+  border-color: rgba(212, 175, 55, 0.3);
+  transform: translateY(-2px);
+}
+
+.card-icon {
+  width: 48px;
+  height: 48px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5rem;
+  flex-shrink: 0;
+}
+
+.revenue-icon { background: rgba(39, 174, 96, 0.1); color: #27ae60; }
+.orders-icon { background: rgba(52, 152, 219, 0.1); color: #3498db; }
+.products-icon { background: rgba(155, 89, 182, 0.1); color: #9b59b6; }
+.aov-icon { background: rgba(212, 175, 55, 0.1); color: #d4af37; }
+
+.card-info {
+  display: flex;
+  flex-direction: column;
+}
+
+.card-label {
+  font-size: 0.85rem;
+  color: #888888;
+  margin-bottom: 4px;
+}
+
+.card-value {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #ffffff;
+  margin: 0;
+}
+
+/* Layout Split Panels */
+.details-section-grid {
+  display: grid;
+  grid-template-columns: 1.5fr 1fr;
+  gap: 30px;
+}
+
+@media (max-width: 992px) {
+  .details-section-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.details-box {
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 12px;
+  padding: 24px;
+  box-sizing: border-box;
+}
+
+.details-box h3 {
+  color: #ffffff;
+  margin: 0 0 20px 0;
+  font-size: 1.15rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+}
+
+/* Tables style */
+.table-wrap {
+  width: 100%;
+  overflow-x: auto;
+}
+
+.overview-table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+}
+
+.overview-table th {
+  color: #777777;
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  padding: 12px 16px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.overview-table td {
+  padding: 16px;
+  color: #cccccc;
+  font-size: 0.9rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+}
+
+.customer-name {
+  color: #ffffff !important;
+  font-weight: 500;
+}
+
+.status-badge-mini {
+  display: inline-block;
+  padding: 4px 10px;
+  font-size: 11px;
+  text-transform: capitalize;
+  border-radius: 4px;
+  font-weight: 600;
+}
+
+.status-badge-mini.paid, .status-badge-mini.delivered {
+  background: rgba(39, 174, 96, 0.1);
+  color: #2ec872;
+}
+
+.status-badge-mini.pending {
+  background: rgba(243, 156, 18, 0.1);
+  color: #f5b041;
+}
+
+.status-badge-mini.processing {
+  background: rgba(52, 152, 219, 0.1);
+  color: #5dade2;
+}
+
+.status-badge-mini.cancelled {
+  background: rgba(231, 76, 60, 0.1);
+  color: #ec7063;
+}
+
+.empty-text {
+  text-align: center;
+  color: #666;
+  font-size: 0.9rem;
+  padding: 30px 0;
+}
+
+/* Category progress bars */
+.category-sales-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.cat-sales-row {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.cat-info {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.92rem;
+}
+
+.cat-name {
+  color: #ffffff;
+  font-weight: 500;
+}
+
+.cat-value {
+  color: #d4af37;
+  font-weight: 600;
+}
+
+.cat-progress-bar {
+  width: 100%;
+  height: 6px;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.cat-progress-fill {
+  height: 100%;
+  background: #d4af37;
+  border-radius: 10px;
+  transition: width 0.6s cubic-bezier(0.1, 0.8, 0.3, 1);
+}
+
+.ao-loading-container, .ao-error-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 80vh;
+  color: #fff;
+  background-color: #0c0806;
+}
+
+.ao-retry-btn {
+  margin-top: 15px;
+  padding: 10px 24px;
+  background: #d4af37;
+  color: #000;
+  border: none;
+  font-weight: 600;
+  border-radius: 6px;
+  cursor: pointer;
+}

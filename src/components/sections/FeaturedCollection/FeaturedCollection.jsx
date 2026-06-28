@@ -24,16 +24,43 @@ const FeaturedCollection = () => {
   };
 
   useEffect(() => {
-    supabase
-      .from('products')
-      .select('id, name, description, images, price')
-      .eq('is_featured', true)
-      .eq('in_stock', true)
-      .limit(1)
-      .maybeSingle()
-      .then(({ data }) => {
-        if (data) setFeatured(data);
-      });
+    const loadFeatured = async () => {
+      try {
+        // Fetch content config
+        const { data: configData } = await supabase.from('site_content').select('*').eq('key', 'featured_collection').maybeSingle();
+        const config = configData?.value || {};
+        
+        let targetProduct = null;
+
+        if (config.product_id) {
+          // Fetch specific product
+          const { data: prod } = await supabase.from('products').select('id, name, description, images, price').eq('id', config.product_id).maybeSingle();
+          if (prod) {
+            targetProduct = prod;
+          }
+        }
+
+        if (!targetProduct) {
+          // Fallback to query database for any product marked is_featured
+          const { data: prod } = await supabase.from('products').select('id, name, description, images, price').eq('is_featured', true).eq('in_stock', true).limit(1).maybeSingle();
+          if (prod) {
+            targetProduct = prod;
+          }
+        }
+
+        if (targetProduct) {
+          setFeatured({
+            ...targetProduct,
+            name: config.heading || targetProduct.name,
+            description: config.description || targetProduct.description
+          });
+        }
+      } catch (err) {
+        console.error('Failed to load Featured Collection dynamic config:', err);
+      }
+    };
+
+    loadFeatured();
   }, []);
 
   const fadeUp = {

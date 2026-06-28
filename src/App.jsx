@@ -17,6 +17,10 @@ import NotFound from './pages/NotFound/NotFound';
 import AdminLogin from './pages/admin/AdminLogin';
 import AdminProducts from './pages/admin/AdminProducts';
 import AdminOrders from './pages/admin/AdminOrders';
+import AdminOverview from './pages/admin/AdminOverview';
+import AdminContent from './pages/admin/AdminContent';
+import AdminEmails from './pages/admin/AdminEmails';
+import AdminSettings from './pages/admin/AdminSettings';
 
 const AdminRoute = ({ children }) => {
   const { user, isAdmin, loading } = useAuth();
@@ -43,9 +47,13 @@ function App() {
 
         {/* Admin */}
         <Route path="/admin/login" element={<AdminLogin />} />
-        <Route path="/admin" element={<Navigate to="/admin/products" replace />} />
+        <Route path="/admin" element={<Navigate to="/admin/overview" replace />} />
+        <Route path="/admin/overview" element={<AdminRoute><AdminOverview /></AdminRoute>} />
         <Route path="/admin/products" element={<AdminRoute><AdminProducts /></AdminRoute>} />
         <Route path="/admin/orders" element={<AdminRoute><AdminOrders /></AdminRoute>} />
+        <Route path="/admin/content" element={<AdminRoute><AdminContent /></AdminRoute>} />
+        <Route path="/admin/emails" element={<AdminRoute><AdminEmails /></AdminRoute>} />
+        <Route path="/admin/settings" element={<AdminRoute><AdminSettings /></AdminRoute>} />
 
         <Route path="*" element={<NotFound />} />
       </Routes>

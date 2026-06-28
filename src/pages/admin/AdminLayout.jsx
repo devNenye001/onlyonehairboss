@@ -1,5 +1,14 @@
 import { NavLink, useNavigate } from 'react-router-dom';
-import { HiOutlineShoppingBag, HiOutlineClipboardList, HiOutlineLogout, HiOutlineHome } from 'react-icons/hi';
+import { 
+  HiOutlineShoppingBag, 
+  HiOutlineClipboardList, 
+  HiOutlineLogout, 
+  HiOutlineHome,
+  HiOutlineChartBar,
+  HiOutlineDocumentText,
+  HiOutlineMail,
+  HiOutlineCog
+} from 'react-icons/hi';
 import { useAuth } from '../../context/AuthContext';
 import './AdminLayout.css';
 
@@ -21,11 +30,23 @@ const AdminLayout = ({ children }) => {
         </div>
 
         <nav className="admin-nav">
+          <NavLink to="/admin/overview" className={({ isActive }) => `admin-nav-link ${isActive ? 'active' : ''}`}>
+            <HiOutlineChartBar /> Overview
+          </NavLink>
           <NavLink to="/admin/products" className={({ isActive }) => `admin-nav-link ${isActive ? 'active' : ''}`}>
             <HiOutlineShoppingBag /> Products
           </NavLink>
           <NavLink to="/admin/orders" className={({ isActive }) => `admin-nav-link ${isActive ? 'active' : ''}`}>
             <HiOutlineClipboardList /> Orders
+          </NavLink>
+          <NavLink to="/admin/content" className={({ isActive }) => `admin-nav-link ${isActive ? 'active' : ''}`}>
+            <HiOutlineDocumentText /> Content Manager
+          </NavLink>
+          <NavLink to="/admin/emails" className={({ isActive }) => `admin-nav-link ${isActive ? 'active' : ''}`}>
+            <HiOutlineMail /> Email Templates
+          </NavLink>
+          <NavLink to="/admin/settings" className={({ isActive }) => `admin-nav-link ${isActive ? 'active' : ''}`}>
+            <HiOutlineCog /> Settings
           </NavLink>
         </nav>
 
