@@ -22,7 +22,6 @@ const callFunction = async (name, body) => {
     headers: {
       'Content-Type': 'application/json',
       'Authorization': token,
-      'apikey': import.meta.env.VITE_SUPABASE_ANON_KEY,
     },
     body: JSON.stringify(body),
   })
