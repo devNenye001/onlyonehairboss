@@ -8,11 +8,18 @@ import './ResetPassword.css';
 const ResetPassword = () => {
   const [password, setPassword] = useState('');
   const [confirm, setConfirm] = useState('');
-  const [showPw, setShowPw] = useState(false);
+  const [visibleFields, setVisibleFields] = useState({
+    password: false,
+    confirm: false
+  });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState(false);
-  const [ready, setReady] = useState(false);
+  const [ready, setReady] = useState(() => {
+    const queryToken = new URLSearchParams(window.location.search).get('token');
+    const params = new URLSearchParams(window.location.hash.replace('#', '?').slice(1));
+    return Boolean(queryToken || params.get('type') === 'recovery');
+  });
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -20,16 +27,13 @@ const ResetPassword = () => {
 
     const queryToken = new URLSearchParams(window.location.search).get('token');
     if (queryToken) {
-      localStorage.setItem('hairboss_token', queryToken);
+      sessionStorage.setItem('hairboss_reset_token', queryToken);
       window.history.replaceState({}, document.title, window.location.pathname);
-      // eslint-disable-next-line react-hooks/set-state-in-effect
-      setReady(true);
       return;
     }
 
     const params = new URLSearchParams(window.location.hash.replace('#', '?').slice(1));
     if (params.get('type') === 'recovery') {
-      setReady(true);
       return;
     }
 
@@ -44,6 +48,10 @@ const ResetPassword = () => {
     return () => { mounted = false; subscription.unsubscribe(); };
   }, []);
 
+  const togglePasswordVisibility = (field) => {
+    setVisibleFields(prev => ({ ...prev, [field]: !prev[field] }));
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (password !== confirm) { setError('Passwords do not match.'); return; }
@@ -54,7 +62,7 @@ const ResetPassword = () => {
     setLoading(false);
     if (err) setError(err.message);
     else {
-      localStorage.removeItem('hairboss_token');
+      sessionStorage.removeItem('hairboss_reset_token');
       setSuccess(true);
       setTimeout(() => navigate('/auth'), 2500);
     }
@@ -90,24 +98,39 @@ const ResetPassword = () => {
               <label>New Password</label>
               <div className="password-wrap">
                 <input
-                  type={showPw ? 'text' : 'password'}
+                  type={visibleFields.password ? 'text' : 'password'}
                   value={password}
                   onChange={e => setPassword(e.target.value)}
                   required minLength={6} placeholder="Password"
                 />
-                <button type="button" className="pw-toggle" onClick={() => setShowPw(v => !v)} tabIndex={-1}>
-                  {showPw ? <HiOutlineEyeOff /> : <HiOutlineEye />}
+                <button
+                  type="button"
+                  className="pw-toggle"
+                  onClick={() => togglePasswordVisibility('password')}
+                  aria-label={visibleFields.password ? 'Hide new password' : 'Show new password'}
+                >
+                  {visibleFields.password ? <HiOutlineEyeOff /> : <HiOutlineEye />}
                 </button>
               </div>
             </div>
             <div className="rp-field">
               <label>Confirm Password</label>
-              <input
-                type={showPw ? 'text' : 'password'}
-                value={confirm}
-                onChange={e => setConfirm(e.target.value)}
-                required minLength={6} placeholder="Confirm password"
-              />
+              <div className="password-wrap">
+                <input
+                  type={visibleFields.confirm ? 'text' : 'password'}
+                  value={confirm}
+                  onChange={e => setConfirm(e.target.value)}
+                  required minLength={6} placeholder="Confirm password"
+                />
+                <button
+                  type="button"
+                  className="pw-toggle"
+                  onClick={() => togglePasswordVisibility('confirm')}
+                  aria-label={visibleFields.confirm ? 'Hide confirm password' : 'Show confirm password'}
+                >
+                  {visibleFields.confirm ? <HiOutlineEyeOff /> : <HiOutlineEye />}
+                </button>
+              </div>
             </div>
             {error && <p className="rp-error">{error}</p>}
             <button type="submit" className="rp-btn" disabled={loading}>

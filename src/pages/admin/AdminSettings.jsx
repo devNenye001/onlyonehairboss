@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import AdminLayout from './AdminLayout';
-import { HiOutlineLockClosed } from 'react-icons/hi';
+import { HiOutlineEye, HiOutlineEyeOff, HiOutlineLockClosed } from 'react-icons/hi';
 import './AdminSettings.css';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
@@ -14,6 +14,15 @@ const AdminSettings = () => {
 
   const [savingPass, setSavingPass] = useState(false);
   const [passMsg, setPassMsg] = useState('');
+  const [visibleFields, setVisibleFields] = useState({
+    currentPassword: false,
+    newPassword: false,
+    confirmPassword: false
+  });
+
+  const togglePasswordVisibility = (field) => {
+    setVisibleFields(prev => ({ ...prev, [field]: !prev[field] }));
+  };
 
   const handleChangePassword = async (e) => {
     e.preventDefault();
@@ -70,32 +79,62 @@ const AdminSettings = () => {
 
             <div className="settings-field-group">
               <label>Current Password</label>
-              <input 
-                type="password" 
-                value={passwordForm.currentPassword} 
-                onChange={e => setPasswordForm({ ...passwordForm, currentPassword: e.target.value })} 
-                required
-              />
+              <div className="settings-password-wrap">
+                <input
+                  type={visibleFields.currentPassword ? 'text' : 'password'}
+                  value={passwordForm.currentPassword}
+                  onChange={e => setPasswordForm({ ...passwordForm, currentPassword: e.target.value })}
+                  required
+                />
+                <button
+                  type="button"
+                  className="settings-pw-toggle"
+                  onClick={() => togglePasswordVisibility('currentPassword')}
+                  aria-label={visibleFields.currentPassword ? 'Hide current password' : 'Show current password'}
+                >
+                  {visibleFields.currentPassword ? <HiOutlineEyeOff /> : <HiOutlineEye />}
+                </button>
+              </div>
             </div>
 
             <div className="settings-field-group">
               <label>New Password</label>
-              <input 
-                type="password" 
-                value={passwordForm.newPassword} 
-                onChange={e => setPasswordForm({ ...passwordForm, newPassword: e.target.value })} 
-                required
-              />
+              <div className="settings-password-wrap">
+                <input
+                  type={visibleFields.newPassword ? 'text' : 'password'}
+                  value={passwordForm.newPassword}
+                  onChange={e => setPasswordForm({ ...passwordForm, newPassword: e.target.value })}
+                  required
+                />
+                <button
+                  type="button"
+                  className="settings-pw-toggle"
+                  onClick={() => togglePasswordVisibility('newPassword')}
+                  aria-label={visibleFields.newPassword ? 'Hide new password' : 'Show new password'}
+                >
+                  {visibleFields.newPassword ? <HiOutlineEyeOff /> : <HiOutlineEye />}
+                </button>
+              </div>
             </div>
 
             <div className="settings-field-group">
               <label>Confirm New Password</label>
-              <input 
-                type="password" 
-                value={passwordForm.confirmPassword} 
-                onChange={e => setPasswordForm({ ...passwordForm, confirmPassword: e.target.value })} 
-                required
-              />
+              <div className="settings-password-wrap">
+                <input
+                  type={visibleFields.confirmPassword ? 'text' : 'password'}
+                  value={passwordForm.confirmPassword}
+                  onChange={e => setPasswordForm({ ...passwordForm, confirmPassword: e.target.value })}
+                  required
+                />
+                <button
+                  type="button"
+                  className="settings-pw-toggle"
+                  onClick={() => togglePasswordVisibility('confirmPassword')}
+                  aria-label={visibleFields.confirmPassword ? 'Hide confirm password' : 'Show confirm password'}
+                >
+                  {visibleFields.confirmPassword ? <HiOutlineEyeOff /> : <HiOutlineEye />}
+                </button>
+              </div>
             </div>
 
             <button type="submit" className="settings-save-btn btn-secondary" disabled={savingPass}>

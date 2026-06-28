@@ -91,6 +91,39 @@
   width: 100%;
 }
 
+.settings-password-wrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.settings-password-wrap input {
+  padding-right: 46px;
+}
+
+.settings-pw-toggle {
+  position: absolute;
+  right: 12px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: #c8a095;
+  font-size: 1.15rem;
+  cursor: pointer;
+  opacity: 0.78;
+  transition: opacity 0.2s ease, color 0.2s ease;
+}
+
+.settings-pw-toggle:hover {
+  color: #ffffff;
+  opacity: 1;
+}
+
 .settings-field-group input:focus {
   border-color: #995544;
 }

@@ -144,11 +144,12 @@ export const supabase = {
 
     updateUser: async ({ password }) => {
       try {
+        const resetToken = sessionStorage.getItem('hairboss_reset_token');
         const res = await fetch(`${API_URL}/auth/reset-password`, {
           method: 'POST',
           headers: { 
             'Content-Type': 'application/json',
-            ...getAuthHeaders()
+            ...(resetToken ? { 'Authorization': `Bearer ${resetToken}` } : getAuthHeaders())
           },
           body: JSON.stringify({ password })
         });
