@@ -26,26 +26,38 @@ const Shop = () => {
   });
 
   useEffect(() => {
-    // Load config
-    supabase.from('site_content').select('*').eq('key', 'collection_section').maybeSingle()
-      .then(({ data }) => {
-        if (data?.value) {
-          setColConfig(prev => ({ ...prev, ...data.value }));
-        }
-      });
+    const loadShopData = async () => {
+      try {
+        // 1. Load config
+        const { data: configData } = await supabase.from('site_content').select('*').eq('key', 'collection_section').maybeSingle();
+        const config = configData?.value || {};
+        setColConfig(prev => ({ ...prev, ...config }));
 
-    // Load products
-    supabase
-      .from('products')
-      .select('id, name, price, images')
-      .eq('in_stock', true)
-      .order('created_at', { ascending: false })
-      .limit(6)
-      .then(({ data }) => {
-        if (data && data.length > 0) {
-          setProducts(data.map(p => ({ ...p, image: Array.isArray(p.images) ? p.images[0] : p.images || '/wig1.svg' })));
+        // 2. Load products
+        const { data: prodData } = await supabase.from('products').select('id, name, price, images, created_at').eq('in_stock', true);
+        if (prodData && prodData.length > 0) {
+          const mapped = prodData.map(p => ({ ...p, image: Array.isArray(p.images) ? p.images[0] : p.images || '/wig1.svg' }));
+          
+          if (config.product_ids && config.product_ids.length > 0) {
+            const ordered = config.product_ids
+              .map(id => mapped.find(p => p.id === id))
+              .filter(Boolean);
+            if (ordered.length > 0) {
+              setProducts(ordered.slice(0, 6));
+              return;
+            }
+          }
+          
+          // Fallback to latest 6 products
+          const sorted = [...prodData].sort((a,b) => new Date(b.created_at || 0) - new Date(a.created_at || 0));
+          setProducts(sorted.map(p => ({ ...p, image: Array.isArray(p.images) ? p.images[0] : p.images || '/wig1.svg' })).slice(0, 6));
         }
-      });
+      } catch (err) {
+        console.error('Failed to load shop section data:', err);
+      }
+    };
+
+    loadShopData();
   }, []);
 
   return (

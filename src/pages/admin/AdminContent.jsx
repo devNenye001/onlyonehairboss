@@ -12,7 +12,7 @@ const AdminContent = () => {
 
   // Sections State
   const [newIns, setNewIns] = useState({ heading: '', description: '', product_ids: [] });
-  const [collections, setCollections] = useState({ title: '', description: '', image_url: '' });
+  const [collections, setCollections] = useState({ title: '', description: '', image_url: '', product_ids: [] });
   const [featuredCol, setFeaturedCol] = useState({ product_id: '', heading: '', description: '' });
   const [socials, setSocials] = useState({ videos: [] });
 
@@ -90,6 +90,12 @@ const AdminContent = () => {
     const ids = [...newIns.product_ids];
     ids[index] = prodId;
     setNewIns({ ...newIns, product_ids: ids.filter(Boolean) });
+  };
+
+  const handleProductSelectForCollections = (prodId, index) => {
+    const ids = [...(collections.product_ids || [])];
+    ids[index] = prodId;
+    setCollections({ ...collections, product_ids: ids.filter(Boolean) });
   };
 
   const handleSocialVideoChange = (index, field, value) => {
@@ -203,6 +209,24 @@ const AdminContent = () => {
                       style={{ display: 'none' }}
                     />
                   </label>
+                </div>
+              </div>
+
+              <div className="wigs-selector-group" style={{ marginTop: '20px' }}>
+                <label>Select Displayed Products (Max 6)</label>
+                <div className="sel-grid">
+                  {[0, 1, 2, 3, 4, 5].map(i => (
+                    <select 
+                      key={i} 
+                      value={collections.product_ids?.[i] || ''} 
+                      onChange={e => handleProductSelectForCollections(e.target.value, i)}
+                    >
+                      <option value="">-- Choose Wig --</option>
+                      {products.map(p => (
+                        <option key={p.id} value={p.id}>{p.name}</option>
+                      ))}
+                    </select>
+                  ))}
                 </div>
               </div>
 
