@@ -2,7 +2,7 @@
 import { useState, useEffect } from 'react';
 import { motion as Motion } from 'framer-motion';
 import './Shop.css';
-import ProductCard from '../../ProductCard/ProductCard';
+import ProductCard, { ProductCardSkeleton } from '../../ProductCard/ProductCard';
 import { supabase } from '../../../utils/supabase/client';
 
 const FALLBACK = [
@@ -18,6 +18,7 @@ const FALLBACK = [
 
 const Shop = () => {
   const [products, setProducts] = useState(FALLBACK);
+  const [loading, setLoading] = useState(true);
   const [colConfig, setColConfig] = useState({
     title: 'Our Collection',
     description: '',
@@ -54,6 +55,8 @@ const Shop = () => {
         }
       } catch (err) {
         console.error('Failed to load shop section data:', err);
+      } finally {
+        setLoading(false);
       }
     };
 
@@ -69,10 +72,10 @@ const Shop = () => {
           {colConfig.description && <p className="shop-desc" style={{ color: '#888', marginTop: '8px', fontSize: '0.95rem', textAlign: 'center' }}>{colConfig.description}</p>}
         </div>
 
-        <div className="product-grid">
-          {products.map(product => (
-            <ProductCard key={product.id} product={product} />
-          ))}
+        <div className="product-grid" aria-label={loading ? 'Loading products' : undefined}>
+          {loading
+            ? Array.from({ length: 8 }, (_, i) => <ProductCardSkeleton key={i} />)
+            : products.map(product => <ProductCard key={product.id} product={product} />)}
         </div>
 
         <section className="shop-banner">

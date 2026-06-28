@@ -4,7 +4,7 @@ import { motion as Motion } from 'framer-motion';
 import { HiOutlineShoppingBag } from 'react-icons/hi';
 import Navbar from '../../components/Navbar/Navbar';
 import Footer from '../../components/Footer/Footer';
-import ProductCard from '../../components/ProductCard/ProductCard';
+import ProductCard, { ProductCardSkeleton } from '../../components/ProductCard/ProductCard';
 import { supabase } from '../../utils/supabase/client';
 import './ShopPage.css';
 
@@ -20,15 +20,6 @@ const FALLBACK = [
   { id: '7', name: 'Deep Wave Curls', price: 270000, images: ['/wig7.svg'], category: 'Deep Wave' },
   { id: '8', name: 'Bone Straight Lace', price: 270000, images: ['/wig8.svg'], category: 'Bone Straight' },
 ];
-
-const SkeletonCard = () => (
-  <div className="skeleton-card">
-    <div className="skeleton-image"></div>
-    <div className="skeleton-text title"></div>
-    <div className="skeleton-text price"></div>
-    <div className="skeleton-button"></div>
-  </div>
-);
 
 const ShopPage = () => {
   const [products, setProducts] = useState([]);
@@ -81,8 +72,8 @@ const ShopPage = () => {
         </div>
 
         {loading ? (
-          <div className="shop-full-grid">
-            {[1, 2, 3, 4, 5, 6, 7, 8].map(i => <SkeletonCard key={i} />)}
+          <div className="shop-full-grid" aria-label="Loading products">
+            {Array.from({ length: 8 }, (_, i) => <ProductCardSkeleton key={i} />)}
           </div>
         ) : filtered.length === 0 ? (
           <div className="shop-empty-container">

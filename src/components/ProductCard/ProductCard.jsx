@@ -40,4 +40,15 @@ const ProductCard = ({ product }) => {
   );
 };
 
+export const ProductCardSkeleton = () => (
+  <div className="product-card product-card-skeleton" aria-hidden="true">
+    <div className="product-image-container skeleton-block skeleton-image-block" />
+    <div className="product-info">
+      <div className="skeleton-block skeleton-name-line" />
+      <div className="skeleton-block skeleton-price-line" />
+      <div className="skeleton-block skeleton-button-line" />
+    </div>
+  </div>
+);
+
 export default ProductCard;

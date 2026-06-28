@@ -3,7 +3,7 @@ import { useSearchParams, Link } from 'react-router-dom';
 import { HiOutlineSearch } from 'react-icons/hi';
 import Navbar from '../../components/Navbar/Navbar';
 import Footer from '../../components/Footer/Footer';
-import ProductCard from '../../components/ProductCard/ProductCard';
+import ProductCard, { ProductCardSkeleton } from '../../components/ProductCard/ProductCard';
 import { supabase } from '../../utils/supabase/client';
 import './Search.css';
 
@@ -56,7 +56,14 @@ const Search = () => {
           <button type="submit" className="search-btn"><HiOutlineSearch /></button>
         </form>
 
-        {loading && <p className="search-status">Searching...</p>}
+        {loading && (
+          <>
+            <p className="search-status">Searching...</p>
+            <div className="search-grid" aria-label="Loading search results">
+              {Array.from({ length: 4 }, (_, i) => <ProductCardSkeleton key={i} />)}
+            </div>
+          </>
+        )}
 
         {!loading && searched && query && results.length > 0 && (
           <p className="search-status">

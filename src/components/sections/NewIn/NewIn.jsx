@@ -1,7 +1,7 @@
 
 import { useState, useEffect } from 'react';
 import './NewIn.css';
-import ProductCard from '../../ProductCard/ProductCard';
+import ProductCard, { ProductCardSkeleton } from '../../ProductCard/ProductCard';
 import { supabase } from '../../../utils/supabase/client';
 
 const FALLBACK = [
@@ -13,6 +13,7 @@ const FALLBACK = [
 
 const NewIn = () => {
   const [newArrivals, setNewArrivals] = useState(FALLBACK);
+  const [loading, setLoading] = useState(true);
   const [heading, setHeading] = useState('New Ins');
   const [description, setDescription] = useState('');
 
@@ -47,6 +48,8 @@ const NewIn = () => {
         }
       } catch (err) {
         console.error('Failed to load New Ins dynamic configuration:', err);
+      } finally {
+        setLoading(false);
       }
     };
 
@@ -63,10 +66,10 @@ const NewIn = () => {
           {description && <p className="new-in-desc" style={{ color: '#888', marginTop: '8px', fontSize: '0.95rem' }}>{description}</p>}
         </div>
 
-        <div className="new-in-grid">
-          {newArrivals.map((product) => (
-            <ProductCard key={product.id} product={product} />
-          ))}
+        <div className="new-in-grid" aria-label={loading ? 'Loading new arrivals' : undefined}>
+          {loading
+            ? Array.from({ length: 4 }, (_, i) => <ProductCardSkeleton key={i} />)
+            : newArrivals.map(product => <ProductCard key={product.id} product={product} />)}
         </div>
 
       </div>
