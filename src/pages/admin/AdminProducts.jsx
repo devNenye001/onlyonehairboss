@@ -33,7 +33,14 @@ const AdminProducts = () => {
     return () => { cancelled = true; };
   }, []);
 
-  const openNew = () => { setForm(EMPTY_FORM); setEditing(null); setImageFiles([]); setShowForm(true); };
+  const openNew = () => { 
+    setForm(EMPTY_FORM); 
+    setEditing(null); 
+    setImageFiles([]); 
+    setMsg('');
+    setSaving(false);
+    setShowForm(true); 
+  };
   const openEdit = (p) => {
     setForm({
       name: p.name,
@@ -44,13 +51,15 @@ const AdminProducts = () => {
     });
     setEditing(p.id);
     setImageFiles([]);
+    setMsg('');
+    setSaving(false);
     setShowForm(true);
   };
 
   const uploadImage = async () => {
     const file = imageFiles[0];
     if (!file) return null;
-    if (!file.type.startsWith('image/')) {
+    if (!file.type || !file.type.startsWith('image/')) {
       alert('Invalid file format. Please upload an image file (PNG, JPG, WebP, etc.).');
       return null;
     }
@@ -73,37 +82,47 @@ const AdminProducts = () => {
     }
 
     setSaving(true);
-    const imageUrl = imageFiles.length ? await uploadImage() : null;
+    try {
+      const imageUrl = imageFiles.length ? await uploadImage() : null;
 
-    const payload = {
-      name: form.name,
-      price: price,
-      description: form.description,
-      category: form.category,
-      is_featured: false,
-      stock_count: parseInt(form.stock, 10),
-      in_stock: parseInt(form.stock, 10) > 0,
-    };
+      const payload = {
+        name: form.name,
+        price: price,
+        description: form.description,
+        category: form.category,
+        is_featured: false,
+        stock_count: parseInt(form.stock, 10),
+        in_stock: parseInt(form.stock, 10) > 0,
+      };
 
-    if (editing) {
-      if (imageUrl) {
-        payload.images = [imageUrl];
+      if (editing) {
+        if (imageUrl) {
+          payload.images = [imageUrl];
+        }
+        const { error } = await supabase.from('products').update(payload).eq('id', editing);
+        if (error) setMsg(`Error: ${error.message}`);
+        else {
+          setMsg('Product updated successfully!');
+          setShowForm(false);
+        }
+      } else {
+        const { error } = await supabase.from('products').insert({
+          ...payload,
+          images: imageUrl ? [imageUrl] : [],
+        });
+        if (error) setMsg(`Error: ${error.message}`);
+        else {
+          setMsg('Product added successfully!');
+          setShowForm(false);
+        }
       }
-      const { error } = await supabase.from('products').update(payload).eq('id', editing);
-      if (error) setMsg(`Error: ${error.message}`);
-      else setMsg('Product updated successfully!');
-    } else {
-      const { error } = await supabase.from('products').insert({
-        ...payload,
-        images: imageUrl ? [imageUrl] : [],
-      });
-      if (error) setMsg(`Error: ${error.message}`);
-      else setMsg('Product added successfully!');
+      fetchProducts({ showLoading: false });
+    } catch (err) {
+      console.error(err);
+      setMsg(`Error: ${err.message}`);
+    } finally {
+      setSaving(false);
     }
-
-    setSaving(false);
-    setShowForm(false);
-    fetchProducts({ showLoading: false });
   };
 
   const handleDelete = async (id) => {

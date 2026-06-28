@@ -38,14 +38,87 @@
 /* Main content */
 .admin-main { flex:1; overflow:auto; }
 
-@media (max-width:768px) {
-  .admin-sidebar { width:180px; min-width:180px; }
+/* Responsive Burger Menu */
+.admin-mobile-header {
+  display: none;
+  height: 60px;
+  background: #1a1a1a;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 20px;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 1000;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
 }
-@media (max-width:560px) {
-  .admin-layout { flex-direction:column; }
-  .admin-sidebar { width:100%; min-width:unset; height:auto; position:relative; flex-direction:row; flex-wrap:wrap; padding:12px; gap:8px; }
-  .admin-sidebar-top { display:none; }
-  .admin-nav { flex-direction:row; padding:0; gap:4px; }
-  .admin-sidebar-bottom { flex-direction:row; border-top:none; padding-top:0; }
-  .admin-nav-link { font-size:0.78rem; padding:8px 10px; }
+
+.admin-burger-btn {
+  background: none;
+  border: none;
+  color: #ffffff;
+  font-size: 1.6rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8px;
+  border-radius: 4px;
+}
+
+.admin-burger-btn:hover {
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.admin-mobile-logo {
+  height: 28px;
+  width: auto;
+  object-fit: contain;
+  filter: brightness(0) invert(1);
+}
+
+.admin-mobile-title {
+  color: rgba(255, 255, 255, 0.8);
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  font-weight: 600;
+}
+
+.admin-sidebar-overlay {
+  position: fixed;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 998;
+}
+
+@media (max-width: 768px) {
+  .admin-mobile-header {
+    display: flex;
+  }
+
+  .admin-sidebar {
+    position: fixed;
+    top: 60px;
+    bottom: 0;
+    left: -240px;
+    width: 240px;
+    min-width: 240px;
+    height: calc(100vh - 60px);
+    z-index: 999;
+    transition: left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .admin-sidebar.open {
+    left: 0;
+  }
+
+  .admin-main {
+    padding-top: 60px;
+    width: 100%;
+  }
 }
