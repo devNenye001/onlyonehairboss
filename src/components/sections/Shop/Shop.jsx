@@ -21,7 +21,6 @@ const Shop = () => {
   const [loading, setLoading] = useState(true);
   const [colConfig, setColConfig] = useState({
     title: 'Our Collection',
-    description: '',
     image_url: '/logo.svg',
     banner_text: 'Luxury Hair. Timeless Beauty.'
   });
@@ -32,7 +31,7 @@ const Shop = () => {
         // 1. Load config
         const { data: configData } = await supabase.from('site_content').select('*').eq('key', 'collection_section').maybeSingle();
         const config = configData?.value || {};
-        setColConfig(prev => ({ ...prev, ...config }));
+        setColConfig(prev => ({ ...prev, ...config, description: '' }));
 
         // 2. Load products
         const { data: prodData } = await supabase.from('products').select('id, name, price, images, created_at').eq('in_stock', true);
@@ -69,7 +68,6 @@ const Shop = () => {
         <div className="shop-header">
           <p className="shop-tag" style={{color:"#995544"}}>Shop</p>
           <h1 className="taprom-headline">{colConfig.title}</h1>
-          {colConfig.description && <p className="shop-desc" style={{ color: '#888', marginTop: '8px', fontSize: '0.95rem', textAlign: 'center' }}>{colConfig.description}</p>}
         </div>
 
         <div className="product-grid" aria-label={loading ? 'Loading products' : undefined}>
@@ -87,7 +85,7 @@ const Shop = () => {
             transition={{ duration: 0.8 }}
           >
             <img src={colConfig.image_url || "/logo.svg"} alt="OnlyOne Hairboss" className="banner-logo" />
-            <h2 className="banner-text">{colConfig.banner_text || colConfig.description || "Luxury Hair. Timeless Beauty."}</h2>
+            <h2 className="banner-text">{colConfig.banner_text || "Luxury Hair. Timeless Beauty."}</h2>
           </Motion.div>
         </section>
       </main>

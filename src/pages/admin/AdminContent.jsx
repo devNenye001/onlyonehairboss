@@ -1,8 +1,13 @@
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import AdminLayout from './AdminLayout';
 import { supabase } from '../../utils/supabase/client';
 import { HiOutlineUpload, HiOutlineSave, HiX } from 'react-icons/hi';
 import './AdminContent.css';
+
+const cleanCollectionConfig = (value = {}) => ({
+  ...value,
+  description: ''
+});
 
 const AdminContent = () => {
   const [products, setProducts] = useState([]);
@@ -16,7 +21,7 @@ const AdminContent = () => {
   const [featuredCol, setFeaturedCol] = useState({ product_id: '', heading: '', description: '', video_url: '' });
   const [socials, setSocials] = useState({ videos: [] });
 
-  const fetchData = async () => {
+  const fetchData = useCallback(async () => {
     setLoading(true);
     try {
       // 1. Fetch products (for selectors)
@@ -29,7 +34,7 @@ const AdminContent = () => {
 
       // 3. Fetch Collection Section config
       const { data: colData } = await supabase.from('site_content').select('*').eq('key', 'collection_section').maybeSingle();
-      if (colData?.value) setCollections(colData.value);
+      if (colData?.value) setCollections(cleanCollectionConfig(colData.value));
 
       // 4. Fetch Featured config
       const { data: featData } = await supabase.from('site_content').select('*').eq('key', 'featured_collection').maybeSingle();
@@ -45,12 +50,12 @@ const AdminContent = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
 
   useEffect(() => {
     // eslint-disable-next-line react-hooks/set-state-in-effect
     fetchData();
-  }, []);
+  }, [fetchData]);
 
   const handleSaveSection = async (key, value) => {
     setSaving(true);
@@ -494,16 +499,6 @@ const AdminContent = () => {
               </div>
 
               <div className="field-group">
-                <label>Section Description</label>
-                <textarea 
-                  value={collections.description} 
-                  onChange={e => setCollections({ ...collections, description: e.target.value })} 
-                  rows="2"
-                  placeholder="Luxury Hair. Timeless Beauty..."
-                />
-              </div>
-
-              <div className="field-group">
                 <label>Banner Image/Logo (URL)</label>
                 <div className="file-upload-row">
                   <input 
@@ -543,7 +538,7 @@ const AdminContent = () => {
 
               <button 
                 className="save-section-btn" 
-                onClick={() => handleSaveSection('collection_section', collections)}
+                onClick={() => handleSaveSection('collection_section', cleanCollectionConfig(collections))}
                 disabled={saving}
               >
                 <HiOutlineSave /> Save Collection Info
