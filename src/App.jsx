@@ -19,7 +19,6 @@ import AdminProducts from './pages/admin/AdminProducts';
 import AdminOrders from './pages/admin/AdminOrders';
 import AdminOverview from './pages/admin/AdminOverview';
 import AdminContent from './pages/admin/AdminContent';
-import AdminEmails from './pages/admin/AdminEmails';
 import AdminSettings from './pages/admin/AdminSettings';
 
 const AdminRoute = ({ children }) => {
@@ -52,7 +51,6 @@ function App() {
         <Route path="/admin/products" element={<AdminRoute><AdminProducts /></AdminRoute>} />
         <Route path="/admin/orders" element={<AdminRoute><AdminOrders /></AdminRoute>} />
         <Route path="/admin/content" element={<AdminRoute><AdminContent /></AdminRoute>} />
-        <Route path="/admin/emails" element={<AdminRoute><AdminEmails /></AdminRoute>} />
         <Route path="/admin/settings" element={<AdminRoute><AdminSettings /></AdminRoute>} />
 
         <Route path="*" element={<NotFound />} />

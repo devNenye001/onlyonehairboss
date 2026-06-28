@@ -10,7 +10,7 @@
 }
 
 .overview-tag {
-  color: #d4af37;
+  color: #995544;
   text-transform: uppercase;
   font-size: 0.82rem;
   letter-spacing: 0.2em;
@@ -46,7 +46,7 @@
 }
 
 .metric-card:hover {
-  border-color: rgba(212, 175, 55, 0.3);
+  border-color: rgba(153, 85, 68, 0.3);
   transform: translateY(-2px);
 }
 
@@ -64,7 +64,7 @@
 .revenue-icon { background: rgba(39, 174, 96, 0.1); color: #27ae60; }
 .orders-icon { background: rgba(52, 152, 219, 0.1); color: #3498db; }
 .products-icon { background: rgba(155, 89, 182, 0.1); color: #9b59b6; }
-.aov-icon { background: rgba(212, 175, 55, 0.1); color: #d4af37; }
+.aov-icon { background: rgba(153, 85, 68, 0.1); color: #995544; }
 
 .card-info {
   display: flex;
@@ -207,7 +207,7 @@
 }
 
 .cat-value {
-  color: #d4af37;
+  color: #995544;
   font-weight: 600;
 }
 
@@ -221,7 +221,7 @@
 
 .cat-progress-fill {
   height: 100%;
-  background: #d4af37;
+  background: #995544;
   border-radius: 10px;
   transition: width 0.6s cubic-bezier(0.1, 0.8, 0.3, 1);
 }
@@ -239,10 +239,15 @@
 .ao-retry-btn {
   margin-top: 15px;
   padding: 10px 24px;
-  background: #d4af37;
-  color: #000;
+  background: #995544;
+  color: #FFF1EA;
   border: none;
   font-weight: 600;
   border-radius: 6px;
   cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.ao-retry-btn:hover {
+  background: #b06653;
 }

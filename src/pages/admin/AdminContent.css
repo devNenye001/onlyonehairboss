@@ -11,7 +11,7 @@
 }
 
 .content-tag {
-  color: #d4af37;
+  color: #995544;
   text-transform: uppercase;
   font-size: 0.82rem;
   letter-spacing: 0.2em;
@@ -28,9 +28,9 @@
 }
 
 .content-alert-msg {
-  background: rgba(212, 175, 55, 0.1);
-  border: 1px solid #d4af37;
-  color: #d4af37;
+  background: rgba(153, 85, 68, 0.1);
+  border: 1px solid #995544;
+  color: #995544;
   padding: 12px 20px;
   border-radius: 8px;
   margin-bottom: 30px;
@@ -103,7 +103,7 @@
 .field-group input:focus, 
 .field-group select:focus, 
 .field-group textarea:focus {
-  border-color: #d4af37;
+  border-color: #995544;
 }
 
 /* File upload helper row */
@@ -183,7 +183,7 @@
 
 .video-item-box h4 {
   margin: 0 0 15px 0;
-  color: #d4af37;
+  color: #995544;
   font-size: 1rem;
   border-bottom: 1px solid rgba(255, 255, 255, 0.05);
   padding-bottom: 8px;
@@ -194,9 +194,9 @@
   display: flex;
   align-items: center;
   gap: 8px;
-  background: #d4af37;
-  color: #0c0806;
-  border: 1px solid #d4af37;
+  background: #995544;
+  color: #FFF1EA;
+  border: 1px solid #995544;
   border-radius: 6px;
   padding: 12px 24px;
   font-size: 0.95rem;
@@ -206,8 +206,8 @@
 }
 
 .save-section-btn:hover {
-  background: #e5be48;
-  border-color: #e5be48;
+  background: #b06653;
+  border-color: #b06653;
 }
 
 .save-section-btn:disabled {

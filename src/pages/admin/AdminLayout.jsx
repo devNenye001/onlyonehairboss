@@ -6,7 +6,6 @@ import {
   HiOutlineHome,
   HiOutlineChartBar,
   HiOutlineDocumentText,
-  HiOutlineMail,
   HiOutlineCog
 } from 'react-icons/hi';
 import { useAuth } from '../../context/AuthContext';
@@ -41,9 +40,6 @@ const AdminLayout = ({ children }) => {
           </NavLink>
           <NavLink to="/admin/content" className={({ isActive }) => `admin-nav-link ${isActive ? 'active' : ''}`}>
             <HiOutlineDocumentText /> Content Manager
-          </NavLink>
-          <NavLink to="/admin/emails" className={({ isActive }) => `admin-nav-link ${isActive ? 'active' : ''}`}>
-            <HiOutlineMail /> Email Templates
           </NavLink>
           <NavLink to="/admin/settings" className={({ isActive }) => `admin-nav-link ${isActive ? 'active' : ''}`}>
             <HiOutlineCog /> Settings
