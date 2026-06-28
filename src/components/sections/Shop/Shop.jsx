@@ -40,7 +40,7 @@ const Shop = () => {
       .select('id, name, price, images')
       .eq('in_stock', true)
       .order('created_at', { ascending: false })
-      .limit(8)
+      .limit(6)
       .then(({ data }) => {
         if (data && data.length > 0) {
           setProducts(data.map(p => ({ ...p, image: Array.isArray(p.images) ? p.images[0] : p.images || '/wig1.svg' })));
