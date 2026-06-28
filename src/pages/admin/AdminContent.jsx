@@ -15,6 +15,7 @@ const AdminContent = () => {
   const [collections, setCollections] = useState({ title: '', description: '', image_url: '', product_ids: [] });
   const [featuredCol, setFeaturedCol] = useState({ product_id: '', heading: '', description: '', video_url: '' });
   const [socials, setSocials] = useState({ videos: [] });
+  const [uploadingFeatured, setUploadingFeatured] = useState(false);
 
   const fetchData = async () => {
     setLoading(true);
@@ -277,23 +278,30 @@ const AdminContent = () => {
               </div>
 
               <div className="field-group">
-                <label>Featured Video (URL / Upload file)</label>
+                <label>Featured Video</label>
                 <div className="file-upload-row">
-                  <input 
-                    value={featuredCol.video_url || ''} 
-                    onChange={e => setFeaturedCol({ ...featuredCol, video_url: e.target.value })} 
-                    placeholder="/featured1.mp4"
-                  />
-                  <label className="upload-file-btn">
-                    <HiOutlineUpload /> Upload Video
+                  <label className="upload-file-btn" style={{ flex: 1, justifyContent: 'center', opacity: uploadingFeatured ? 0.6 : 1 }}>
+                    <HiOutlineUpload /> {uploadingFeatured ? 'Uploading video, please wait...' : 'Upload Video from Device'}
                     <input 
                       type="file" 
                       accept="video/*" 
-                      onChange={e => handleMediaUpload(e.target.files[0], url => setFeaturedCol({ ...featuredCol, video_url: url }))}
+                      disabled={uploadingFeatured}
+                      onChange={async (e) => {
+                        const file = e.target.files[0];
+                        if (!file) return;
+                        setUploadingFeatured(true);
+                        await handleMediaUpload(file, url => setFeaturedCol({ ...featuredCol, video_url: url }));
+                        setUploadingFeatured(false);
+                      }}
                       style={{ display: 'none' }}
                     />
                   </label>
                 </div>
+                {featuredCol.video_url && !uploadingFeatured && (
+                  <p style={{ color: '#995544', fontSize: '0.82rem', marginTop: '6px', fontWeight: '500' }}>
+                    ✓ Video uploaded successfully: {featuredCol.video_url.split('/').pop()}
+                  </p>
+                )}
               </div>
 
               <button 
