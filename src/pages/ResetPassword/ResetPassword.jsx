@@ -18,20 +18,25 @@ const ResetPassword = () => {
   useEffect(() => {
     let mounted = true;
 
-    // Case 1: token already processed before component mounted — check hash + session
-    const params = new URLSearchParams(window.location.hash.replace('#', '?').slice(1));
-    if (params.get('type') === 'recovery') {
+    const queryToken = new URLSearchParams(window.location.search).get('token');
+    if (queryToken) {
+      localStorage.setItem('hairboss_token', queryToken);
+      window.history.replaceState({}, document.title, window.location.pathname);
       // eslint-disable-next-line react-hooks/set-state-in-effect
       setReady(true);
       return;
     }
 
-    // Case 2: session already exists (token was processed just before mount)
+    const params = new URLSearchParams(window.location.hash.replace('#', '?').slice(1));
+    if (params.get('type') === 'recovery') {
+      setReady(true);
+      return;
+    }
+
     supabase.auth.getSession().then(({ data: { session } }) => {
       if (mounted && session) setReady(true);
     });
 
-    // Case 3: event fires after mount
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event) => {
       if (mounted && event === 'PASSWORD_RECOVERY') setReady(true);
     });
@@ -43,11 +48,16 @@ const ResetPassword = () => {
     e.preventDefault();
     if (password !== confirm) { setError('Passwords do not match.'); return; }
     if (password.length < 6) { setError('Password must be at least 6 characters.'); return; }
-    setError(''); setLoading(true);
+    setError('');
+    setLoading(true);
     const { error: err } = await supabase.auth.updateUser({ password });
     setLoading(false);
     if (err) setError(err.message);
-    else { setSuccess(true); setTimeout(() => navigate('/auth'), 2500); }
+    else {
+      localStorage.removeItem('hairboss_token');
+      setSuccess(true);
+      setTimeout(() => navigate('/auth'), 2500);
+    }
   };
 
   return (
@@ -83,7 +93,7 @@ const ResetPassword = () => {
                   type={showPw ? 'text' : 'password'}
                   value={password}
                   onChange={e => setPassword(e.target.value)}
-                  required minLength={6} placeholder="••••••••"
+                  required minLength={6} placeholder="Password"
                 />
                 <button type="button" className="pw-toggle" onClick={() => setShowPw(v => !v)} tabIndex={-1}>
                   {showPw ? <HiOutlineEyeOff /> : <HiOutlineEye />}
@@ -96,7 +106,7 @@ const ResetPassword = () => {
                 type={showPw ? 'text' : 'password'}
                 value={confirm}
                 onChange={e => setConfirm(e.target.value)}
-                required minLength={6} placeholder="••••••••"
+                required minLength={6} placeholder="Confirm password"
               />
             </div>
             {error && <p className="rp-error">{error}</p>}
