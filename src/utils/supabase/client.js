@@ -265,35 +265,49 @@ export const supabase = {
       },
 
       // Executing DB insertions
-      insert: async (payload) => {
-        try {
-          const res = await fetch(`${API_URL}/db/${table}`, {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-              ...getAuthHeaders()
-            },
-            body: JSON.stringify({ payload })
-          });
-          const json = await res.json();
-          if (!res.ok) {
-            return { data: null, error: { message: json.error || 'Insertion failed.' } };
+      insert: (payload) => {
+        let selectCalled = false;
+        let singleCalled = false;
+
+        const chain = {
+          select: () => {
+            selectCalled = true;
+            return chain;
+          },
+          single: () => {
+            singleCalled = true;
+            return chain;
+          },
+          then: async (resolve, reject) => {
+            try {
+              const res = await fetch(`${API_URL}/db/${table}`, {
+                method: 'POST',
+                headers: {
+                  'Content-Type': 'application/json',
+                  ...getAuthHeaders()
+                },
+                body: JSON.stringify({ payload })
+              });
+              const json = await res.json();
+              if (!res.ok) {
+                resolve({ data: null, error: { message: json.error || 'Insertion failed.' } });
+                return;
+              }
+              let data = json.data;
+              if (singleCalled) {
+                data = Array.isArray(data) ? data[0] : data;
+              }
+              resolve({ data, error: null });
+            } catch (err) {
+              resolve({ data: null, error: { message: err.message } });
+            }
           }
-          
-          const data = json.data;
-          const returnChain = {
-            select: () => returnChain,
-            single: () => ({ data: Array.isArray(data) ? data[0] : data, error: null }),
-            then: (resolve) => resolve({ data, error: null })
-          };
-          return returnChain;
-        } catch (err) {
-          return { data: null, error: { message: err.message } };
-        }
+        };
+        return chain;
       },
 
       // Executing DB updates
-      update: async (payload) => {
+      update: (payload) => {
         const updateChain = {
           eq: async (field, value) => {
             try {

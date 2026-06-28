@@ -70,8 +70,16 @@ const AdminContent = () => {
   };
 
   // Upload helpers
-  const handleMediaUpload = async (file, onComplete) => {
+  const handleMediaUpload = async (file, expectedType, onComplete) => {
     if (!file) return;
+    if (expectedType === 'image' && !file.type.startsWith('image/')) {
+      alert('Invalid file format. Please upload an image file (PNG, JPG, WebP, etc.).');
+      return;
+    }
+    if (expectedType === 'video' && !file.type.startsWith('video/')) {
+      alert('Invalid file format. Please upload a video file (MP4, WEBM, etc.).');
+      return;
+    }
     try {
       setSaving(true);
       const ext = file.name.split('.').pop();
@@ -206,7 +214,7 @@ const AdminContent = () => {
                     <input 
                       type="file" 
                       accept="image/*" 
-                      onChange={e => handleMediaUpload(e.target.files[0], url => setCollections({ ...collections, image_url: url }))}
+                      onChange={e => handleMediaUpload(e.target.files[0], 'image', url => setCollections({ ...collections, image_url: url }))}
                       style={{ display: 'none' }}
                     />
                   </label>
@@ -290,7 +298,7 @@ const AdminContent = () => {
                         const file = e.target.files[0];
                         if (!file) return;
                         setUploadingFeatured(true);
-                        await handleMediaUpload(file, url => setFeaturedCol({ ...featuredCol, video_url: url }));
+                        await handleMediaUpload(file, 'video', url => setFeaturedCol({ ...featuredCol, video_url: url }));
                         setUploadingFeatured(false);
                       }}
                       style={{ display: 'none' }}
@@ -338,7 +346,7 @@ const AdminContent = () => {
                             <input 
                               type="file" 
                               accept="video/*" 
-                              onChange={e => handleMediaUpload(e.target.files[0], url => handleSocialVideoChange(i, 'videoUrl', url))}
+                              onChange={e => handleMediaUpload(e.target.files[0], 'video', url => handleSocialVideoChange(i, 'videoUrl', url))}
                               style={{ display: 'none' }}
                             />
                           </label>

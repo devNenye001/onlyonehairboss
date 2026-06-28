@@ -1,11 +1,11 @@
 import { useEffect, useState } from 'react';
 import { motion as Motion } from 'framer-motion';
-import { HiOutlinePencil, HiOutlineTrash, HiOutlineStar, HiStar, HiOutlinePlus, HiX } from 'react-icons/hi';
+import { HiOutlinePencil, HiOutlineTrash, HiOutlinePlus, HiX } from 'react-icons/hi';
 import AdminLayout from './AdminLayout';
 import { supabase } from '../../utils/supabase/client';
 import './AdminProducts.css';
 
-const EMPTY_FORM = { name: '', price: '', description: '', featured: false, stock: 0, category: 'General' };
+const EMPTY_FORM = { name: '', price: '', description: '', stock: 10, category: 'General' };
 
 const AdminProducts = () => {
   const [products, setProducts] = useState([]);
@@ -39,7 +39,6 @@ const AdminProducts = () => {
       name: p.name,
       price: p.price,
       description: p.description ?? '',
-      featured: p.is_featured ?? false,
       stock: p.stock_count ?? 0,
       category: p.category ?? 'General'
     });
@@ -51,6 +50,10 @@ const AdminProducts = () => {
   const uploadImage = async () => {
     const file = imageFiles[0];
     if (!file) return null;
+    if (!file.type.startsWith('image/')) {
+      alert('Invalid file format. Please upload an image file (PNG, JPG, WebP, etc.).');
+      return null;
+    }
     const ext = file.name.split('.').pop();
     const path = `${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`;
     const { data, error } = await supabase.storage.from('product-images').upload(path, file);
@@ -61,16 +64,23 @@ const AdminProducts = () => {
 
   const handleSave = async (e) => {
     e.preventDefault();
-    setSaving(true);
     setMsg('');
+
+    const price = parseFloat(form.price);
+    if (isNaN(price) || price <= 0) {
+      setMsg('Please enter a valid positive number for price.');
+      return;
+    }
+
+    setSaving(true);
     const imageUrl = imageFiles.length ? await uploadImage() : null;
 
     const payload = {
       name: form.name,
-      price: parseFloat(form.price),
+      price: price,
       description: form.description,
       category: form.category,
-      is_featured: form.featured,
+      is_featured: false,
       stock_count: parseInt(form.stock, 10),
       in_stock: parseInt(form.stock, 10) > 0,
     };
@@ -103,12 +113,6 @@ const AdminProducts = () => {
     fetchProducts({ showLoading: false });
   };
 
-  const toggleFeatured = async (p) => {
-    const { error } = await supabase.from('products').update({ is_featured: !p.is_featured }).eq('id', p.id);
-    if (error) setMsg(`Error: ${error.message}`);
-    fetchProducts({ showLoading: false });
-  };
-
   const handleChange = e => {
     const { name, value, type, checked } = e.target;
     setForm(f => ({ ...f, [name]: type === 'checkbox' ? checked : value }));
@@ -133,7 +137,7 @@ const AdminProducts = () => {
               <thead>
                 <tr>
                   <th>Image</th><th>Name</th><th>Price</th><th>Stock Qty</th>
-                  <th>Status</th><th>Featured</th><th>Actions</th>
+                  <th>Status</th><th>Actions</th>
                 </tr>
               </thead>
               <tbody>
@@ -144,11 +148,6 @@ const AdminProducts = () => {
                     <td>₦{p.price?.toLocaleString()}</td>
                     <td>{p.stock_count ?? 0}</td>
                     <td><span className={`ap-badge ${p.stock_count > 0 ? 'in' : 'out'}`}>{p.stock_count > 0 ? 'In Stock' : 'Out'}</span></td>
-                    <td>
-                      <button className="ap-icon-btn" onClick={() => toggleFeatured(p)}>
-                        {p.is_featured ? <HiStar className="star-filled" /> : <HiOutlineStar />}
-                      </button>
-                    </td>
                     <td className="ap-actions-cell">
                       <button className="ap-icon-btn" onClick={() => openEdit(p)}><HiOutlinePencil /></button>
                       <button className="ap-icon-btn danger" onClick={() => handleDelete(p.id)}><HiOutlineTrash /></button>
@@ -206,16 +205,10 @@ const AdminProducts = () => {
                   <label>Description</label>
                   <textarea name="description" value={form.description} onChange={handleChange} rows="3" placeholder="Product description..." />
                 </div>
-                <div className="ap-form-field">
+                 <div className="ap-form-field">
                   <label>Product Image</label>
                   <input type="file" accept="image/*" onChange={e => setImageFiles(Array.from(e.target.files))} />
                   <p className="ap-field-hint">{editing ? 'Leave empty to keep existing image.' : 'Upload product image.'}</p>
-                </div>
-                <div className="ap-checkboxes">
-                  <label className="ap-checkbox">
-                    <input type="checkbox" name="featured" checked={form.featured} onChange={handleChange} />
-                    Featured
-                  </label>
                 </div>
                 <button type="submit" className="ap-save-btn" disabled={saving}>
                   {saving ? 'Saving...' : (editing ? 'Update Product' : 'Add Product')}
