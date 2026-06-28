@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { motion as Motion } from 'framer-motion';
 import { useFlutterwave, closePaymentModal } from 'flutterwave-react-v3';
@@ -14,19 +14,35 @@ const FLUTTERWAVE_KEY = import.meta.env.VITE_FLUTTERWAVE_PUBLIC_KEY;
 
 const Checkout = () => {
   const { cart, cartTotal, clearCart } = useCart();
-  const { user } = useAuth();
+  const { user, loading: authLoading } = useAuth();
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [form, setForm] = useState({
-    fullName: user?.user_metadata?.full_name ?? user?.user_metadata?.name ?? '',
-    email:    user?.email ?? '',
+    fullName: '',
+    email:    '',
     phone:    '',
     address:  '',
     city:     '',
     state:    '',
     notes:    '',
   });
+
+  useEffect(() => {
+    if (!authLoading && !user) {
+      navigate('/auth?redirect=/checkout');
+    }
+  }, [user, authLoading, navigate]);
+
+  useEffect(() => {
+    if (user) {
+      setForm(f => ({
+        ...f,
+        fullName: f.fullName || user.user_metadata?.full_name || user.user_metadata?.name || '',
+        email: f.email || user.email || '',
+      }));
+    }
+  }, [user]);
 
   const handleChange = e => setForm(f => ({ ...f, [e.target.name]: e.target.value }));
 
@@ -129,6 +145,14 @@ const Checkout = () => {
       },
     });
   };
+
+  if (authLoading) return (
+    <div className="checkout-page">
+      <Navbar />
+      <div className="checkout-empty">Verifying authentication state...</div>
+      <Footer />
+    </div>
+  );
 
   if (!cart.length) return (
     <div className="checkout-page">
