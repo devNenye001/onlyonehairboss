@@ -6,41 +6,82 @@ import { supabase } from '../../utils/supabase/client';
 import './AdminOrders.css';
 
 const STATUSES = ['pending', 'processing', 'shipped', 'delivered', 'cancelled'];
+const shortId = (id) => (typeof id === 'string' ? id.slice(0, 8).toUpperCase() : 'UNKNOWN');
 
 const AdminOrders = () => {
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
   const [selected, setSelected] = useState(null);
   const [items, setItems] = useState([]);
-  const [updating, setUpdating] = useState(false);
+  const [updatingStatus, setUpdatingStatus] = useState('');
+  const [notice, setNotice] = useState('');
+  const [error, setError] = useState('');
 
-  const fetchOrders = async () => {
-    const { data } = await supabase.from('orders').select('*').order('created_at', { ascending: false });
-    setOrders(data ?? []);
+  const fetchOrders = async ({ showLoading = false } = {}) => {
+    if (showLoading) setLoading(true);
+    const { data, error: fetchError } = await supabase.from('orders').select('*').order('created_at', { ascending: false });
+    if (fetchError) {
+      setError(fetchError.message || 'Failed to load orders.');
+    } else {
+      setOrders(data ?? []);
+    }
     setLoading(false);
   };
 
   useEffect(() => {
     let cancelled = false;
     supabase.from('orders').select('*').order('created_at', { ascending: false })
-      .then(({ data }) => {
-        if (!cancelled) { setOrders(data ?? []); setLoading(false); }
+      .then(({ data, error: fetchError }) => {
+        if (cancelled) return;
+        if (fetchError) setError(fetchError.message || 'Failed to load orders.');
+        setOrders(data ?? []);
+        setLoading(false);
       });
     return () => { cancelled = true; };
   }, []);
 
+  useEffect(() => {
+    if (!selected) return undefined;
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    return () => {
+      document.body.style.overflow = previousOverflow;
+    };
+  }, [selected]);
+
   const viewOrder = async (order) => {
     setSelected(order);
-    const { data } = await supabase.from('order_items').select('*').eq('order_id', order.id);
+    setError('');
+    const { data, error: itemError } = await supabase.from('order_items').select('*').eq('order_id', order.id);
+    if (itemError) setError(itemError.message || 'Failed to load order items.');
     setItems(data ?? []);
   };
 
   const updateStatus = async (orderId, status) => {
-    setUpdating(true);
-    await supabase.from('orders').update({ status }).eq('id', orderId);
-    setUpdating(false);
+    if (!STATUSES.includes(status) || updatingStatus) return;
+    const previousSelected = selected;
+    const previousOrders = orders;
+    setUpdatingStatus(status);
+    setError('');
+    setNotice('');
+
     setSelected(o => o ? { ...o, status } : o);
-    fetchOrders();
+    setOrders(list => list.map(order => order.id === orderId ? { ...order, status } : order));
+
+    const { data, error: updateError } = await supabase.from('orders').update({ status }).eq('id', orderId);
+    setUpdatingStatus('');
+
+    if (updateError) {
+      setSelected(previousSelected);
+      setOrders(previousOrders);
+      setError(updateError.message || 'Failed to update order status.');
+      return;
+    }
+
+    setSelected(o => o ? { ...o, ...data } : o);
+    setOrders(list => list.map(order => order.id === orderId ? { ...order, ...data } : order));
+    setNotice(`Order status updated to ${status}.`);
+    fetchOrders({ showLoading: false });
   };
 
   const statusColor = (s) => ({
@@ -48,7 +89,7 @@ const AdminOrders = () => {
     delivered: '#27ae60', cancelled: '#e74c3c',
   }[s] ?? '#888');
 
-  const fmt = (d) => new Date(d).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
+  const fmt = (d) => d ? new Date(d).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' }) : '-';
 
   return (
     <AdminLayout>
@@ -57,6 +98,9 @@ const AdminOrders = () => {
           <p className="ao-tag">Admin</p>
           <h1 className="ao-headline">Orders</h1>
         </div>
+
+        {notice && <p className="ao-toast success" role="status">{notice}</p>}
+        {error && <p className="ao-toast error" role="alert">{error}</p>}
 
         {loading ? <p className="ao-loading">Loading orders...</p> : (
           <div className="ao-table-wrap">
@@ -69,19 +113,19 @@ const AdminOrders = () => {
               </thead>
               <tbody>
                 {orders.map(o => (
-                  <tr key={o.id}>
-                    <td className="ao-mono">{o.id.slice(0, 8).toUpperCase()}</td>
-                    <td className="ao-name">{o.full_name}</td>
-                    <td>{o.email}</td>
-                    <td>₦{o.total?.toLocaleString()}</td>
+                  <tr key={o.id || `${o.email}-${o.created_at}`}>
+                    <td className="ao-mono">{shortId(o.id)}</td>
+                    <td className="ao-name">{o.full_name || '-'}</td>
+                    <td>{o.email || '-'}</td>
+                    <td>NGN {Number(o.total || 0).toLocaleString()}</td>
                     <td>
                       <span className="ao-status-badge" style={{ background: `${statusColor(o.status)}22`, color: statusColor(o.status) }}>
-                        {o.status}
+                        {o.status || 'pending'}
                       </span>
                     </td>
                     <td>{fmt(o.created_at)}</td>
                     <td>
-                      <button className="ao-view-btn" onClick={() => viewOrder(o)}><HiOutlineEye /></button>
+                      <button className="ao-view-btn" onClick={() => viewOrder(o)} aria-label={`View order ${shortId(o.id)}`}><HiOutlineEye /></button>
                     </td>
                   </tr>
                 ))}
@@ -90,25 +134,27 @@ const AdminOrders = () => {
           </div>
         )}
 
-        {/* Detail Panel */}
         {selected && (
           <div className="ao-modal-backdrop" onClick={() => setSelected(null)}>
             <Motion.div
               className="ao-modal"
+              role="dialog"
+              aria-modal="true"
+              aria-labelledby="order-detail-title"
               initial={{ opacity: 0, x: 40 }}
               animate={{ opacity: 1, x: 0 }}
               onClick={e => e.stopPropagation()}
             >
               <div className="ao-modal-header">
-                <h2>Order #{selected.id.slice(0, 8).toUpperCase()}</h2>
-                <button className="ao-close-btn" onClick={() => setSelected(null)}><HiX /></button>
+                <h2 id="order-detail-title">Order #{shortId(selected.id)}</h2>
+                <button className="ao-close-btn" onClick={() => setSelected(null)} aria-label="Close order details"><HiX /></button>
               </div>
 
               <div className="ao-detail-section">
                 <h4>Customer Info</h4>
-                <p><strong>Name:</strong> {selected.full_name}</p>
-                <p><strong>Email:</strong> {selected.email}</p>
-                <p><strong>Phone:</strong> {selected.phone}</p>
+                <p><strong>Name:</strong> {selected.full_name || '-'}</p>
+                <p><strong>Email:</strong> {selected.email || '-'}</p>
+                <p><strong>Phone:</strong> {selected.phone || '-'}</p>
                 <p><strong>Address:</strong> {selected.address}, {selected.city}, {selected.state}</p>
                 {selected.notes && <p><strong>Notes:</strong> {selected.notes}</p>}
               </div>
@@ -116,15 +162,15 @@ const AdminOrders = () => {
               <div className="ao-detail-section">
                 <h4>Order Items</h4>
                 {items.map(i => (
-                  <div key={i.id} className="ao-item-row">
+                  <div key={i.id || i.product_name} className="ao-item-row">
                     {i.product_image && <img src={i.product_image} alt={i.product_name} className="ao-item-img" />}
                     <div>
                       <p className="ao-item-name">{i.product_name}</p>
-                      <p className="ao-item-meta">Qty: {i.quantity} · ₦{i.price?.toLocaleString()}</p>
+                      <p className="ao-item-meta">Qty: {i.quantity} - NGN {Number(i.price || 0).toLocaleString()}</p>
                     </div>
                   </div>
                 ))}
-                <p className="ao-total"><strong>Total: ₦{selected.total?.toLocaleString()}</strong></p>
+                <p className="ao-total"><strong>Total: NGN {Number(selected.total || 0).toLocaleString()}</strong></p>
               </div>
 
               <div className="ao-detail-section">
@@ -135,10 +181,10 @@ const AdminOrders = () => {
                       key={s}
                       className={`ao-status-btn ${selected.status === s ? 'current' : ''}`}
                       onClick={() => updateStatus(selected.id, s)}
-                      disabled={updating}
+                      disabled={Boolean(updatingStatus) || selected.status === s}
                       style={selected.status === s ? { background: statusColor(s), color: '#fff', borderColor: statusColor(s) } : {}}
                     >
-                      {s}
+                      {updatingStatus === s ? 'Updating...' : s}
                     </button>
                   ))}
                 </div>

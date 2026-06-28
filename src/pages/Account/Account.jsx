@@ -8,6 +8,8 @@ import { useAuth } from '../../context/AuthContext';
 import { supabase } from '../../utils/supabase/client';
 import './Account.css';
 
+const shortId = (id) => (typeof id === 'string' ? id.slice(0, 8).toUpperCase() : 'UNKNOWN');
+
 const Account = () => {
   const { user, signOut, loading } = useAuth();
   const navigate = useNavigate();
@@ -91,7 +93,7 @@ const Account = () => {
               {orders.map(order => (
                 <Link key={order.id} to={`/order/${order.id}`} className="account-order-row">
                   <div>
-                    <p className="account-order-id">#{order.id.slice(0, 8).toUpperCase()}</p>
+                    <p className="account-order-id">#{shortId(order.id)}</p>
                     <p className="account-order-date">
                       {new Date(order.created_at).toLocaleDateString('en-NG', {
                         day: 'numeric', month: 'short', year: 'numeric',

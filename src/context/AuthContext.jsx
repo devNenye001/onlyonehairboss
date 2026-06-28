@@ -1,7 +1,6 @@
 import { createContext, useContext, useEffect, useState } from 'react';
 import { supabase } from '../utils/supabase/client';
 import { syncSignupMetadata } from '../utils/supabase/billingApi';
-import { sendEmail } from '../utils/email';
 
 const AuthContext = createContext(null);
 
@@ -84,7 +83,6 @@ export const AuthProvider = ({ children }) => {
     });
     if (!error && data.user) {
       syncSignupMetadata({ full_name: fullName }).catch(() => {});
-      sendEmail('welcome', { email: data.user.email, name: fullName || data.user.email });
     }
     return { data, error };
   };
@@ -121,6 +119,7 @@ export const AuthProvider = ({ children }) => {
   );
 };
 
+// eslint-disable-next-line react-refresh/only-export-components
 export const useAuth = () => {
   const ctx = useContext(AuthContext);
   if (!ctx) throw new Error('useAuth must be used inside AuthProvider');

@@ -16,7 +16,9 @@ const getProductImage = (images) => {
       try {
         const parsed = JSON.parse(images);
         return parsed[0] || '/wig1.svg';
-      } catch (e) {}
+      } catch {
+        return '/wig1.svg';
+      }
     }
     return images || '/wig1.svg';
   }
@@ -204,13 +206,16 @@ const AdminProducts = () => {
           <div className="ap-modal-backdrop" onClick={() => setShowForm(false)}>
             <Motion.div
               className="ap-modal"
+              role="dialog"
+              aria-modal="true"
+              aria-labelledby="product-form-title"
               initial={{ opacity: 0, scale: 0.95 }}
               animate={{ opacity: 1, scale: 1 }}
               onClick={e => e.stopPropagation()}
             >
               <div className="ap-modal-header">
-                <h2>{editing ? 'Edit Product' : 'Add Product'}</h2>
-                <button className="ap-close-btn" onClick={() => setShowForm(false)}><HiX /></button>
+                <h2 id="product-form-title">{editing ? 'Edit Product' : 'Add Product'}</h2>
+                <button className="ap-close-btn" onClick={() => setShowForm(false)} aria-label="Close product form"><HiX /></button>
               </div>
               <form onSubmit={handleSave} className="ap-form">
                 <div className="ap-form-row">

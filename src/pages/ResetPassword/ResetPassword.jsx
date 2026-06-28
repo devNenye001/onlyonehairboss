@@ -21,6 +21,7 @@ const ResetPassword = () => {
     // Case 1: token already processed before component mounted — check hash + session
     const params = new URLSearchParams(window.location.hash.replace('#', '?').slice(1));
     if (params.get('type') === 'recovery') {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setReady(true);
       return;
     }

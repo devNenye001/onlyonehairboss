@@ -7,6 +7,8 @@ import Footer from '../../components/Footer/Footer';
 import { supabase } from '../../utils/supabase/client';
 import './OrderConfirmation.css';
 
+const shortId = (id) => (typeof id === 'string' ? id.slice(0, 8).toUpperCase() : 'UNKNOWN');
+
 const OrderConfirmation = () => {
   const { id } = useParams();
   const [order, setOrder] = useState(null);
@@ -43,7 +45,7 @@ const OrderConfirmation = () => {
             <div className="oc-details">
               <div className="oc-detail-row">
                 <span>Order ID</span>
-                <span className="oc-mono">{order.id.slice(0, 8).toUpperCase()}</span>
+                <span className="oc-mono">{shortId(order.id)}</span>
               </div>
               <div className="oc-detail-row">
                 <span>Name</span>

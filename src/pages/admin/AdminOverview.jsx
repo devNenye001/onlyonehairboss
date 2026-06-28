@@ -1,6 +1,5 @@
 import { useEffect, useState } from 'react';
 import AdminLayout from './AdminLayout';
-import { supabase } from '../../utils/supabase/client';
 import { HiOutlineTrendingUp, HiOutlineShoppingBag, HiOutlineDatabase, HiOutlineCurrencyDollar } from 'react-icons/hi';
 import './AdminOverview.css';
 
@@ -31,6 +30,7 @@ const AdminOverview = () => {
   };
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     fetchStats();
   }, []);
 

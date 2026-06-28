@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { motion as Motion } from 'framer-motion';
 import { useFlutterwave, closePaymentModal } from 'flutterwave-react-v3';
@@ -7,10 +7,10 @@ import Footer from '../../components/Footer/Footer';
 import { useCart } from '../../context/CartContext';
 import { useAuth } from '../../context/AuthContext';
 import { supabase } from '../../utils/supabase/client';
-import { sendEmail } from '../../utils/email';
 import './Checkout.css';
 
 const FLUTTERWAVE_KEY = import.meta.env.VITE_FLUTTERWAVE_PUBLIC_KEY;
+const makeTxRef = () => `ohb_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
 
 const Checkout = () => {
   const { cart, cartTotal, clearCart } = useCart();
@@ -18,14 +18,16 @@ const Checkout = () => {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [paymentState, setPaymentState] = useState('');
+  const [txRef, setTxRef] = useState(makeTxRef);
   const [form, setForm] = useState({
     fullName: '',
-    email:    '',
-    phone:    '',
-    address:  '',
-    city:     '',
-    state:    '',
-    notes:    '',
+    email: '',
+    phone: '',
+    address: '',
+    city: '',
+    state: '',
+    notes: '',
   });
 
   useEffect(() => {
@@ -36,6 +38,7 @@ const Checkout = () => {
 
   useEffect(() => {
     if (user) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setForm(f => ({
         ...f,
         fullName: f.fullName || user.user_metadata?.full_name || user.user_metadata?.name || '',
@@ -46,102 +49,109 @@ const Checkout = () => {
 
   const handleChange = e => setForm(f => ({ ...f, [e.target.name]: e.target.value }));
 
-  // Flutterwave config
-  const flutterwaveConfig = {
+  const flutterwaveConfig = useMemo(() => ({
     public_key: FLUTTERWAVE_KEY || '',
-    tx_ref:     `ohb_${Date.now()}`,
-    amount:     cartTotal,
-    currency:   'NGN',
+    tx_ref: txRef,
+    amount: cartTotal,
+    currency: 'NGN',
     payment_options: 'card,ussd,account',
     customer: {
-      email:        form.email || 'guest@onlyonehairboss.com',
+      email: form.email || 'guest@onlyonehairboss.com',
       phone_number: form.phone,
-      name:         form.fullName,
+      name: form.fullName,
     },
     customizations: {
-      title:       'OnlyOne Hairboss',
+      title: 'OnlyOne Hairboss',
       description: 'Payment for wigs order',
-      logo:        window.location.origin + '/logo1.svg',
+      logo: window.location.origin + '/logo1.svg',
     },
-  };
+  }), [cartTotal, form.email, form.fullName, form.phone, txRef]);
 
   const handleFlutterPayment = useFlutterwave(flutterwaveConfig);
 
-  const saveOrder = async (paymentRef) => {
+  const verifyAndCreateOrder = async (paymentRef, responseTxRef) => {
     setLoading(true);
     setError('');
+    setPaymentState('Verifying payment...');
 
-    const { data: order, error: orderErr } = await supabase
-      .from('orders')
-      .insert({
-        user_id:        user?.id ?? null,
-        full_name:      form.fullName,
-        email:          form.email,
-        phone:          form.phone,
-        address:        form.address,
-        city:           form.city,
-        state:          form.state,
-        notes:          form.notes,
-        total:          cartTotal,
-        status:         'paid',
-        payment_method: 'flutterwave',
-        payment_proof:  paymentRef,
-      })
-      .select()
-      .single();
+    try {
+      const token = localStorage.getItem('hairboss_token');
+      const res = await fetch(`${supabase.API_URL}/checkout/verify-payment`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        },
+        body: JSON.stringify({
+          transaction_id: paymentRef,
+          payload: {
+            full_name: form.fullName.trim(),
+            email: form.email.trim(),
+            phone: form.phone.trim(),
+            address: form.address.trim(),
+            city: form.city.trim(),
+            state: form.state.trim(),
+            notes: form.notes.trim(),
+            total: Number(cartTotal),
+            tx_ref: responseTxRef || txRef,
+            items: cart.map(i => ({
+              id: i.id,
+              name: i.name,
+              image: i.image ?? '',
+              quantity: i.quantity,
+              price: i.price,
+            })),
+          },
+        }),
+      });
+      const body = await res.json();
+      if (!res.ok) throw new Error(body.error || 'Payment verification failed.');
 
-    if (orderErr) {
-      setError('Payment received but order save failed. Contact support with ref: ' + paymentRef);
+      clearCart();
+      navigate(`/order/${body.data.id}`);
+    } catch (err) {
+      setError(`Payment received but order confirmation failed. Contact support with ref: ${paymentRef}. ${err.message}`);
+      setTxRef(makeTxRef());
+    } finally {
       setLoading(false);
-      return;
+      setPaymentState('');
     }
-
-    const items = cart.map(i => ({
-      order_id:      order.id,
-      product_id:    typeof i.id === 'string' && i.id.includes('-') ? i.id : null,
-      product_name:  i.name,
-      product_image: i.image ?? '',
-      quantity:      i.quantity,
-      price:         i.price,
-    }));
-
-    await supabase.from('order_items').insert(items);
-
-    sendEmail('order_confirmation', {
-      email: form.email,
-      name: form.fullName,
-      orderId: order.id.slice(0, 8).toUpperCase(),
-      total: cartTotal,
-      items: cart.map(i => ({ name: i.name, quantity: i.quantity, price: i.price })),
-      address: form.address,
-      city: form.city,
-      state: form.state,
-    });
-
-    clearCart();
-    navigate(`/order/${order.id}`);
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    if (!cart.length) return;
+    if (!cart.length || loading) return;
     if (!FLUTTERWAVE_KEY) {
       setError('Payment is not configured yet. Contact the store owner.');
       return;
     }
+
+    const required = ['fullName', 'email', 'phone', 'address', 'city', 'state'];
+    if (required.some(key => !form[key]?.trim())) {
+      setError('Please complete all required shipping fields.');
+      return;
+    }
+    if (!Number.isFinite(Number(cartTotal)) || Number(cartTotal) <= 0) {
+      setError('Your cart total is invalid. Please refresh and try again.');
+      return;
+    }
+
     setError('');
+    setPaymentState('Opening secure Flutterwave checkout...');
 
     handleFlutterPayment({
       callback: (response) => {
         if (response.status === 'successful' || response.status === 'completed') {
-          saveOrder(response.transaction_id?.toString() || response.tx_ref);
+          verifyAndCreateOrder(response.transaction_id?.toString() || response.tx_ref, response.tx_ref);
         } else {
           setError('Payment was not successful. Status: ' + response.status);
+          setPaymentState('');
         }
         closePaymentModal();
       },
       onClose: () => {
-        // User closed the Flutterwave modal — do nothing
+        setPaymentState('');
+        setError('Payment was cancelled before completion.');
       },
     });
   };
@@ -170,7 +180,6 @@ const Checkout = () => {
         <h1 className="checkout-headline">Checkout</h1>
 
         <div className="checkout-grid">
-          {/* Form */}
           <Motion.form
             className="checkout-form"
             onSubmit={handleSubmit}
@@ -214,17 +223,17 @@ const Checkout = () => {
             </div>
 
             {error && <p className="co-error">{error}</p>}
+            {paymentState && <p className="co-secure-note">{paymentState}</p>}
 
             <button type="submit" className="co-place-btn" disabled={loading}>
-              {loading ? 'Saving order...' : `Pay ₦${cartTotal.toLocaleString()} with Flutterwave`}
+              {loading ? 'Confirming payment...' : `Pay NGN ${cartTotal.toLocaleString()} with Flutterwave`}
             </button>
 
             <p className="co-secure-note">
-              Secured by Flutterwave · Cards, Bank Transfer, USSD accepted
+              Secured by Flutterwave - Cards, Bank Transfer, USSD accepted
             </p>
           </Motion.form>
 
-          {/* Order Summary */}
           <Motion.div
             className="co-summary"
             initial={{ opacity: 0, x: 20 }}
@@ -239,12 +248,12 @@ const Checkout = () => {
                   <p className="co-item-name">{item.name}</p>
                   <p className="co-item-qty">Qty: {item.quantity}</p>
                 </div>
-                <p className="co-item-price">₦{(item.price * item.quantity).toLocaleString()}</p>
+                <p className="co-item-price">NGN {(item.price * item.quantity).toLocaleString()}</p>
               </div>
             ))}
             <div className="co-total">
               <span>Total</span>
-              <span>₦{cartTotal.toLocaleString()}</span>
+              <span>NGN {cartTotal.toLocaleString()}</span>
             </div>
           </Motion.div>
         </div>

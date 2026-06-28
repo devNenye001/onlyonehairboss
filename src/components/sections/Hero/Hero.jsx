@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { motion as Motion, AnimatePresence } from 'framer-motion';
 import { HiOutlineShoppingBag, HiOutlineSearch, HiOutlineUser, HiMenu, HiX } from 'react-icons/hi';

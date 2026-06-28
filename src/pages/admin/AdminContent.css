@@ -138,6 +138,42 @@
   background: rgba(255, 255, 255, 0.15);
 }
 
+.upload-progress-box {
+  margin-top: 10px;
+  color: #cccccc;
+  font-size: 0.82rem;
+}
+
+.upload-progress-track {
+  width: 100%;
+  height: 8px;
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: 999px;
+  overflow: hidden;
+}
+
+.upload-progress-bar {
+  height: 100%;
+  background: #995544;
+  transition: width 0.2s ease;
+}
+
+.upload-error-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: #ffb3a6;
+}
+
+.upload-error-row button {
+  border: 1px solid rgba(255,255,255,0.2);
+  background: rgba(255,255,255,0.08);
+  color: #ffffff;
+  border-radius: 6px;
+  padding: 6px 10px;
+  cursor: pointer;
+}
+
 /* Wigs product grid selectors */
 .wigs-selector-group {
   margin-bottom: 25px;

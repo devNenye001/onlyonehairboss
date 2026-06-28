@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import AdminLayout from './AdminLayout';
 import { supabase } from '../../utils/supabase/client';
-import { HiOutlineUpload, HiOutlineSave, HiOutlineTrash, HiOutlinePlus, HiX } from 'react-icons/hi';
+import { HiOutlineUpload, HiOutlineSave, HiX } from 'react-icons/hi';
 import './AdminContent.css';
 
 const AdminContent = () => {
@@ -15,7 +15,6 @@ const AdminContent = () => {
   const [collections, setCollections] = useState({ title: '', description: '', image_url: '', product_ids: [] });
   const [featuredCol, setFeaturedCol] = useState({ product_id: '', heading: '', description: '', video_url: '' });
   const [socials, setSocials] = useState({ videos: [] });
-  const [uploadingFeatured, setUploadingFeatured] = useState(false);
 
   const fetchData = async () => {
     setLoading(true);
@@ -49,6 +48,7 @@ const AdminContent = () => {
   };
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     fetchData();
   }, []);
 
@@ -76,6 +76,63 @@ const AdminContent = () => {
   const [retryUploadFn, setRetryUploadFn] = useState(null);
   const [previewVideoUrl, setPreviewVideoUrl] = useState(null);
 
+  const compressImage = (file, maxWidth = 1800, quality = 0.82) => {
+    if (!file?.type?.startsWith('image/') || file.type === 'image/gif' || file.size < 450 * 1024) {
+      return Promise.resolve(file);
+    }
+
+    return new Promise((resolve) => {
+      const img = new Image();
+      const url = URL.createObjectURL(file);
+      img.onload = () => {
+        const scale = Math.min(1, maxWidth / img.width);
+        const canvas = document.createElement('canvas');
+        canvas.width = Math.round(img.width * scale);
+        canvas.height = Math.round(img.height * scale);
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+        canvas.toBlob((blob) => {
+          URL.revokeObjectURL(url);
+          if (!blob) return resolve(file);
+          resolve(new File([blob], file.name.replace(/\.[^.]+$/, '.webp'), { type: 'image/webp' }));
+        }, 'image/webp', quality);
+      };
+      img.onerror = () => {
+        URL.revokeObjectURL(url);
+        resolve(file);
+      };
+      img.src = url;
+    });
+  };
+
+  const uploadFormDataWithRetry = (url, formData, { onProgress, retries = 2, timeoutMs = 45000 } = {}) => {
+    const token = localStorage.getItem('hairboss_token') || '';
+
+    const attemptUpload = (attempt) => new Promise((resolve, reject) => {
+      const xhr = new XMLHttpRequest();
+      xhr.open('POST', url, true);
+      xhr.timeout = timeoutMs;
+      if (token) xhr.setRequestHeader('Authorization', `Bearer ${token}`);
+      xhr.upload.addEventListener('progress', (event) => {
+        if (event.lengthComputable) onProgress?.(Math.round((event.loaded / event.total) * 100));
+      });
+      xhr.onload = () => {
+        let data = {};
+        try { data = JSON.parse(xhr.responseText); } catch { /* response was not JSON */ }
+        if (xhr.status >= 200 && xhr.status < 300) return resolve(data);
+        reject(new Error(data.error || `Upload failed with HTTP ${xhr.status}`));
+      };
+      xhr.onerror = () => reject(new Error('Network connection failed.'));
+      xhr.ontimeout = () => reject(new Error('Upload timed out.'));
+      xhr.send(formData);
+    }).catch((err) => {
+      if (attempt < retries) return attemptUpload(attempt + 1);
+      throw err;
+    });
+
+    return attemptUpload(0);
+  };
+
   // Upload helper for images (uses single-part upload since images are small)
   const handleMediaUpload = async (file, expectedType, onComplete) => {
     if (!file) return;
@@ -85,25 +142,24 @@ const AdminContent = () => {
     }
     try {
       setSaving(true);
+      setUploadingSlot('image');
+      setUploadProgress(0);
+      setUploadError(null);
+      const uploadFile = await compressImage(file);
       const formData = new FormData();
-      formData.append('image', file);
-      
-      const res = await fetch(`${supabase.API_URL}/storage/upload`, {
-        method: 'POST',
-        headers: { 'Authorization': `Bearer ${localStorage.getItem('hairboss_token')}` },
-        body: formData
+      formData.append('image', uploadFile);
+
+      const data = await uploadFormDataWithRetry(`${supabase.API_URL}/storage/upload`, formData, {
+        onProgress: setUploadProgress,
       });
-      if (!res.ok) {
-        const data = await res.json();
-        throw new Error(data.error || 'Upload failed');
-      }
-      const data = await res.json();
       const publicUrl = `${supabase.API_URL}/storage/files/${data.path}`;
       onComplete(publicUrl);
     } catch (err) {
-      alert('Upload failed: ' + err.message);
+      setUploadError(err.message || 'Upload failed.');
     } finally {
       setSaving(false);
+      setUploadingSlot(null);
+      setUploadProgress(0);
     }
   };
 
@@ -133,7 +189,7 @@ const AdminContent = () => {
             URL.revokeObjectURL(fileUrl);
             resolve(blob);
           }, 'image/jpeg', 0.85);
-        } catch (e) {
+        } catch {
           URL.revokeObjectURL(fileUrl);
           resolve(null);
         }
@@ -163,7 +219,7 @@ const AdminContent = () => {
       'Authorization': `Bearer ${token}`
     };
 
-    const uploadNextChunk = () => {
+    const uploadNextChunk = (retryCount = 0) => {
       const start = chunkIndex * CHUNK_SIZE;
       const end = Math.min(start + CHUNK_SIZE, totalSize);
       const chunk = file.slice(start, end);
@@ -176,6 +232,7 @@ const AdminContent = () => {
       
       const xhr = new XMLHttpRequest();
       xhr.open('POST', `${supabase.API_URL}/storage/upload/chunk`, true);
+      xhr.timeout = 45000;
       
       // Set auth headers
       Object.keys(headers).forEach(key => {
@@ -214,13 +271,29 @@ const AdminContent = () => {
           try {
             const json = JSON.parse(xhr.responseText);
             errorMsg = json.error || errorMsg;
-          } catch(e) {}
-          onError(new Error(errorMsg), uploadNextChunk);
+          } catch { errorMsg = 'Upload failed'; }
+          if (retryCount < 2) {
+            uploadNextChunk(retryCount + 1);
+          } else {
+            onError(new Error(errorMsg), () => uploadNextChunk(0));
+          }
         }
       };
       
       xhr.onerror = () => {
-        onError(new Error('Network connection failed.'), uploadNextChunk);
+        if (retryCount < 2) {
+          uploadNextChunk(retryCount + 1);
+        } else {
+          onError(new Error('Network connection failed.'), () => uploadNextChunk(0));
+        }
+      };
+
+      xhr.ontimeout = () => {
+        if (retryCount < 2) {
+          uploadNextChunk(retryCount + 1);
+        } else {
+          onError(new Error('Upload timed out.'), () => uploadNextChunk(0));
+        }
       };
       
       xhr.send(formData);
@@ -253,15 +326,12 @@ const AdminContent = () => {
         const thumbFile = new File([thumbBlob], `thumb-${Date.now()}.jpg`, { type: 'image/jpeg' });
         const formData = new FormData();
         formData.append('image', thumbFile);
-        const res = await fetch(`${supabase.API_URL}/storage/upload`, {
-          method: 'POST',
-          headers: { 'Authorization': `Bearer ${localStorage.getItem('hairboss_token')}` },
-          body: formData
-        });
-        if (res.ok) {
-          const data = await res.json();
+        try {
+          const data = await uploadFormDataWithRetry(`${supabase.API_URL}/storage/upload`, formData);
           thumbnailUrl = `${supabase.API_URL}/storage/files/${data.path}`;
-        }
+        } catch (thumbErr) {
+          console.warn('Thumbnail upload failed:', thumbErr);
+        } 
       }
       
       // 2. Start chunked upload
@@ -317,6 +387,32 @@ const AdminContent = () => {
     const videos = [...socials.videos];
     videos[index] = { ...videos[index], [field]: value };
     setSocials({ ...socials, videos });
+  };
+
+  const renderUploadProgress = (slot) => {
+    if (uploadingSlot !== slot && !(slot === 'featured' && uploadError)) return null;
+    return (
+      <div className="upload-progress-box" role="status">
+        {uploadingSlot === slot && (
+          <>
+            <div className="upload-progress-track">
+              <div className="upload-progress-bar" style={{ width: `${uploadProgress}%` }} />
+            </div>
+            <p>{uploadProgress}% uploaded{uploadTimeLeft ? ` - about ${uploadTimeLeft}s left` : ''}</p>
+          </>
+        )}
+        {uploadError && (
+          <div className="upload-error-row">
+            <span>{uploadError}</span>
+            {retryUploadFn && (
+              <button type="button" onClick={() => { setUploadError(null); retryUploadFn(); }}>
+                Retry
+              </button>
+            )}
+          </div>
+        )}
+      </div>
+    );
   };
 
   return (
@@ -639,11 +735,11 @@ const AdminContent = () => {
       {/* Video Preview Modal */}
       {previewVideoUrl && (
         <div className="qv-modal-backdrop" onClick={() => setPreviewVideoUrl(null)}>
-          <div className="qv-modal" style={{ maxWidth: '600px', display: 'flex', flexDirection: 'column', alignItems: 'center' }} onClick={e => e.stopPropagation()}>
-            <button className="qv-close-btn" onClick={() => setPreviewVideoUrl(null)}>
+          <div className="qv-modal" role="dialog" aria-modal="true" aria-labelledby="video-preview-title" style={{ maxWidth: '600px', display: 'flex', flexDirection: 'column', alignItems: 'center' }} onClick={e => e.stopPropagation()}>
+            <button className="qv-close-btn" onClick={() => setPreviewVideoUrl(null)} aria-label="Close video preview">
               <HiX />
             </button>
-            <h3 style={{ fontFamily: 'Taprom, serif', fontSize: '1.4rem', color: '#1a120e', margin: '0 0 20px 0' }}>Video Preview</h3>
+            <h3 id="video-preview-title" style={{ fontFamily: 'Taprom, serif', fontSize: '1.4rem', color: '#1a120e', margin: '0 0 20px 0' }}>Video Preview</h3>
             <video
               src={previewVideoUrl}
               controls

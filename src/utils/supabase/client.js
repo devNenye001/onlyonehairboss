@@ -8,6 +8,30 @@ const getAuthHeaders = () => {
   return token ? { 'Authorization': `Bearer ${token}` } : {};
 };
 
+const uploadWithRetry = (url, formData, { retries = 2, timeoutMs = 45000 } = {}) => {
+  const attemptUpload = (attempt) => new Promise((resolve, reject) => {
+    const xhr = new XMLHttpRequest();
+    xhr.open('POST', url, true);
+    xhr.timeout = timeoutMs;
+    const token = localStorage.getItem('hairboss_token');
+    if (token) xhr.setRequestHeader('Authorization', `Bearer ${token}`);
+    xhr.onload = () => {
+      let data = {};
+      try { data = JSON.parse(xhr.responseText); } catch { /* response was not JSON */ }
+      if (xhr.status >= 200 && xhr.status < 300) return resolve(data);
+      reject(new Error(data.error || `Upload failed with HTTP ${xhr.status}`));
+    };
+    xhr.onerror = () => reject(new Error('Network connection failed.'));
+    xhr.ontimeout = () => reject(new Error('Upload timed out.'));
+    xhr.send(formData);
+  }).catch((error) => {
+    if (attempt < retries) return attemptUpload(attempt + 1);
+    throw error;
+  });
+
+  return attemptUpload(0);
+};
+
 export const supabase = {
   API_URL,
   auth: {
@@ -96,7 +120,7 @@ export const supabase = {
           return { data: { session: null }, error: null };
         }
         return { data: { session: { access_token: token, user: data.user } }, error: null };
-      } catch (err) {
+      } catch {
         return { data: { session: null }, error: null };
       }
     },
@@ -174,22 +198,12 @@ export const supabase = {
 
   // Storage
   storage: {
-    from: (bucket) => ({
+    from: () => ({
       upload: async (path, file) => {
         try {
           const formData = new FormData();
           formData.append('image', file);
-          const res = await fetch(`${API_URL}/storage/upload`, {
-            method: 'POST',
-            headers: {
-              ...getAuthHeaders()
-            },
-            body: formData
-          });
-          const data = await res.json();
-          if (!res.ok) {
-            return { data: null, error: { message: data.error || 'Upload failed' } };
-          }
+          const data = await uploadWithRetry(`${API_URL}/storage/upload`, formData);
           return { data: { path: data.path }, error: null };
         } catch (err) {
           return { data: null, error: { message: err.message } };
@@ -228,7 +242,6 @@ export const supabase = {
 
   // Fluent database operations builder
   from: (table) => {
-    let selectFields = '*';
     let orderField = null;
     let orderAscending = true;
     let eqField = null;
@@ -239,7 +252,7 @@ export const supabase = {
 
     const builder = {
       select: (fields = '*') => {
-        selectFields = fields;
+        void fields;
         return builder;
       },
       order: (field, { ascending = true } = {}) => {
@@ -267,19 +280,17 @@ export const supabase = {
 
       // Executing DB insertions
       insert: (payload) => {
-        let selectCalled = false;
         let singleCalled = false;
 
         const chain = {
           select: () => {
-            selectCalled = true;
             return chain;
           },
           single: () => {
             singleCalled = true;
             return chain;
           },
-          then: async (resolve, reject) => {
+          then: async (resolve) => {
             try {
               const res = await fetch(`${API_URL}/db/${table}`, {
                 method: 'POST',
@@ -360,7 +371,7 @@ export const supabase = {
       },
 
       // Promise adapter for fetching data
-      then: async (resolve, reject) => {
+      then: async (resolve) => {
         try {
           let url = `${API_URL}/db/${table}?`;
           if (eqField) {

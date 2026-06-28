@@ -50,6 +50,7 @@ const ProductDetails = () => {
       }
     };
     fetchProduct();
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setActiveImg(0);
   }, [id]);
 
@@ -256,8 +257,8 @@ const ProductDetails = () => {
       {/* Quick View Modal Overlay */}
       {quickViewProduct && (
         <div className="qv-modal-backdrop" onClick={() => setQuickViewProduct(null)}>
-          <div className="qv-modal" onClick={e => e.stopPropagation()}>
-            <button className="qv-close-btn" onClick={() => setQuickViewProduct(null)}>
+          <div className="qv-modal" role="dialog" aria-modal="true" aria-labelledby="quick-view-title" onClick={e => e.stopPropagation()}>
+            <button className="qv-close-btn" onClick={() => setQuickViewProduct(null)} aria-label="Close quick view">
               <HiX />
             </button>
             <div className="qv-grid">
@@ -284,7 +285,7 @@ const ProductDetails = () => {
               {/* Details Column */}
               <div className="qv-details">
                 <p className="qv-category">{quickViewProduct.category}</p>
-                <h2 className="qv-name">{quickViewProduct.name}</h2>
+                <h2 className="qv-name" id="quick-view-title">{quickViewProduct.name}</h2>
                 <p className="qv-price">₦{quickViewProduct.price?.toLocaleString()}</p>
                 <p className="qv-desc">{quickViewProduct.description || 'Premium quality wig crafted for a flawless, natural look with rich volume and a silky finish.'}</p>
                 
