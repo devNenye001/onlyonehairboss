@@ -43,14 +43,14 @@ const Shop = () => {
               .map(id => mapped.find(p => p.id === id))
               .filter(Boolean);
             if (ordered.length > 0) {
-              setProducts(ordered.slice(0, 6));
+              setProducts(ordered.slice(0, 8));
               return;
             }
           }
           
-          // Fallback to latest 6 products
+          // Fallback to latest 8 products
           const sorted = [...prodData].sort((a,b) => new Date(b.created_at || 0) - new Date(a.created_at || 0));
-          setProducts(sorted.map(p => ({ ...p, image: Array.isArray(p.images) ? p.images[0] : p.images || '/wig1.svg' })).slice(0, 6));
+          setProducts(sorted.map(p => ({ ...p, image: Array.isArray(p.images) ? p.images[0] : p.images || '/wig1.svg' })).slice(0, 8));
         }
       } catch (err) {
         console.error('Failed to load shop section data:', err);

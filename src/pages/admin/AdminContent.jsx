@@ -222,9 +222,9 @@ const AdminContent = () => {
               </div>
 
               <div className="wigs-selector-group" style={{ marginTop: '20px' }}>
-                <label>Select Displayed Products (Max 6)</label>
+                <label>Select Displayed Products (Max 8)</label>
                 <div className="sel-grid">
-                  {[0, 1, 2, 3, 4, 5].map(i => (
+                  {[0, 1, 2, 3, 4, 5, 6, 7].map(i => (
                     <select 
                       key={i} 
                       value={collections.product_ids?.[i] || ''} 
