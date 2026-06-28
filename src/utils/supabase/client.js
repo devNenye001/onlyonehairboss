@@ -247,6 +247,8 @@ export const supabase = {
     let orderAscending = true;
     let eqField = null;
     let eqValue = null;
+    let ilikeField = null;
+    let ilikeValue = null;
     let isSingle = false;
     let isMaybeSingle = false;
     let limitVal = null;
@@ -264,6 +266,11 @@ export const supabase = {
       eq: (field, value) => {
         eqField = field;
         eqValue = value;
+        return builder;
+      },
+      ilike: (field, value) => {
+        ilikeField = field;
+        ilikeValue = value;
         return builder;
       },
       single: () => {
@@ -377,6 +384,9 @@ export const supabase = {
           let url = `${API_URL}/db/${table}?`;
           if (eqField) {
             url += `eq_field=${encodeURIComponent(eqField)}&eq_value=${encodeURIComponent(eqValue)}&`;
+          }
+          if (ilikeField) {
+            url += `ilike_field=${encodeURIComponent(ilikeField)}&ilike_value=${encodeURIComponent(ilikeValue)}&`;
           }
           if (orderField) {
             url += `order_field=${encodeURIComponent(orderField)}&order_ascending=${orderAscending}&`;

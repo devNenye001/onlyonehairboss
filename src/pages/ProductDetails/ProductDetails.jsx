@@ -19,6 +19,8 @@ const FALLBACK = [
   { id: '8', name: 'Bone Straight Lace', price: 270000, images: ['/wig8.svg'], description: 'Premium bone straight lace wig for a seamless blend.', category: 'Bone Straight', in_stock: true },
 ];
 
+const formatPrice = (price) => `₦${Number(price || 0).toLocaleString()}`;
+
 const ProductDetails = () => {
   const { id } = useParams();
   const navigate = useNavigate();
@@ -199,7 +201,7 @@ const ProductDetails = () => {
           >
             <p className="pd-category">{product.category}</p>
             <h1 className="pd-name">{product.name}</h1>
-            <p className="pd-price">₦{product.price.toLocaleString()}</p>
+            <p className="pd-price">{formatPrice(product.price)}</p>
             <p className="pd-desc">{product.description || 'Premium quality wig crafted for a flawless, natural look with rich volume and a silky finish.'}</p>
  
             <div className="pd-stock">
@@ -237,7 +239,7 @@ const ProductDetails = () => {
                       <img src={img} alt={p.name} className="pd-related-card-img" />
                     </div>
                     <h3 className="pd-related-card-name">{p.name}</h3>
-                    <p className="pd-related-card-price">₦{p.price?.toLocaleString()}</p>
+                    <p className="pd-related-card-price">{formatPrice(p.price)}</p>
                     <div className="pd-related-card-actions">
                       <button className="pd-btn-quick" onClick={(e) => openQuickView(p, e)}>
                         Quick View
@@ -286,7 +288,7 @@ const ProductDetails = () => {
               <div className="qv-details">
                 <p className="qv-category">{quickViewProduct.category}</p>
                 <h2 className="qv-name" id="quick-view-title">{quickViewProduct.name}</h2>
-                <p className="qv-price">₦{quickViewProduct.price?.toLocaleString()}</p>
+                <p className="qv-price">{formatPrice(quickViewProduct.price)}</p>
                 <p className="qv-desc">{quickViewProduct.description || 'Premium quality wig crafted for a flawless, natural look with rich volume and a silky finish.'}</p>
                 
                 <div className="qv-stock">
