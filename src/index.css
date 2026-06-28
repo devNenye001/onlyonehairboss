@@ -8,3 +8,8 @@ html, body {
     overflow-x: hidden;
     width: 100%;
 }
+
+select option {
+    background-color: #1a120e !important;
+    color: #ffffff !important;
+}

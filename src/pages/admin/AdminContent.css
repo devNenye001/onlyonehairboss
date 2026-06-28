@@ -214,3 +214,8 @@
   opacity: 0.5;
   cursor: not-allowed;
 }
+
+select option {
+  background-color: #1a120e !important;
+  color: #ffffff !important;
+}
