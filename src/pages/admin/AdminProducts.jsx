@@ -91,6 +91,11 @@ const AdminProducts = () => {
     e.preventDefault();
     setMsg('');
 
+    if (!form.description || !form.description.trim()) {
+      setMsg('Description is required.');
+      return;
+    }
+
     const price = parseFloat(form.price);
     if (isNaN(price) || price <= 0) {
       setMsg('Please enter a valid positive number for price.');
@@ -238,7 +243,7 @@ const AdminProducts = () => {
                 </div>
                 <div className="ap-form-field">
                   <label>Description</label>
-                  <textarea name="description" value={form.description} onChange={handleChange} rows="3" placeholder="Product description..." />
+                  <textarea name="description" value={form.description} onChange={handleChange} rows="3" required placeholder="Product description..." />
                 </div>
                  <div className="ap-form-field">
                   <label>Product Image</label>

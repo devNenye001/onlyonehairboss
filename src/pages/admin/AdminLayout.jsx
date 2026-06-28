@@ -44,7 +44,6 @@ const AdminLayout = ({ children }) => {
       <aside className={`admin-sidebar ${isOpen ? 'open' : ''}`}>
         <div className="admin-sidebar-top">
           <img src="/logo.svg" alt="OnlyOne Hairboss" className="admin-sidebar-logo" />
-          <p className="admin-sidebar-label">Admin</p>
         </div>
 
         <nav className="admin-nav">
