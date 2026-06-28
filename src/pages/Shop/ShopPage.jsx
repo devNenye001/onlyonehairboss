@@ -46,7 +46,7 @@ const ShopPage = () => {
     id: p.id,
     name: p.name,
     price: p.price,
-    image: p.images || p.image,
+    image: Array.isArray(p.images) ? p.images[0] : p.images || p.image || '/wig1.svg',
   });
 
   return (
