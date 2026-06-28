@@ -81,14 +81,14 @@ const AdminProducts = () => {
       }
       const { error } = await supabase.from('products').update(payload).eq('id', editing);
       if (error) setMsg(`Error: ${error.message}`);
-      else setMsg('Product updated.');
+      else setMsg('Product updated successfully!');
     } else {
       const { error } = await supabase.from('products').insert({
         ...payload,
         images: imageUrl ? [imageUrl] : [],
       });
       if (error) setMsg(`Error: ${error.message}`);
-      else setMsg('Product added.');
+      else setMsg('Product added successfully!');
     }
 
     setSaving(false);

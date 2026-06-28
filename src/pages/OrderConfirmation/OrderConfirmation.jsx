@@ -33,10 +33,10 @@ const OrderConfirmation = () => {
           transition={{ duration: 0.6 }}
         >
           <HiCheckCircle className="oc-check-icon" />
-          <p className="oc-tag">Order Placed</p>
+          <p className="oc-tag">Payment Confirmed</p>
           <h1 className="oc-headline">Thank You!</h1>
           <p className="oc-sub">
-            Your order has been received. We'll process it within 3 working days.
+            Your payment was successful and confirmed. Your order has been received and will be processed within 3 working days.
           </p>
 
           {order && (
