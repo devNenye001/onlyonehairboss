@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import AdminLayout from './AdminLayout';
 import { 
   HiOutlineTrendingUp, 
@@ -6,16 +7,15 @@ import {
   HiOutlineDatabase, 
   HiOutlineCurrencyDollar
 } from 'react-icons/hi';
-import { FaTrophy, FaLightbulb, FaCrown, FaFire, FaBolt, FaChartLine } from 'react-icons/fa';
 import './AdminOverview.css';
 
 const API_URL = import.meta.env.VITE_API_URL || (import.meta.env.DEV ? 'http://localhost:5000/api' : '/api');
 
 const AdminOverview = () => {
+  const navigate = useNavigate();
   const [stats, setStats] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
-  const [showRevenueModal, setShowRevenueModal] = useState(false);
 
   const fetchStats = async () => {
     try {
@@ -65,61 +65,6 @@ const AdminOverview = () => {
     );
   }
 
-  const renderRevenueChart = () => {
-    const data = stats.monthlySales || [];
-    if (data.length === 0) {
-      return <p className="empty-text">No sales data yet for chart.</p>;
-    }
-
-    const padding = { top: 30, right: 30, bottom: 40, left: 60 };
-    const width = 750;
-    const height = 280;
-    const chartWidth = width - padding.left - padding.right;
-    const chartHeight = height - padding.top - padding.bottom;
-
-    const maxSales = Math.max(...data.map((d) => parseFloat(d.sales) || 0), 1);
-    const points = data.map((d, i) => {
-      const x = padding.left + (i / Math.max(data.length - 1, 1)) * chartWidth;
-      const y = padding.top + chartHeight - ((parseFloat(d.sales) || 0) / maxSales) * chartHeight;
-      return { x, y, month: d.month, sales: parseFloat(d.sales) || 0 };
-    });
-
-    const linePath = points.map((p, i) => `${i === 0 ? 'M' : 'L'} ${p.x} ${p.y}`).join(' ');
-
-    return (
-      <div style={{ background: 'rgba(255, 255, 255, 0.01)', border: '1px solid rgba(153, 85, 68, 0.1)', borderRadius: '8px', padding: '16px 20px' }}>
-        <h3 style={{ display: 'flex', alignItems: 'center', gap: '8px', margin: '0 0 15px 0', borderBottom: '1px solid rgba(153, 85, 68, 0.1)', paddingBottom: '8px', color: '#FFF1EA', fontSize: '1.1rem' }}>
-          <FaChartLine style={{ color: '#995544' }} /> Monthly Revenue Trend
-        </h3>
-        <svg viewBox={`0 0 ${width} ${height}`} width="100%" height="auto" style={{ display: 'block' }}>
-          {[0, 0.25, 0.5, 0.75, 1].map((ratio) => {
-            const y = padding.top + chartHeight * (1 - ratio);
-            return (
-              <g key={ratio}>
-                <line x1={padding.left} y1={y} x2={width - padding.right} y2={y} stroke="rgba(255,255,255,0.06)" strokeWidth="1" />
-                <text x={padding.left - 10} y={y + 4} textAnchor="end" fill="#888" fontSize="11">
-                  {fmt(maxSales * ratio)}
-                </text>
-              </g>
-            );
-          })}
-          <path d={linePath} fill="none" stroke="#995544" strokeWidth="2.5" strokeLinejoin="round" strokeLinecap="round" />
-          {points.map((p, i) => (
-            <g key={i} className="chart-dot-group">
-              <circle cx={p.x} cy={p.y} r="5" fill="#995544" stroke="#1a120e" strokeWidth="2" />
-              <title>{p.month}: {fmt(p.sales)}</title>
-            </g>
-          ))}
-          {points.map((p, i) => (
-            <text key={`label-${i}`} x={p.x} y={height - 10} textAnchor="middle" fill="#888" fontSize="11">
-              {p.month}
-            </text>
-          ))}
-        </svg>
-      </div>
-    );
-  };
-
   return (
     <AdminLayout>
       <div className="overview-page">
@@ -128,20 +73,19 @@ const AdminOverview = () => {
           <h1 className="overview-headline">Overview</h1>
         </div>
 
-        {/* Dashboard Grid Cards */}
         <div className="overview-grid">
           <div 
             className="metric-card clickable-revenue-card" 
-            onClick={() => setShowRevenueModal(true)}
+            onClick={() => navigate('/admin/revenue')}
             style={{ cursor: 'pointer' }}
+            role="button"
+            tabIndex={0}
+            onKeyDown={(e) => e.key === 'Enter' && navigate('/admin/revenue')}
           >
             <div className="card-icon revenue-icon"><HiOutlineCurrencyDollar /></div>
             <div className="card-info">
               <span className="card-label">Total Revenue</span>
               <h2 className="card-value">{fmt(stats.yearlyRevenue || stats.revenue)}</h2>
-              <p style={{ margin: '4px 0 0 0', fontSize: '0.78rem', color: '#888888' }}>
-                Month: {fmt(stats.monthlyRevenue)} | Week: {fmt(stats.weeklyRevenue)}
-              </p>
             </div>
           </div>
 
@@ -171,7 +115,6 @@ const AdminOverview = () => {
         </div>
 
         <div className="details-section-grid">
-          {/* Recent Orders */}
           <div className="details-box">
             <h3>Recent Orders</h3>
             <div className="table-wrap">
@@ -205,7 +148,6 @@ const AdminOverview = () => {
             </div>
           </div>
 
-          {/* Sales by Category */}
           <div className="details-box">
             <h3>Sales by Category</h3>
             <div className="category-sales-wrap">
@@ -231,123 +173,6 @@ const AdminOverview = () => {
             </div>
           </div>
         </div>
-
-        {/* Dynamic Analytics Details Modal */}
-        {showRevenueModal && (
-          <div className="ao-modal-backdrop" style={{ justifyContent: 'center', alignItems: 'center' }} onClick={() => setShowRevenueModal(false)}>
-            <div
-              className="ao-analytics-modal"
-              style={{
-                width: '90%',
-                maxWidth: '850px',
-                background: '#1a120e',
-                border: '1px solid rgba(153, 85, 68, 0.2)',
-                borderRadius: '12px',
-                maxHeight: '90vh',
-                overflowY: 'auto',
-                padding: '30px',
-                boxShadow: '0 20px 50px rgba(0, 0, 0, 0.6)'
-              }}
-              onClick={e => e.stopPropagation()}
-            >
-              <div className="ao-modal-header" style={{ borderBottom: '1px solid rgba(153, 85, 68, 0.15)', paddingBottom: '15px', marginBottom: '20px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <h2 style={{ fontSize: '1.4rem', color: '#FFF1EA', display: 'flex', alignItems: 'center', gap: '10px', margin: 0 }}>
-                  <HiOutlineCurrencyDollar style={{ color: '#995544' }} /> Revenue & Sales Analytics
-                </h2>
-                <button 
-                  onClick={() => setShowRevenueModal(false)}
-                  style={{ background: 'transparent', border: 'none', color: '#a0857c', fontSize: '1.4rem', cursor: 'pointer', display: 'flex', alignItems: 'center' }}
-                  aria-label="Close analytics modal"
-                >
-                  &times;
-                </button>
-              </div>
-
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '25px' }}>
-                {/* Chart Section */}
-                {renderRevenueChart()}
-
-                {/* Grid for Best Sellers and Insights */}
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '20px' }}>
-                  {/* Best Selling Wigs */}
-                  <div style={{ background: 'rgba(255, 255, 255, 0.01)', border: '1px solid rgba(153, 85, 68, 0.1)', borderRadius: '8px', padding: '16px 20px' }}>
-                    <h3 style={{ display: 'flex', alignItems: 'center', gap: '8px', margin: '0 0 15px 0', borderBottom: '1px solid rgba(153, 85, 68, 0.1)', paddingBottom: '8px', color: '#FFF1EA', fontSize: '1.1rem' }}>
-                      <FaTrophy style={{ color: '#995544' }} /> Best Selling Wigs
-                    </h3>
-                    <div className="table-wrap">
-                      <table className="overview-table" style={{ width: '100%' }}>
-                        <thead>
-                          <tr>
-                            <th>Period</th>
-                            <th>Wig Name</th>
-                            <th>Qty</th>
-                            <th>Sales</th>
-                          </tr>
-                        </thead>
-                        <tbody>
-                          {stats.bestSellers?.slice(0, 5).map((w, idx) => (
-                            <tr key={idx}>
-                              <td style={{ color: '#888888', fontSize: '0.85rem' }}>{w.period}</td>
-                              <td className="customer-name">{w.product_name}</td>
-                              <td style={{ fontWeight: '600' }}>{w.quantity_sold} units</td>
-                              <td>{fmt(w.sales_value)}</td>
-                            </tr>
-                          ))}
-                          {(!stats.bestSellers || stats.bestSellers.length === 0) && (
-                            <tr>
-                              <td colSpan="4" className="empty-text">No sales recorded yet.</td>
-                            </tr>
-                          )}
-                        </tbody>
-                      </table>
-                    </div>
-                  </div>
-
-                  {/* Sales Insights */}
-                  <div style={{ background: 'rgba(255, 255, 255, 0.01)', border: '1px solid rgba(153, 85, 68, 0.1)', borderRadius: '8px', padding: '16px 20px' }}>
-                    <h3 style={{ display: 'flex', alignItems: 'center', gap: '8px', margin: '0 0 15px 0', borderBottom: '1px solid rgba(153, 85, 68, 0.1)', paddingBottom: '8px', color: '#FFF1EA', fontSize: '1.1rem' }}>
-                      <FaLightbulb style={{ color: '#995544' }} /> Sales Insights
-                    </h3>
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-                      {stats.insights?.map((insight, idx) => {
-                        const getInsightIcon = (index) => {
-                          if (index === 0) return <FaCrown style={{ color: '#f39c12', fontSize: '1.05rem' }} />;
-                          if (index === 1) return <FaFire style={{ color: '#e74c3c', fontSize: '1.05rem' }} />;
-                          if (index === 2) return <FaBolt style={{ color: '#f1c40f', fontSize: '1.05rem' }} />;
-                          return <FaChartLine style={{ color: '#2ecc71', fontSize: '1.05rem' }} />;
-                        };
-                        
-                        return (
-                          <div 
-                            key={idx} 
-                            style={{ 
-                              background: 'rgba(153, 85, 68, 0.03)', 
-                              borderLeft: '3px solid #995544', 
-                              padding: '10px 14px', 
-                              borderRadius: '4px', 
-                              fontSize: '0.88rem', 
-                              color: '#dddddd', 
-                              lineHeight: '1.5',
-                              display: 'flex',
-                              alignItems: 'flex-start',
-                              gap: '10px'
-                            }}
-                          >
-                            <div style={{ marginTop: '2px', flexShrink: 0 }}>{getInsightIcon(idx)}</div>
-                            <div>{insight}</div>
-                          </div>
-                        );
-                      })}
-                      {(!stats.insights || stats.insights.length === 0) && (
-                        <p className="empty-text">Generating insights...</p>
-                      )}
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        )}
       </div>
     </AdminLayout>
   );

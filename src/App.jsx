@@ -18,6 +18,7 @@ import AdminLogin from './pages/admin/AdminLogin';
 import AdminProducts from './pages/admin/AdminProducts';
 import AdminOrders from './pages/admin/AdminOrders';
 import AdminOverview from './pages/admin/AdminOverview';
+import AdminRevenueAnalytics from './pages/admin/AdminRevenueAnalytics';
 import AdminContent from './pages/admin/AdminContent';
 import AdminSettings from './pages/admin/AdminSettings';
 
@@ -48,6 +49,7 @@ function App() {
         <Route path="/admin/login" element={<AdminLogin />} />
         <Route path="/admin" element={<Navigate to="/admin/overview" replace />} />
         <Route path="/admin/overview" element={<AdminRoute><AdminOverview /></AdminRoute>} />
+        <Route path="/admin/revenue" element={<AdminRoute><AdminRevenueAnalytics /></AdminRoute>} />
         <Route path="/admin/products" element={<AdminRoute><AdminProducts /></AdminRoute>} />
         <Route path="/admin/orders" element={<AdminRoute><AdminOrders /></AdminRoute>} />
         <Route path="/admin/content" element={<AdminRoute><AdminContent /></AdminRoute>} />

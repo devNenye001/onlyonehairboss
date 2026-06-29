@@ -8,6 +8,7 @@ import {
   HiOutlineChartBar,
   HiOutlineDocumentText,
   HiOutlineCog,
+  HiOutlineCurrencyDollar,
   HiOutlineMenu,
   HiX
 } from 'react-icons/hi';
@@ -48,6 +49,9 @@ const AdminLayout = ({ children }) => {
         <nav className="admin-nav">
           <NavLink to="/admin/overview" onClick={closeSidebar} className={({ isActive }) => `admin-nav-link ${isActive ? 'active' : ''}`}>
             <HiOutlineChartBar /> Overview
+          </NavLink>
+          <NavLink to="/admin/revenue" onClick={closeSidebar} className={({ isActive }) => `admin-nav-link ${isActive ? 'active' : ''}`}>
+            <HiOutlineCurrencyDollar /> Revenue Analytics
           </NavLink>
           <NavLink to="/admin/products" onClick={closeSidebar} className={({ isActive }) => `admin-nav-link ${isActive ? 'active' : ''}`}>
             <HiOutlineShoppingBag /> Products
