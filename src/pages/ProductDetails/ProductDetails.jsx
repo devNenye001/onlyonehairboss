@@ -4,6 +4,7 @@ import { motion as Motion } from 'framer-motion';
 import { HiOutlineShoppingBag, HiArrowLeft, HiX } from 'react-icons/hi';
 import Navbar from '../../components/Navbar/Navbar';
 import Footer from '../../components/Footer/Footer';
+import ProductCard from '../../components/ProductCard/ProductCard';
 import { supabase } from '../../utils/supabase/client';
 import { useCart } from '../../context/CartContext';
 import './ProductDetails.css';
@@ -232,24 +233,13 @@ const ProductDetails = () => {
             <h2 className="pd-related-headline">More Wigs You'll Love</h2>
             <div className="pd-related-grid">
               {related.map(p => {
-                const img = (Array.isArray(p.images) ? p.images[0] : p.images) || p.image || '/wig1.svg';
-                return (
-                  <div key={p.id} className="pd-related-card" onClick={() => navigate(`/product/${p.id}`)}>
-                    <div className="pd-related-card-img-wrap">
-                      <img src={img} alt={p.name} className="pd-related-card-img" />
-                    </div>
-                    <h3 className="pd-related-card-name">{p.name}</h3>
-                    <p className="pd-related-card-price">{formatPrice(p.price)}</p>
-                    <div className="pd-related-card-actions">
-                      <button className="pd-btn-quick" onClick={(e) => openQuickView(p, e)}>
-                        Quick View
-                      </button>
-                      <button className="pd-btn-cart" onClick={(e) => handleCardAddToCart(p, e)}>
-                        Add to Cart
-                      </button>
-                    </div>
-                  </div>
-                );
+                const cardProduct = {
+                  id: p.id,
+                  name: p.name,
+                  price: p.price,
+                  image: (Array.isArray(p.images) ? p.images[0] : p.images) || p.image || '/wig1.svg',
+                };
+                return <ProductCard key={p.id} product={cardProduct} />;
               })}
             </div>
           </section>
