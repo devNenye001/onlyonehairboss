@@ -47,11 +47,11 @@ const Navbar = () => {
         <div className="page-nav-icons">
           <HiOutlineSearch className="page-icon hide-mobile" onClick={() => navigate('/search')} />
           {user ? (
-            <div className="nav-avatar hide-mobile" onClick={() => navigate('/account')} title={user.user_metadata?.full_name || user.email}>
+            <div className="nav-avatar" onClick={() => navigate('/account')} title={user.user_metadata?.full_name || user.email}>
               {userInitial}
             </div>
           ) : (
-            <HiOutlineUser className="page-icon hide-mobile" onClick={() => navigate('/auth')} />
+            <HiOutlineUser className="page-icon" onClick={() => navigate('/auth')} />
           )}
           <div className="page-cart-icon" onClick={() => navigate('/cart')}>
             <HiOutlineShoppingBag className="page-icon" />

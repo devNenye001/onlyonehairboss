@@ -95,11 +95,11 @@ const Hero = () => {
         <div className="nav-icons">
           <HiOutlineSearch className="icon hide-mobile" onClick={() => navigate('/search')} />
           {user ? (
-            <div className="hero-avatar hide-mobile" onClick={() => navigate('/account')} title={user.user_metadata?.full_name || user.email}>
+            <div className="hero-avatar" onClick={() => navigate('/account')} title={user.user_metadata?.full_name || user.email}>
               {userInitial}
             </div>
           ) : (
-            <HiOutlineUser className="icon hide-mobile" onClick={() => navigate('/auth')} />
+            <HiOutlineUser className="icon" onClick={() => navigate('/auth')} />
           )}
           <div className="cart-icon" onClick={() => navigate('/cart')}>
             <HiOutlineShoppingBag className="icon" />

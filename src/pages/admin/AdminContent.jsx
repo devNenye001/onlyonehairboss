@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useState, useRef } from 'react';
 import AdminLayout from './AdminLayout';
 import { supabase } from '../../utils/supabase/client';
 import { HiOutlineUpload, HiOutlineSave, HiX } from 'react-icons/hi';
@@ -80,6 +80,45 @@ const AdminContent = () => {
   const [uploadError, setUploadError] = useState(null);
   const [retryUploadFn, setRetryUploadFn] = useState(null);
   const [previewVideoUrl, setPreviewVideoUrl] = useState(null);
+  const [isDragging, setIsDragging] = useState(false);
+  const fileInputRef = useRef(null);
+
+  const handleDragOver = (e) => {
+    e.preventDefault();
+    if (uploadingSlot !== null) return;
+    setIsDragging(true);
+  };
+
+  const handleDragLeave = () => {
+    setIsDragging(false);
+  };
+
+  const handleDrop = (e) => {
+    e.preventDefault();
+    setIsDragging(false);
+    if (uploadingSlot !== null) return;
+    
+    const file = e.dataTransfer.files[0];
+    if (file) {
+      handleChunkedVideoUpload(file, 'featured', (vUrl) => {
+        setFeaturedCol(prev => ({ ...prev, video_url: vUrl }));
+      });
+    }
+  };
+
+  const handleZoneClick = () => {
+    if (uploadingSlot !== null) return;
+    fileInputRef.current?.click();
+  };
+
+  const handleFileSelect = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      handleChunkedVideoUpload(file, 'featured', (vUrl) => {
+        setFeaturedCol(prev => ({ ...prev, video_url: vUrl }));
+      });
+    }
+  };
 
   const compressImage = (file, maxWidth = 1800, quality = 0.82) => {
     if (!file?.type?.startsWith('image/') || file.type === 'image/gif' || file.size < 450 * 1024) {
@@ -584,44 +623,50 @@ const AdminContent = () => {
 
               <div className="field-group">
                 <label>Featured Video</label>
-                <div className="file-upload-row">
-                  <input 
-                    value={featuredCol.video_url || ''} 
-                    onChange={e => setFeaturedCol({ ...featuredCol, video_url: e.target.value })} 
-                    placeholder="Upload video..."
-                    style={{ flex: 1 }}
-                  />
-                  <label className="upload-file-btn" style={{ cursor: uploadingSlot === 'featured' ? 'not-allowed' : 'pointer', opacity: uploadingSlot === 'featured' ? 0.6 : 1 }}>
-                    <HiOutlineUpload /> {featuredCol.video_url ? 'Replace' : 'Upload'}
+                {featuredCol.video_url ? (
+                  <div className="uploaded-video-container">
+                    <div className="uploaded-video-card">
+                      <video src={featuredCol.video_url} className="uploaded-video-preview" muted loop playsInline autoPlay />
+                      <div className="uploaded-video-details">
+                        <span className="file-label">Active Featured Video</span>
+                        <span className="file-url" title={featuredCol.video_url}>{featuredCol.video_url.split('/').pop()}</span>
+                        <div className="uploaded-video-actions">
+                          <button type="button" className="action-btn preview" onClick={() => setPreviewVideoUrl(featuredCol.video_url)}>
+                            Preview Fullscreen
+                          </button>
+                          <button type="button" className="action-btn delete" onClick={() => setFeaturedCol(prev => ({ ...prev, video_url: '' }))}>
+                            Delete Video
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                ) : (
+                  <div 
+                    className={`drag-drop-zone ${isDragging ? 'dragging' : ''} ${uploadingSlot === 'featured' ? 'uploading' : ''}`}
+                    onDragOver={handleDragOver}
+                    onDragLeave={handleDragLeave}
+                    onDrop={handleDrop}
+                    onClick={handleZoneClick}
+                  >
                     <input 
-                      type="file" 
-                      accept="video/*" 
-                      disabled={uploadingSlot !== null}
-                      onChange={e => handleChunkedVideoUpload(e.target.files[0], 'featured', (vUrl) => {
-                        setFeaturedCol({ ...featuredCol, video_url: vUrl });
-                      })}
+                      type="file"
+                      ref={fileInputRef}
+                      accept="video/*"
+                      onChange={handleFileSelect}
                       style={{ display: 'none' }}
+                      disabled={uploadingSlot !== null}
                     />
-                  </label>
-                  {featuredCol.video_url && (
-                    <>
-                      <button
-                        type="button"
-                        onClick={() => setPreviewVideoUrl(featuredCol.video_url)}
-                        style={{ padding: '0 12px', background: 'rgba(153, 85, 68, 0.1)', color: '#995544', border: '1px solid rgba(153, 85, 68, 0.2)', borderRadius: '6px', cursor: 'pointer' }}
-                      >
-                        Preview
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => setFeaturedCol({ ...featuredCol, video_url: '' })}
-                        style={{ padding: '0 12px', background: 'rgba(192, 57, 43, 0.1)', color: '#c0392b', border: '1px solid rgba(192, 57, 43, 0.2)', borderRadius: '6px', cursor: 'pointer' }}
-                      >
-                        Delete
-                      </button>
-                    </>
-                  )}
-                </div>
+                    <div className="drag-drop-icon-container">
+                      <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="cloud-icon">
+                        <path d="M12 12v9m0-9l-3 3m3-3l3 3" />
+                        <path d="M20.39 18.39A5 5 0 0 0 18 9h-1.26A8 8 0 1 0 3 16.3" />
+                      </svg>
+                    </div>
+                    <p className="drag-drop-text">Drag & drop or <span className="browse-link">click to browse</span></p>
+                    <p className="drag-drop-subtext">Video only · max 20 MB</p>
+                  </div>
+                )}
                 {renderUploadProgress('featured')}
               </div>
 
