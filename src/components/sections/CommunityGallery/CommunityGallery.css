@@ -1,0 +1,132 @@
+.community-section {
+  background-color: #FFF1EA;
+  font-family: 'DM Sans', sans-serif;
+  letter-spacing: -2%;
+  width: 100%;
+  overflow: hidden;
+  padding: 40px 0;
+}
+
+.community-container {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 20px 4%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.community-header {
+  text-align: center;
+  margin-bottom: 40px;
+  max-width: 700px;
+}
+
+.community-tag {
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: #995544;
+  margin: 0 0 4px 0;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+}
+
+.community-headline {
+  font-family: 'Taprom', serif;
+  font-size: clamp(2rem, 5vw, 3.2rem);
+  font-weight: 500;
+  color: #000000;
+  margin: 0;
+  line-height: 1.2;
+}
+
+.community-subtitle {
+  font-size: 1.05rem;
+  color: #7d6259;
+  margin-top: 15px;
+  line-height: 1.6;
+}
+
+/* 3 column grid */
+.community-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 24px;
+  width: 100%;
+  margin-bottom: 40px;
+}
+
+.community-card {
+  width: 100%;
+  border-radius: 4px;
+  overflow: hidden;
+  box-shadow: 0 4px 20px rgba(153, 85, 68, 0.05);
+}
+
+.community-img-wrapper {
+  width: 100%;
+  aspect-ratio: 3 / 4; /* Portrait */
+  background-color: #1a120e;
+  overflow: hidden;
+}
+
+.community-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  transition: transform 0.4s cubic-bezier(0.25, 1, 0.5, 1);
+}
+
+.community-card:hover .community-img {
+  transform: scale(1.04);
+}
+
+.community-action-wrap {
+  display: flex;
+  justify-content: center;
+  width: 100%;
+}
+
+.explore-feed-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 14px 44px;
+  background-color: #995544;
+  border: 1px solid #995544;
+  color: #FFF1EA;
+  font-weight: 500;
+  font-size: 0.95rem;
+  text-decoration: none;
+  transition: all 0.3s cubic-bezier(0.25, 1, 0.5, 1);
+  box-shadow: none !important;
+}
+
+.explore-feed-btn:hover {
+  background-color: transparent;
+  color: #995544;
+}
+
+.btn-arrow {
+  font-size: 1.1rem;
+}
+
+/* Responsive Rules */
+@media (max-width: 992px) {
+  .community-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 16px;
+  }
+}
+
+@media (max-width: 576px) {
+  .community-grid {
+    grid-template-columns: 1fr;
+    gap: 14px;
+  }
+  .explore-feed-btn {
+    width: 100%;
+  }
+}

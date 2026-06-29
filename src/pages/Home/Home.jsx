@@ -11,6 +11,7 @@ import Shop from '../../components/sections/Shop/Shop';
 import Socials from '../../components/sections/Socials/Socials';
 import WhyUs from '../../components/sections/WhyUs/WhyUs';
 import Testimonial from '../../components/Testimonial/Testimonial';
+import CommunityGallery from '../../components/sections/CommunityGallery/CommunityGallery';
 
 const Home = () => {
   const { hash } = useLocation();
@@ -36,6 +37,7 @@ const Home = () => {
       <WhyUs />
       <Testimonial />
       <Socials />
+      <CommunityGallery />
       <div id="contact"><Contact /></div>
       <FinalCTA />
       <Footer />
