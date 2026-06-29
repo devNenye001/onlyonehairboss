@@ -1,10 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
 import AdminLayout from './AdminLayout';
-import {
-  HiOutlineCurrencyDollar,
-  HiOutlineArrowLeft,
-} from 'react-icons/hi';
 import { FaTrophy, FaLightbulb, FaCrown, FaFire, FaBolt, FaChartLine } from 'react-icons/fa';
 import './AdminRevenueAnalytics.css';
 
@@ -236,14 +231,9 @@ const AdminRevenueAnalytics = () => {
   return (
     <AdminLayout>
       <div className="ra-page">
-        <Link to="/admin/overview" className="ra-back-link">
-          <HiOutlineArrowLeft /> Back to Overview
-        </Link>
-
         <div className="ra-header">
           <p className="ra-tag">Admin</p>
           <h1 className="ra-headline">
-            <HiOutlineCurrencyDollar className="ra-headline-icon" />
             Revenue &amp; Sales Analytics
           </h1>
           <p className="ra-subheadline">Track how your store is performing over time</p>
