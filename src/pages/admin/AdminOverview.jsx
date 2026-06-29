@@ -3,7 +3,7 @@ import AdminLayout from './AdminLayout';
 import { HiOutlineTrendingUp, HiOutlineShoppingBag, HiOutlineDatabase, HiOutlineCurrencyDollar } from 'react-icons/hi';
 import './AdminOverview.css';
 
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
+const API_URL = import.meta.env.VITE_API_URL || (import.meta.env.DEV ? 'http://localhost:5000/api' : '/api');
 
 const AdminOverview = () => {
   const [stats, setStats] = useState(null);
