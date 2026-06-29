@@ -171,26 +171,36 @@ const AdminRevenueAnalytics = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
 
-  const fetchStats = async () => {
-    try {
-      setLoading(true);
-      const token = localStorage.getItem('hairboss_token');
-      const res = await fetch(`${API_URL}/admin/stats`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error || 'Failed to fetch stats');
-      setStats(data);
-    } catch (err) {
-      console.error(err);
-      setError(err.message);
-    } finally {
-      setLoading(false);
-    }
-  };
-
   useEffect(() => {
-    fetchStats();
+    let mounted = true;
+    const controller = new AbortController();
+    const fetchData = async () => {
+      try {
+        setLoading(true);
+        const token = localStorage.getItem('hairboss_token');
+        const res = await fetch(`${API_URL}/admin/stats`, {
+          headers: { Authorization: `Bearer ${token}` },
+          signal: controller.signal,
+        });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || 'Failed to fetch stats');
+        if (mounted) {
+          setStats(data);
+          setError('');
+        }
+      } catch (err) {
+        if (err.name !== 'AbortError' && mounted) {
+          setError(err.message);
+        }
+      } finally {
+        if (mounted) setLoading(false);
+      }
+    };
+    void fetchData();
+    return () => {
+      mounted = false;
+      controller.abort();
+    };
   }, []);
 
   if (loading) {
@@ -207,7 +217,7 @@ const AdminRevenueAnalytics = () => {
         <div className="ra-error">
           <h2>Analytics Error</h2>
           <p>{error}</p>
-          <button onClick={fetchStats} className="ra-retry-btn">Retry</button>
+          <button onClick={() => window.location.reload()} className="ra-retry-btn">Retry</button>
         </div>
       </AdminLayout>
     );
