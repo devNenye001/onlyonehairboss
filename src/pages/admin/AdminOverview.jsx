@@ -15,6 +15,7 @@ const AdminOverview = () => {
   const [stats, setStats] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const [showRevenueModal, setShowRevenueModal] = useState(false);
 
   const fetchStats = async () => {
     try {
@@ -63,6 +64,61 @@ const AdminOverview = () => {
       </AdminLayout>
     );
   }
+
+  const renderRevenueChart = () => {
+    const data = stats.monthlySales || [];
+    if (data.length === 0) {
+      return <p className="empty-text">No sales data yet for chart.</p>;
+    }
+
+    const padding = { top: 30, right: 30, bottom: 40, left: 60 };
+    const width = 750;
+    const height = 280;
+    const chartWidth = width - padding.left - padding.right;
+    const chartHeight = height - padding.top - padding.bottom;
+
+    const maxSales = Math.max(...data.map((d) => parseFloat(d.sales) || 0), 1);
+    const points = data.map((d, i) => {
+      const x = padding.left + (i / Math.max(data.length - 1, 1)) * chartWidth;
+      const y = padding.top + chartHeight - ((parseFloat(d.sales) || 0) / maxSales) * chartHeight;
+      return { x, y, month: d.month, sales: parseFloat(d.sales) || 0 };
+    });
+
+    const linePath = points.map((p, i) => `${i === 0 ? 'M' : 'L'} ${p.x} ${p.y}`).join(' ');
+
+    return (
+      <div style={{ background: 'rgba(255, 255, 255, 0.01)', border: '1px solid rgba(153, 85, 68, 0.1)', borderRadius: '8px', padding: '16px 20px' }}>
+        <h3 style={{ display: 'flex', alignItems: 'center', gap: '8px', margin: '0 0 15px 0', borderBottom: '1px solid rgba(153, 85, 68, 0.1)', paddingBottom: '8px', color: '#FFF1EA', fontSize: '1.1rem' }}>
+          <FaChartLine style={{ color: '#995544' }} /> Monthly Revenue Trend
+        </h3>
+        <svg viewBox={`0 0 ${width} ${height}`} width="100%" height="auto" style={{ display: 'block' }}>
+          {[0, 0.25, 0.5, 0.75, 1].map((ratio) => {
+            const y = padding.top + chartHeight * (1 - ratio);
+            return (
+              <g key={ratio}>
+                <line x1={padding.left} y1={y} x2={width - padding.right} y2={y} stroke="rgba(255,255,255,0.06)" strokeWidth="1" />
+                <text x={padding.left - 10} y={y + 4} textAnchor="end" fill="#888" fontSize="11">
+                  {fmt(maxSales * ratio)}
+                </text>
+              </g>
+            );
+          })}
+          <path d={linePath} fill="none" stroke="#995544" strokeWidth="2.5" strokeLinejoin="round" strokeLinecap="round" />
+          {points.map((p, i) => (
+            <g key={i} className="chart-dot-group">
+              <circle cx={p.x} cy={p.y} r="5" fill="#995544" stroke="#1a120e" strokeWidth="2" />
+              <title>{p.month}: {fmt(p.sales)}</title>
+            </g>
+          ))}
+          {points.map((p, i) => (
+            <text key={`label-${i}`} x={p.x} y={height - 10} textAnchor="middle" fill="#888" fontSize="11">
+              {p.month}
+            </text>
+          ))}
+        </svg>
+      </div>
+    );
+  };
 
   return (
     <AdminLayout>
