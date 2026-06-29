@@ -5,7 +5,7 @@ import AdminLayout from './AdminLayout';
 import { supabase } from '../../utils/supabase/client';
 import './AdminProducts.css';
 
-const EMPTY_FORM = { name: '', price: '', description: '', stock: 10, category: 'General' };
+const EMPTY_FORM = { name: '', price: '', description: '', stock: 10, category: 'General', weight_g: 1000 };
 
 const getProductImage = (images) => {
   if (Array.isArray(images)) {
@@ -65,7 +65,8 @@ const AdminProducts = () => {
       price: p.price,
       description: p.description ?? '',
       stock: p.stock_count ?? 0,
-      category: p.category ?? 'General'
+      category: p.category ?? 'General',
+      weight_g: p.weight_g ?? 1000
     });
     setEditing(p.id);
     setImageFiles([]);
@@ -116,6 +117,7 @@ const AdminProducts = () => {
         is_featured: false,
         stock_count: parseInt(form.stock, 10),
         in_stock: parseInt(form.stock, 10) > 0,
+        weight_g: parseInt(form.weight_g, 10) || 1000,
       };
 
       if (editing) {
@@ -244,6 +246,15 @@ const AdminProducts = () => {
                   <div className="ap-form-field">
                     <label>Stock Quantity</label>
                     <input name="stock" type="number" value={form.stock} onChange={handleChange} min="0" placeholder="0" />
+                  </div>
+                </div>
+                <div className="ap-form-row">
+                  <div className="ap-form-field">
+                    <label>Weight (grams)</label>
+                    <input name="weight_g" type="number" value={form.weight_g} onChange={handleChange} min="1" placeholder="1000" required />
+                  </div>
+                  <div className="ap-form-field">
+                    {/* Placeholder for layout */}
                   </div>
                 </div>
                 <div className="ap-form-field">

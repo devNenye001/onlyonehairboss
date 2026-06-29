@@ -28,20 +28,45 @@ const Checkout = () => {
     city: '',
     state: '',
     notes: '',
+    country: 'Nigeria',
   });
-  const [shippingMethod, setShippingMethod] = useState('local');
 
-  const totalItemsQty = useMemo(() => {
-    return cart.reduce((acc, item) => acc + (Number(item.quantity) || 1), 0);
+  const currency = useMemo(() => {
+    return form.country?.trim().toLowerCase() === 'nigeria' ? 'NGN' : 'USD';
+  }, [form.country]);
+
+  const totalWeightGrams = useMemo(() => {
+    return cart.reduce((acc, item) => acc + (Number(item.weight_g || 1000) * (Number(item.quantity) || 1)), 0);
   }, [cart]);
 
+  const totalWeightKg = useMemo(() => {
+    return Math.ceil(totalWeightGrams / 1000);
+  }, [totalWeightGrams]);
+
+  const shippingCostNgn = useMemo(() => {
+    const isLocal = form.country?.trim().toLowerCase() === 'nigeria';
+    return isLocal ? 10000 * totalWeightKg : 86000 * totalWeightKg;
+  }, [form.country, totalWeightKg]);
+
+  const conversionRate = 1600; // 1 USD = 1600 NGN
+
+  const subtotal = useMemo(() => {
+    return currency === 'USD' ? Math.ceil(cartTotal / conversionRate) : cartTotal;
+  }, [currency, cartTotal]);
+
   const shippingCost = useMemo(() => {
-    return shippingMethod === 'international' ? 86000 * totalItemsQty : 10000 * totalItemsQty;
-  }, [shippingMethod, totalItemsQty]);
+    return currency === 'USD' ? Math.ceil(shippingCostNgn / conversionRate) : shippingCostNgn;
+  }, [currency, shippingCostNgn]);
 
   const finalTotal = useMemo(() => {
-    return cartTotal + shippingCost;
-  }, [cartTotal, shippingCost]);
+    return subtotal + shippingCost;
+  }, [subtotal, shippingCost]);
+
+  const formatPrice = (amount) => {
+    return currency === 'USD' 
+      ? `USD $${amount.toLocaleString('en-US')}` 
+      : `NGN ₦${amount.toLocaleString('en-US')}`;
+  };
 
   useEffect(() => {
     if (!authLoading && !user) {
@@ -66,7 +91,7 @@ const Checkout = () => {
     public_key: FLUTTERWAVE_KEY || '',
     tx_ref: txRef,
     amount: finalTotal,
-    currency: 'NGN',
+    currency: currency,
     payment_options: 'card,ussd,account',
     customer: {
       email: form.email || 'guest@onlyonehairboss.com',
@@ -78,7 +103,7 @@ const Checkout = () => {
       description: 'Payment for wigs order',
       logo: window.location.origin + '/logo.svg',
     },
-  }), [finalTotal, form.email, form.fullName, form.phone, txRef]);
+  }), [finalTotal, currency, form.email, form.fullName, form.phone, txRef]);
 
   const handleFlutterPayment = useFlutterwave(flutterwaveConfig);
 
@@ -104,17 +129,19 @@ const Checkout = () => {
             address: form.address.trim(),
             city: form.city.trim(),
             state: form.state.trim(),
+            country: form.country.trim(),
             notes: form.notes.trim(),
             total: Number(finalTotal),
+            currency: currency,
             tx_ref: responseTxRef || txRef,
-            shipping_method: shippingMethod,
+            shipping_method: form.country?.trim().toLowerCase() === 'nigeria' ? 'local' : 'international',
             shipping_fee: Number(shippingCost),
             items: cart.map(i => ({
               id: i.id,
               name: i.name,
               image: i.image ?? '',
               quantity: i.quantity,
-              price: i.price,
+              price: currency === 'USD' ? Math.ceil(i.price / conversionRate) : i.price,
             })),
           },
         }),
@@ -141,7 +168,7 @@ const Checkout = () => {
       return;
     }
 
-    const required = ['fullName', 'email', 'phone', 'address', 'city', 'state'];
+    const required = ['fullName', 'email', 'phone', 'address', 'city', 'state', 'country'];
     if (required.some(key => !form[key]?.trim())) {
       setError('Please complete all required shipping fields.');
       return;
@@ -233,76 +260,19 @@ const Checkout = () => {
               </div>
             </div>
             <div className="co-field">
+              <label>Country</label>
+              <input name="country" value={form.country} onChange={handleChange} required placeholder="Nigeria" />
+            </div>
+            <div className="co-field">
               <label>Order Notes (optional)</label>
               <textarea name="notes" value={form.notes} onChange={handleChange} rows="3" placeholder="Any special instructions..." />
-            </div>
-
-            <div className="shipping-methods-container" style={{ marginTop: '25px', marginBottom: '25px' }}>
-              <h4 style={{ color: '#cccccc', fontSize: '0.9rem', marginBottom: '12px', fontWeight: '600' }}>Choose Shipping Method</h4>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-                <label 
-                  style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '12px',
-                    padding: '14px 16px',
-                    borderRadius: '8px',
-                    background: shippingMethod === 'local' ? 'rgba(153, 85, 68, 0.08)' : 'rgba(255, 255, 255, 0.02)',
-                    border: shippingMethod === 'local' ? '1px solid #995544' : '1px solid rgba(255, 255, 255, 0.08)',
-                    cursor: 'pointer',
-                    transition: 'all 0.2s ease'
-                  }}
-                >
-                  <input 
-                    type="radio" 
-                    name="shippingMethod" 
-                    value="local" 
-                    checked={shippingMethod === 'local'} 
-                    onChange={() => setShippingMethod('local')}
-                    style={{ width: 'auto', accentColor: '#995544', cursor: 'pointer' }}
-                  />
-                  <div style={{ flex: 1 }}>
-                    <div style={{ fontWeight: '600', fontSize: '0.92rem', color: '#ffffff' }}>Local Delivery (Within Nigeria)</div>
-                    <div style={{ fontSize: '0.8rem', color: '#888888', marginTop: '2px' }}>Doorstep Delivery by GIG Logistics (1kg per wig)</div>
-                  </div>
-                  <div style={{ fontWeight: '700', fontSize: '1rem', color: '#995544' }}>₦{(10000 * totalItemsQty).toLocaleString()}</div>
-                </label>
-
-                <label 
-                  style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '12px',
-                    padding: '14px 16px',
-                    borderRadius: '8px',
-                    background: shippingMethod === 'international' ? 'rgba(153, 85, 68, 0.08)' : 'rgba(255, 255, 255, 0.02)',
-                    border: shippingMethod === 'international' ? '1px solid #995544' : '1px solid rgba(255, 255, 255, 0.08)',
-                    cursor: 'pointer',
-                    transition: 'all 0.2s ease'
-                  }}
-                >
-                  <input 
-                    type="radio" 
-                    name="shippingMethod" 
-                    value="international" 
-                    checked={shippingMethod === 'international'} 
-                    onChange={() => setShippingMethod('international')}
-                    style={{ width: 'auto', accentColor: '#995544', cursor: 'pointer' }}
-                  />
-                  <div style={{ flex: 1 }}>
-                    <div style={{ fontWeight: '600', fontSize: '0.92rem', color: '#ffffff' }}>International Delivery</div>
-                    <div style={{ fontSize: '0.8rem', color: '#888888', marginTop: '2px' }}>DHL Express Delivery (1kg per wig)</div>
-                  </div>
-                  <div style={{ fontWeight: '700', fontSize: '1rem', color: '#995544' }}>₦{(86000 * totalItemsQty).toLocaleString()}</div>
-                </label>
-              </div>
             </div>
 
             {error && <p className="co-error">{error}</p>}
             {paymentState && <p className="co-secure-note">{paymentState}</p>}
 
             <button type="submit" className="co-place-btn" disabled={loading}>
-              {loading ? 'Confirming payment...' : `Pay NGN ${finalTotal.toLocaleString()} with Flutterwave`}
+              {loading ? 'Confirming payment...' : `Pay ${formatPrice(finalTotal)}`}
             </button>
 
             <p className="co-secure-note">
@@ -317,29 +287,36 @@ const Checkout = () => {
             transition={{ duration: 0.5 }}
           >
             <h3 className="co-summary-title">Order Summary</h3>
-            {cart.map(item => (
-              <div key={item.id} className="co-item">
-                <img src={item.image} alt={item.name} className="co-item-img" />
-                <div className="co-item-info">
-                  <p className="co-item-name">{item.name}</p>
-                  <p className="co-item-qty">Qty: {item.quantity}</p>
+            {cart.map(item => {
+              const itemPrice = currency === 'USD' ? Math.ceil(item.price / conversionRate) : item.price;
+              return (
+                <div key={item.id} className="co-item" style={{ borderBottom: '1px solid rgba(153,85,68,0.1)' }}>
+                  <img src={item.image} alt={item.name} className="co-item-img" />
+                  <div className="co-item-info">
+                    <p className="co-item-name" style={{ color: '#1a120e', fontWeight: '600' }}>{item.name}</p>
+                    <p className="co-item-qty" style={{ color: '#7d6259' }}>Qty: {item.quantity} ({(item.weight_g || 1000)}g)</p>
+                  </div>
+                  <p className="co-item-price" style={{ color: '#1a120e', fontWeight: '700' }}>{formatPrice(itemPrice * item.quantity)}</p>
                 </div>
-                <p className="co-item-price">NGN {(item.price * item.quantity).toLocaleString()}</p>
-              </div>
-            ))}
-            <div className="co-summary-calc" style={{ marginTop: '20px', borderTop: '1px solid rgba(255,255,255,0.06)', paddingTop: '15px', display: 'flex', flexDirection: 'column', gap: '8px', fontSize: '0.9rem', color: '#888' }}>
+              );
+            })}
+            <div className="co-summary-calc" style={{ marginTop: '20px', borderTop: '1px solid rgba(153,85,68,0.15)', paddingTop: '15px', display: 'flex', flexDirection: 'column', gap: '8px', fontSize: '0.92rem', color: '#554440' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between' }}>
                 <span>Subtotal</span>
-                <span style={{ color: '#eee' }}>NGN {cartTotal.toLocaleString()}</span>
+                <span style={{ color: '#1a120e', fontWeight: '600' }}>{formatPrice(subtotal)}</span>
               </div>
               <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                <span>Shipping ({shippingMethod === 'international' ? 'DHL' : 'GIG'})</span>
-                <span style={{ color: '#eee' }}>NGN {shippingCost.toLocaleString()}</span>
+                <span>Shipping ({currency === 'USD' ? 'DHL Express' : 'GIG Doorstep'})</span>
+                <span style={{ color: '#1a120e', fontWeight: '600' }}>{formatPrice(shippingCost)}</span>
+              </div>
+              <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.82rem', color: '#7d6259' }}>
+                <span>Total Weight</span>
+                <span>{totalWeightGrams >= 1000 ? `${(totalWeightGrams / 1000).toFixed(1)}kg` : `${totalWeightGrams}g`}</span>
               </div>
             </div>
-            <div className="co-total" style={{ borderTop: '1px solid rgba(255,255,255,0.06)', marginTop: '12px', paddingTop: '15px' }}>
+            <div className="co-total" style={{ borderTop: '1px solid rgba(153,85,68,0.15)', marginTop: '12px', paddingTop: '15px', color: '#1a120e', display: 'flex', justifyContent: 'space-between', fontSize: '1.15rem', fontWeight: '700' }}>
               <span>Total</span>
-              <span>NGN {finalTotal.toLocaleString()}</span>
+              <span>{formatPrice(finalTotal)}</span>
             </div>
           </Motion.div>
         </div>

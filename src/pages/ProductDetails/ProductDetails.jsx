@@ -222,6 +222,7 @@ const ProductDetails = () => {
  
             <div className="pd-meta">
               <p>Category: <span>{product.category || '—'}</span></p>
+              <p>Weight: <span>{product.weight_g ? `${product.weight_g}g` : '1000g'}</span></p>
               <p>Note: <span>Order processing takes 3 working days.</span></p>
             </div>
           </Motion.div>
