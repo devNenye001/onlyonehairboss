@@ -71,8 +71,11 @@ const AdminOverview = () => {
           <div className="metric-card">
             <div className="card-icon revenue-icon"><HiOutlineCurrencyDollar /></div>
             <div className="card-info">
-              <span className="card-label">Total Revenue</span>
-              <h2 className="card-value">{fmt(stats.revenue)}</h2>
+              <span className="card-label">Total Revenue (Year)</span>
+              <h2 className="card-value">{fmt(stats.yearlyRevenue || stats.revenue)}</h2>
+              <p style={{ margin: '4px 0 0 0', fontSize: '0.78rem', color: '#888888' }}>
+                Month: {fmt(stats.monthlyRevenue)} | Week: {fmt(stats.weeklyRevenue)}
+              </p>
             </div>
           </div>
 
@@ -158,6 +161,67 @@ const AdminOverview = () => {
               ))}
               {stats.categorySales.length === 0 && (
                 <p className="empty-text">No sales recorded yet.</p>
+              )}
+            </div>
+          </div>
+        </div>
+
+        {/* Dynamic Analytics Details Section */}
+        <div className="details-section-grid" style={{ marginTop: '30px' }}>
+          {/* Best Selling Wigs */}
+          <div className="details-box">
+            <h3>🏆 Best Selling Wigs</h3>
+            <div className="table-wrap">
+              <table className="overview-table">
+                <thead>
+                  <tr>
+                    <th>Period</th>
+                    <th>Wig Name</th>
+                    <th>Qty Sold</th>
+                    <th>Sales Value</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {stats.bestSellers?.slice(0, 5).map((w, idx) => (
+                    <tr key={idx}>
+                      <td style={{ color: '#888888', fontSize: '0.85rem' }}>{w.period}</td>
+                      <td className="customer-name">{w.product_name}</td>
+                      <td style={{ fontWeight: '600' }}>{w.quantity_sold} units</td>
+                      <td>{fmt(w.sales_value)}</td>
+                    </tr>
+                  ))}
+                  {(!stats.bestSellers || stats.bestSellers.length === 0) && (
+                    <tr>
+                      <td colSpan="4" className="empty-text">No sales recorded yet.</td>
+                    </tr>
+                  )}
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          {/* Sales Performance Insights */}
+          <div className="details-box">
+            <h3>💡 Sales Performance Insights</h3>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', marginTop: '16px' }}>
+              {stats.insights?.map((insight, idx) => (
+                <div 
+                  key={idx} 
+                  style={{ 
+                    background: 'rgba(153, 85, 68, 0.04)', 
+                    borderLeft: '4px solid #995544', 
+                    padding: '12px 16px', 
+                    borderRadius: '4px', 
+                    fontSize: '0.9rem', 
+                    color: '#dddddd', 
+                    lineHeight: '1.5' 
+                  }}
+                >
+                  {insight}
+                </div>
+              ))}
+              {(!stats.insights || stats.insights.length === 0) && (
+                <p className="empty-text">Generating insights...</p>
               )}
             </div>
           </div>

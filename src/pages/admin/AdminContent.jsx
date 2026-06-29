@@ -20,6 +20,12 @@ const AdminContent = () => {
   const [collections, setCollections] = useState({ title: '', description: '', image_url: '', product_ids: [] });
   const [featuredCol, setFeaturedCol] = useState({ product_id: '', heading: '', description: '', video_url: '' });
   const [socials, setSocials] = useState({ videos: [] });
+  const [feedbacks, setFeedbacks] = useState({
+    new_ins: null,
+    collection_section: null,
+    featured_collection: null,
+    stay_connected: null
+  });
 
   const fetchData = useCallback(async () => {
     setLoading(true);
@@ -60,17 +66,23 @@ const AdminContent = () => {
   const handleSaveSection = async (key, value) => {
     setSaving(true);
     setMsg('');
+    setFeedbacks(prev => ({ ...prev, [key]: null }));
     try {
       const { error } = await supabase.from('site_content').insert({ key, value });
       if (error) throw error;
       setMsg(`${key.replace('_', ' ').toUpperCase()} section saved successfully!`);
+      setFeedbacks(prev => ({ ...prev, [key]: { type: 'success', text: 'Saved successfully! ✨' } }));
     } catch (err) {
       console.error(err);
       setMsg(`Failed to save ${key}: ` + err.message);
+      setFeedbacks(prev => ({ ...prev, [key]: { type: 'error', text: err.message || 'Failed to save.' } }));
     } finally {
       setSaving(false);
-      // Clear alert message after 3 seconds
-      setTimeout(() => setMsg(''), 3000);
+      // Clear messages and feedbacks after 3 seconds
+      setTimeout(() => {
+        setMsg('');
+        setFeedbacks(prev => ({ ...prev, [key]: null }));
+      }, 3000);
     }
   };
 
@@ -514,13 +526,20 @@ const AdminContent = () => {
                 </div>
               </div>
 
-              <button 
-                className="save-section-btn" 
-                onClick={() => handleSaveSection('new_ins', newIns)}
-                disabled={saving}
-              >
-                <HiOutlineSave /> Save New Ins
-              </button>
+              <div className="save-actions-row">
+                <button 
+                  className="save-section-btn" 
+                  onClick={() => handleSaveSection('new_ins', newIns)}
+                  disabled={saving}
+                >
+                  <HiOutlineSave /> Save New Ins
+                </button>
+                {feedbacks.new_ins && (
+                  <span className={`inline-feedback ${feedbacks.new_ins.type}`}>
+                    {feedbacks.new_ins.text}
+                  </span>
+                )}
+              </div>
             </div>
 
             {/* 2. COLLECTION SECTION */}
@@ -575,13 +594,20 @@ const AdminContent = () => {
                 </div>
               </div>
 
-              <button 
-                className="save-section-btn" 
-                onClick={() => handleSaveSection('collection_section', cleanCollectionConfig(collections))}
-                disabled={saving}
-              >
-                <HiOutlineSave /> Save Collection Info
-              </button>
+              <div className="save-actions-row">
+                <button 
+                  className="save-section-btn" 
+                  onClick={() => handleSaveSection('collection_section', cleanCollectionConfig(collections))}
+                  disabled={saving}
+                >
+                  <HiOutlineSave /> Save Collection Info
+                </button>
+                {feedbacks.collection_section && (
+                  <span className={`inline-feedback ${feedbacks.collection_section.type}`}>
+                    {feedbacks.collection_section.text}
+                  </span>
+                )}
+              </div>
             </div>
 
             {/* 3. FEATURED COLLECTION */}
@@ -670,13 +696,20 @@ const AdminContent = () => {
                 {renderUploadProgress('featured')}
               </div>
 
-              <button 
-                className="save-section-btn" 
-                onClick={() => handleSaveSection('featured_collection', featuredCol)}
-                disabled={saving}
-              >
-                <HiOutlineSave /> Save Featured Info
-              </button>
+              <div className="save-actions-row">
+                <button 
+                  className="save-section-btn" 
+                  onClick={() => handleSaveSection('featured_collection', featuredCol)}
+                  disabled={saving}
+                >
+                  <HiOutlineSave /> Save Featured Info
+                </button>
+                {feedbacks.featured_collection && (
+                  <span className={`inline-feedback ${feedbacks.featured_collection.type}`}>
+                    {feedbacks.featured_collection.text}
+                  </span>
+                )}
+              </div>
             </div>
 
             {/* 4. STAY CONNECTED (VIDEOS) */}
@@ -759,13 +792,20 @@ const AdminContent = () => {
                 })}
               </div>
  
-              <button 
-                className="save-section-btn" 
-                onClick={() => handleSaveSection('stay_connected', socials)}
-                disabled={saving}
-              >
-                <HiOutlineSave /> Save Social Videos
-              </button>
+              <div className="save-actions-row">
+                <button 
+                  className="save-section-btn" 
+                  onClick={() => handleSaveSection('stay_connected', socials)}
+                  disabled={saving}
+                >
+                  <HiOutlineSave /> Save Social Videos
+                </button>
+                {feedbacks.stay_connected && (
+                  <span className={`inline-feedback ${feedbacks.stay_connected.type}`}>
+                    {feedbacks.stay_connected.text}
+                  </span>
+                )}
+              </div>
             </div>
  
           </div>

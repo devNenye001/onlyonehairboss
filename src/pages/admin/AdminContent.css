@@ -415,6 +415,49 @@ select option {
   color: #ffffff;
 }
 
+.save-actions-row {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 15px;
+  margin-top: 20px;
+}
+
+.inline-feedback {
+  font-size: 0.9rem;
+  font-weight: 600;
+  animation: feedbackFade 0.25s ease-out;
+}
+
+.inline-feedback.success {
+  color: #2ecc71;
+}
+
+.inline-feedback.error {
+  color: #e74c3c;
+}
+
+@keyframes feedbackFade {
+  from { opacity: 0; transform: translateX(-5px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+
+@media (max-width: 768px) {
+  .file-upload-row {
+    flex-direction: column;
+    gap: 10px;
+  }
+  .upload-file-btn {
+    width: 100%;
+    justify-content: center;
+  }
+  .file-upload-row button {
+    width: 100%;
+    height: 48px;
+    box-sizing: border-box;
+  }
+}
+
 @media (max-width: 576px) {
   .uploaded-video-card {
     flex-direction: column;

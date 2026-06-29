@@ -8,6 +8,19 @@ import './AdminOrders.css';
 const STATUSES = ['pending', 'processing', 'shipped', 'delivered', 'cancelled'];
 const shortId = (id) => (typeof id === 'string' ? id.slice(0, 8).toUpperCase() : 'UNKNOWN');
 
+const resolveImageUrl = (img) => {
+  if (!img) return '/wig1.svg';
+  if (img.startsWith('http')) return img;
+  if (img.startsWith('/api/')) {
+    const apiBase = import.meta.env.VITE_API_URL || (import.meta.env.DEV ? 'http://localhost:5000/api' : '/api');
+    const backendUrl = apiBase.endsWith('/api') ? apiBase.slice(0, -4) : apiBase;
+    return `${backendUrl}${img}`;
+  }
+  if (img.startsWith('/')) return img;
+  const apiBase = import.meta.env.VITE_API_URL || (import.meta.env.DEV ? 'http://localhost:5000/api' : '/api');
+  return `${apiBase}/storage/files/${img}`;
+};
+
 const AdminOrders = () => {
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -163,7 +176,12 @@ const AdminOrders = () => {
                 <h4>Order Items</h4>
                 {items.map(i => (
                   <div key={i.id || i.product_name} className="ao-item-row">
-                    {i.product_image && <img src={i.product_image} alt={i.product_name} className="ao-item-img" />}
+                    <img 
+                      src={resolveImageUrl(i.product_image)} 
+                      alt={i.product_name} 
+                      className="ao-item-img" 
+                      onError={(e) => { e.target.src = '/wig1.svg'; }}
+                    />
                     <div>
                       <p className="ao-item-name">{i.product_name}</p>
                       <p className="ao-item-meta">Qty: {i.quantity} - NGN {Number(i.price || 0).toLocaleString()}</p>

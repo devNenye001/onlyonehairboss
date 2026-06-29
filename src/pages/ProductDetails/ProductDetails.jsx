@@ -200,7 +200,6 @@ const ProductDetails = () => {
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.6 }}
           >
-            <p className="pd-category">{product.category}</p>
             <h1 className="pd-name">{product.name}</h1>
             <p className="pd-price">{formatPrice(product.price)}</p>
             <p className="pd-desc">{product.description || 'Premium quality wig crafted for a flawless, natural look with rich volume and a silky finish.'}</p>

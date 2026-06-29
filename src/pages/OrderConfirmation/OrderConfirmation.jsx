@@ -9,6 +9,19 @@ import './OrderConfirmation.css';
 
 const shortId = (id) => (typeof id === 'string' ? id.slice(0, 8).toUpperCase() : 'UNKNOWN');
 
+const resolveImageUrl = (img) => {
+  if (!img) return '/wig1.svg';
+  if (img.startsWith('http')) return img;
+  if (img.startsWith('/api/')) {
+    const apiBase = import.meta.env.VITE_API_URL || (import.meta.env.DEV ? 'http://localhost:5000/api' : '/api');
+    const backendUrl = apiBase.endsWith('/api') ? apiBase.slice(0, -4) : apiBase;
+    return `${backendUrl}${img}`;
+  }
+  if (img.startsWith('/')) return img;
+  const apiBase = import.meta.env.VITE_API_URL || (import.meta.env.DEV ? 'http://localhost:5000/api' : '/api');
+  return `${apiBase}/storage/files/${img}`;
+};
+
 const OrderConfirmation = () => {
   const { id } = useParams();
   const [order, setOrder] = useState(null);
@@ -71,7 +84,12 @@ const OrderConfirmation = () => {
               <h3 className="oc-items-title">Items Ordered</h3>
               {items.map(item => (
                 <div key={item.id} className="oc-item">
-                  {item.product_image && <img src={item.product_image} alt={item.product_name} className="oc-item-img" />}
+                  <img 
+                    src={resolveImageUrl(item.product_image)} 
+                    alt={item.product_name} 
+                    className="oc-item-img" 
+                    onError={(e) => { e.target.src = '/wig1.svg'; }}
+                  />
                   <div>
                     <p className="oc-item-name">{item.product_name}</p>
                     <p className="oc-item-meta">Qty: {item.quantity} · ₦{item.price?.toLocaleString()}</p>
