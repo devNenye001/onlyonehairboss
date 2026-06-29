@@ -35,7 +35,6 @@ const CommunityGallery = () => {
         
         {/* Header Block */}
         <div className="community-header">
-          <p className="community-tag">Socials</p>
           <h2 className="community-headline">Our Beautiful Community</h2>
           <p className="community-subtitle">
             See how our community styles their favorite lace, closures, and custom color units. Real people, flawless hair.
