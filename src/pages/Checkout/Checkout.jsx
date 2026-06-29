@@ -29,6 +29,19 @@ const Checkout = () => {
     state: '',
     notes: '',
   });
+  const [shippingMethod, setShippingMethod] = useState('local');
+
+  const totalItemsQty = useMemo(() => {
+    return cart.reduce((acc, item) => acc + (Number(item.quantity) || 1), 0);
+  }, [cart]);
+
+  const shippingCost = useMemo(() => {
+    return shippingMethod === 'international' ? 86000 * totalItemsQty : 10000 * totalItemsQty;
+  }, [shippingMethod, totalItemsQty]);
+
+  const finalTotal = useMemo(() => {
+    return cartTotal + shippingCost;
+  }, [cartTotal, shippingCost]);
 
   useEffect(() => {
     if (!authLoading && !user) {
@@ -52,7 +65,7 @@ const Checkout = () => {
   const flutterwaveConfig = useMemo(() => ({
     public_key: FLUTTERWAVE_KEY || '',
     tx_ref: txRef,
-    amount: cartTotal,
+    amount: finalTotal,
     currency: 'NGN',
     payment_options: 'card,ussd,account',
     customer: {
@@ -63,9 +76,9 @@ const Checkout = () => {
     customizations: {
       title: 'OnlyOne Hairboss',
       description: 'Payment for wigs order',
-      logo: window.location.origin + '/logo1.svg',
+      logo: window.location.origin + '/logo.svg',
     },
-  }), [cartTotal, form.email, form.fullName, form.phone, txRef]);
+  }), [finalTotal, form.email, form.fullName, form.phone, txRef]);
 
   const handleFlutterPayment = useFlutterwave(flutterwaveConfig);
 
@@ -92,8 +105,10 @@ const Checkout = () => {
             city: form.city.trim(),
             state: form.state.trim(),
             notes: form.notes.trim(),
-            total: Number(cartTotal),
+            total: Number(finalTotal),
             tx_ref: responseTxRef || txRef,
+            shipping_method: shippingMethod,
+            shipping_fee: Number(shippingCost),
             items: cart.map(i => ({
               id: i.id,
               name: i.name,
@@ -222,11 +237,72 @@ const Checkout = () => {
               <textarea name="notes" value={form.notes} onChange={handleChange} rows="3" placeholder="Any special instructions..." />
             </div>
 
+            <div className="shipping-methods-container" style={{ marginTop: '25px', marginBottom: '25px' }}>
+              <h4 style={{ color: '#cccccc', fontSize: '0.9rem', marginBottom: '12px', fontWeight: '600' }}>Choose Shipping Method</h4>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                <label 
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '12px',
+                    padding: '14px 16px',
+                    borderRadius: '8px',
+                    background: shippingMethod === 'local' ? 'rgba(153, 85, 68, 0.08)' : 'rgba(255, 255, 255, 0.02)',
+                    border: shippingMethod === 'local' ? '1px solid #995544' : '1px solid rgba(255, 255, 255, 0.08)',
+                    cursor: 'pointer',
+                    transition: 'all 0.2s ease'
+                  }}
+                >
+                  <input 
+                    type="radio" 
+                    name="shippingMethod" 
+                    value="local" 
+                    checked={shippingMethod === 'local'} 
+                    onChange={() => setShippingMethod('local')}
+                    style={{ width: 'auto', accentColor: '#995544', cursor: 'pointer' }}
+                  />
+                  <div style={{ flex: 1 }}>
+                    <div style={{ fontWeight: '600', fontSize: '0.92rem', color: '#ffffff' }}>Local Delivery (Within Nigeria)</div>
+                    <div style={{ fontSize: '0.8rem', color: '#888888', marginTop: '2px' }}>Doorstep Delivery by GIG Logistics (1kg per wig)</div>
+                  </div>
+                  <div style={{ fontWeight: '700', fontSize: '1rem', color: '#995544' }}>₦{(10000 * totalItemsQty).toLocaleString()}</div>
+                </label>
+
+                <label 
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '12px',
+                    padding: '14px 16px',
+                    borderRadius: '8px',
+                    background: shippingMethod === 'international' ? 'rgba(153, 85, 68, 0.08)' : 'rgba(255, 255, 255, 0.02)',
+                    border: shippingMethod === 'international' ? '1px solid #995544' : '1px solid rgba(255, 255, 255, 0.08)',
+                    cursor: 'pointer',
+                    transition: 'all 0.2s ease'
+                  }}
+                >
+                  <input 
+                    type="radio" 
+                    name="shippingMethod" 
+                    value="international" 
+                    checked={shippingMethod === 'international'} 
+                    onChange={() => setShippingMethod('international')}
+                    style={{ width: 'auto', accentColor: '#995544', cursor: 'pointer' }}
+                  />
+                  <div style={{ flex: 1 }}>
+                    <div style={{ fontWeight: '600', fontSize: '0.92rem', color: '#ffffff' }}>International Delivery</div>
+                    <div style={{ fontSize: '0.8rem', color: '#888888', marginTop: '2px' }}>DHL Express Delivery (1kg per wig)</div>
+                  </div>
+                  <div style={{ fontWeight: '700', fontSize: '1rem', color: '#995544' }}>₦{(86000 * totalItemsQty).toLocaleString()}</div>
+                </label>
+              </div>
+            </div>
+
             {error && <p className="co-error">{error}</p>}
             {paymentState && <p className="co-secure-note">{paymentState}</p>}
 
             <button type="submit" className="co-place-btn" disabled={loading}>
-              {loading ? 'Confirming payment...' : `Pay NGN ${cartTotal.toLocaleString()} with Flutterwave`}
+              {loading ? 'Confirming payment...' : `Pay NGN ${finalTotal.toLocaleString()} with Flutterwave`}
             </button>
 
             <p className="co-secure-note">
@@ -251,9 +327,19 @@ const Checkout = () => {
                 <p className="co-item-price">NGN {(item.price * item.quantity).toLocaleString()}</p>
               </div>
             ))}
-            <div className="co-total">
+            <div className="co-summary-calc" style={{ marginTop: '20px', borderTop: '1px solid rgba(255,255,255,0.06)', paddingTop: '15px', display: 'flex', flexDirection: 'column', gap: '8px', fontSize: '0.9rem', color: '#888' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                <span>Subtotal</span>
+                <span style={{ color: '#eee' }}>NGN {cartTotal.toLocaleString()}</span>
+              </div>
+              <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                <span>Shipping ({shippingMethod === 'international' ? 'DHL' : 'GIG'})</span>
+                <span style={{ color: '#eee' }}>NGN {shippingCost.toLocaleString()}</span>
+              </div>
+            </div>
+            <div className="co-total" style={{ borderTop: '1px solid rgba(255,255,255,0.06)', marginTop: '12px', paddingTop: '15px' }}>
               <span>Total</span>
-              <span>NGN {cartTotal.toLocaleString()}</span>
+              <span>NGN {finalTotal.toLocaleString()}</span>
             </div>
           </Motion.div>
         </div>
