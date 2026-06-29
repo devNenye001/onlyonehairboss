@@ -196,7 +196,7 @@ const AdminContent = () => {
       const data = await uploadFormDataWithRetry(`${supabase.API_URL}/storage/upload`, formData, {
         onProgress: setUploadProgress,
       });
-      const publicUrl = `${supabase.API_URL}/storage/files/${data.path}`;
+      const publicUrl = data.path.startsWith('http') ? data.path : `${supabase.API_URL}/storage/files/${data.path}`;
       onComplete(publicUrl);
     } catch (err) {
       setUploadError(err.message || 'Upload failed.');
@@ -303,7 +303,7 @@ const AdminContent = () => {
         if (xhr.status >= 200 && xhr.status < 300) {
           const res = JSON.parse(xhr.responseText);
           if (res.completed) {
-            const publicUrl = `${supabase.API_URL}/storage/files/${res.path}`;
+            const publicUrl = res.path.startsWith('http') ? res.path : `${supabase.API_URL}/storage/files/${res.path}`;
             onProgress(100, 0);
             onComplete(publicUrl);
           } else {
@@ -372,7 +372,7 @@ const AdminContent = () => {
         formData.append('image', thumbFile);
         try {
           const data = await uploadFormDataWithRetry(`${supabase.API_URL}/storage/upload`, formData);
-          thumbnailUrl = `${supabase.API_URL}/storage/files/${data.path}`;
+          thumbnailUrl = data.path.startsWith('http') ? data.path : `${supabase.API_URL}/storage/files/${data.path}`;
         } catch (thumbErr) {
           console.warn('Thumbnail upload failed:', thumbErr);
         } 
