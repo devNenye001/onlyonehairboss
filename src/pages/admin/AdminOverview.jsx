@@ -1,6 +1,12 @@
 import { useEffect, useState } from 'react';
 import AdminLayout from './AdminLayout';
-import { HiOutlineTrendingUp, HiOutlineShoppingBag, HiOutlineDatabase, HiOutlineCurrencyDollar } from 'react-icons/hi';
+import { 
+  HiOutlineTrendingUp, 
+  HiOutlineShoppingBag, 
+  HiOutlineDatabase, 
+  HiOutlineCurrencyDollar
+} from 'react-icons/hi';
+import { FaTrophy, FaLightbulb, FaCrown, FaFire, FaBolt, FaChartLine } from 'react-icons/fa';
 import './AdminOverview.css';
 
 const API_URL = import.meta.env.VITE_API_URL || (import.meta.env.DEV ? 'http://localhost:5000/api' : '/api');
@@ -170,7 +176,9 @@ const AdminOverview = () => {
         <div className="details-section-grid" style={{ marginTop: '30px' }}>
           {/* Best Selling Wigs */}
           <div className="details-box">
-            <h3>🏆 Best Selling Wigs</h3>
+            <h3 style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <FaTrophy style={{ color: '#995544' }} /> Best Selling Wigs
+            </h3>
             <div className="table-wrap">
               <table className="overview-table">
                 <thead>
@@ -202,24 +210,39 @@ const AdminOverview = () => {
 
           {/* Sales Performance Insights */}
           <div className="details-box">
-            <h3>💡 Sales Performance Insights</h3>
+            <h3 style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <FaLightbulb style={{ color: '#995544' }} /> Sales Performance Insights
+            </h3>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', marginTop: '16px' }}>
-              {stats.insights?.map((insight, idx) => (
-                <div 
-                  key={idx} 
-                  style={{ 
-                    background: 'rgba(153, 85, 68, 0.04)', 
-                    borderLeft: '4px solid #995544', 
-                    padding: '12px 16px', 
-                    borderRadius: '4px', 
-                    fontSize: '0.9rem', 
-                    color: '#dddddd', 
-                    lineHeight: '1.5' 
-                  }}
-                >
-                  {insight}
-                </div>
-              ))}
+              {stats.insights?.map((insight, idx) => {
+                const getInsightIcon = (index) => {
+                  if (index === 0) return <FaCrown style={{ color: '#f39c12', fontSize: '1.1rem' }} />;
+                  if (index === 1) return <FaFire style={{ color: '#e74c3c', fontSize: '1.1rem' }} />;
+                  if (index === 2) return <FaBolt style={{ color: '#f1c40f', fontSize: '1.1rem' }} />;
+                  return <FaChartLine style={{ color: '#2ecc71', fontSize: '1.1rem' }} />;
+                };
+                
+                return (
+                  <div 
+                    key={idx} 
+                    style={{ 
+                      background: 'rgba(153, 85, 68, 0.04)', 
+                      borderLeft: '4px solid #995544', 
+                      padding: '12px 16px', 
+                      borderRadius: '4px', 
+                      fontSize: '0.9rem', 
+                      color: '#dddddd', 
+                      lineHeight: '1.5',
+                      display: 'flex',
+                      alignItems: 'flex-start',
+                      gap: '12px'
+                    }}
+                  >
+                    <div style={{ marginTop: '2px', flexShrink: 0 }}>{getInsightIcon(idx)}</div>
+                    <div>{insight}</div>
+                  </div>
+                );
+              })}
               {(!stats.insights || stats.insights.length === 0) && (
                 <p className="empty-text">Generating insights...</p>
               )}

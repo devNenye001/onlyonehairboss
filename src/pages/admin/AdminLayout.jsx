@@ -34,7 +34,6 @@ const AdminLayout = ({ children }) => {
           {isOpen ? <HiX /> : <HiOutlineMenu />}
         </button>
         <img src="/logo.svg" alt="OnlyOne Hairboss" className="admin-mobile-logo" />
-        <span className="admin-mobile-title">Admin</span>
       </header>
 
       {/* Mobile Sidebar Overlay */}
