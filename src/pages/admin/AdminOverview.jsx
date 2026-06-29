@@ -74,10 +74,14 @@ const AdminOverview = () => {
 
         {/* Dashboard Grid Cards */}
         <div className="overview-grid">
-          <div className="metric-card">
+          <div 
+            className="metric-card clickable-revenue-card" 
+            onClick={() => setShowRevenueModal(true)}
+            style={{ cursor: 'pointer' }}
+          >
             <div className="card-icon revenue-icon"><HiOutlineCurrencyDollar /></div>
             <div className="card-info">
-              <span className="card-label">Total Revenue (Year)</span>
+              <span className="card-label">Total Revenue</span>
               <h2 className="card-value">{fmt(stats.yearlyRevenue || stats.revenue)}</h2>
               <p style={{ margin: '4px 0 0 0', fontSize: '0.78rem', color: '#888888' }}>
                 Month: {fmt(stats.monthlyRevenue)} | Week: {fmt(stats.weeklyRevenue)}
@@ -172,83 +176,122 @@ const AdminOverview = () => {
           </div>
         </div>
 
-        {/* Dynamic Analytics Details Section */}
-        <div className="details-section-grid" style={{ marginTop: '30px' }}>
-          {/* Best Selling Wigs */}
-          <div className="details-box">
-            <h3 style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-              <FaTrophy style={{ color: '#995544' }} /> Best Selling Wigs
-            </h3>
-            <div className="table-wrap">
-              <table className="overview-table">
-                <thead>
-                  <tr>
-                    <th>Period</th>
-                    <th>Wig Name</th>
-                    <th>Qty Sold</th>
-                    <th>Sales Value</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {stats.bestSellers?.slice(0, 5).map((w, idx) => (
-                    <tr key={idx}>
-                      <td style={{ color: '#888888', fontSize: '0.85rem' }}>{w.period}</td>
-                      <td className="customer-name">{w.product_name}</td>
-                      <td style={{ fontWeight: '600' }}>{w.quantity_sold} units</td>
-                      <td>{fmt(w.sales_value)}</td>
-                    </tr>
-                  ))}
-                  {(!stats.bestSellers || stats.bestSellers.length === 0) && (
-                    <tr>
-                      <td colSpan="4" className="empty-text">No sales recorded yet.</td>
-                    </tr>
-                  )}
-                </tbody>
-              </table>
-            </div>
-          </div>
+        {/* Dynamic Analytics Details Modal */}
+        {showRevenueModal && (
+          <div className="ao-modal-backdrop" style={{ justifyContent: 'center', alignItems: 'center' }} onClick={() => setShowRevenueModal(false)}>
+            <div
+              className="ao-analytics-modal"
+              style={{
+                width: '90%',
+                maxWidth: '850px',
+                background: '#1a120e',
+                border: '1px solid rgba(153, 85, 68, 0.2)',
+                borderRadius: '12px',
+                maxHeight: '90vh',
+                overflowY: 'auto',
+                padding: '30px',
+                boxShadow: '0 20px 50px rgba(0, 0, 0, 0.6)'
+              }}
+              onClick={e => e.stopPropagation()}
+            >
+              <div className="ao-modal-header" style={{ borderBottom: '1px solid rgba(153, 85, 68, 0.15)', paddingBottom: '15px', marginBottom: '20px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <h2 style={{ fontSize: '1.4rem', color: '#FFF1EA', display: 'flex', alignItems: 'center', gap: '10px', margin: 0 }}>
+                  <HiOutlineCurrencyDollar style={{ color: '#995544' }} /> Revenue & Sales Analytics
+                </h2>
+                <button 
+                  onClick={() => setShowRevenueModal(false)}
+                  style={{ background: 'transparent', border: 'none', color: '#a0857c', fontSize: '1.4rem', cursor: 'pointer', display: 'flex', alignItems: 'center' }}
+                  aria-label="Close analytics modal"
+                >
+                  &times;
+                </button>
+              </div>
 
-          {/* Sales Performance Insights */}
-          <div className="details-box">
-            <h3 style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-              <FaLightbulb style={{ color: '#995544' }} /> Sales Performance Insights
-            </h3>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', marginTop: '16px' }}>
-              {stats.insights?.map((insight, idx) => {
-                const getInsightIcon = (index) => {
-                  if (index === 0) return <FaCrown style={{ color: '#f39c12', fontSize: '1.1rem' }} />;
-                  if (index === 1) return <FaFire style={{ color: '#e74c3c', fontSize: '1.1rem' }} />;
-                  if (index === 2) return <FaBolt style={{ color: '#f1c40f', fontSize: '1.1rem' }} />;
-                  return <FaChartLine style={{ color: '#2ecc71', fontSize: '1.1rem' }} />;
-                };
-                
-                return (
-                  <div 
-                    key={idx} 
-                    style={{ 
-                      background: 'rgba(153, 85, 68, 0.04)', 
-                      borderLeft: '4px solid #995544', 
-                      padding: '12px 16px', 
-                      borderRadius: '4px', 
-                      fontSize: '0.9rem', 
-                      color: '#dddddd', 
-                      lineHeight: '1.5',
-                      display: 'flex',
-                      alignItems: 'flex-start',
-                      gap: '12px'
-                    }}
-                  >
-                    <div style={{ marginTop: '2px', flexShrink: 0 }}>{getInsightIcon(idx)}</div>
-                    <div>{insight}</div>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '25px' }}>
+                {/* Chart Section */}
+                {renderRevenueChart()}
+
+                {/* Grid for Best Sellers and Insights */}
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '20px' }}>
+                  {/* Best Selling Wigs */}
+                  <div style={{ background: 'rgba(255, 255, 255, 0.01)', border: '1px solid rgba(153, 85, 68, 0.1)', borderRadius: '8px', padding: '16px 20px' }}>
+                    <h3 style={{ display: 'flex', alignItems: 'center', gap: '8px', margin: '0 0 15px 0', borderBottom: '1px solid rgba(153, 85, 68, 0.1)', paddingBottom: '8px', color: '#FFF1EA', fontSize: '1.1rem' }}>
+                      <FaTrophy style={{ color: '#995544' }} /> Best Selling Wigs
+                    </h3>
+                    <div className="table-wrap">
+                      <table className="overview-table" style={{ width: '100%' }}>
+                        <thead>
+                          <tr>
+                            <th>Period</th>
+                            <th>Wig Name</th>
+                            <th>Qty</th>
+                            <th>Sales</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {stats.bestSellers?.slice(0, 5).map((w, idx) => (
+                            <tr key={idx}>
+                              <td style={{ color: '#888888', fontSize: '0.85rem' }}>{w.period}</td>
+                              <td className="customer-name">{w.product_name}</td>
+                              <td style={{ fontWeight: '600' }}>{w.quantity_sold} units</td>
+                              <td>{fmt(w.sales_value)}</td>
+                            </tr>
+                          ))}
+                          {(!stats.bestSellers || stats.bestSellers.length === 0) && (
+                            <tr>
+                              <td colSpan="4" className="empty-text">No sales recorded yet.</td>
+                            </tr>
+                          )}
+                        </tbody>
+                      </table>
+                    </div>
                   </div>
-                );
-              })}
-              {(!stats.insights || stats.insights.length === 0) && (
-                <p className="empty-text">Generating insights...</p>
-              )}
+
+                  {/* Sales Insights */}
+                  <div style={{ background: 'rgba(255, 255, 255, 0.01)', border: '1px solid rgba(153, 85, 68, 0.1)', borderRadius: '8px', padding: '16px 20px' }}>
+                    <h3 style={{ display: 'flex', alignItems: 'center', gap: '8px', margin: '0 0 15px 0', borderBottom: '1px solid rgba(153, 85, 68, 0.1)', paddingBottom: '8px', color: '#FFF1EA', fontSize: '1.1rem' }}>
+                      <FaLightbulb style={{ color: '#995544' }} /> Sales Insights
+                    </h3>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                      {stats.insights?.map((insight, idx) => {
+                        const getInsightIcon = (index) => {
+                          if (index === 0) return <FaCrown style={{ color: '#f39c12', fontSize: '1.05rem' }} />;
+                          if (index === 1) return <FaFire style={{ color: '#e74c3c', fontSize: '1.05rem' }} />;
+                          if (index === 2) return <FaBolt style={{ color: '#f1c40f', fontSize: '1.05rem' }} />;
+                          return <FaChartLine style={{ color: '#2ecc71', fontSize: '1.05rem' }} />;
+                        };
+                        
+                        return (
+                          <div 
+                            key={idx} 
+                            style={{ 
+                              background: 'rgba(153, 85, 68, 0.03)', 
+                              borderLeft: '3px solid #995544', 
+                              padding: '10px 14px', 
+                              borderRadius: '4px', 
+                              fontSize: '0.88rem', 
+                              color: '#dddddd', 
+                              lineHeight: '1.5',
+                              display: 'flex',
+                              alignItems: 'flex-start',
+                              gap: '10px'
+                            }}
+                          >
+                            <div style={{ marginTop: '2px', flexShrink: 0 }}>{getInsightIcon(idx)}</div>
+                            <div>{insight}</div>
+                          </div>
+                        );
+                      })}
+                      {(!stats.insights || stats.insights.length === 0) && (
+                        <p className="empty-text">Generating insights...</p>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
-        </div>
+        )}
       </div>
     </AdminLayout>
   );
