@@ -411,6 +411,11 @@
     grid-template-columns: 1fr;
     gap: 20px;
   }
+  .pd-related-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 24px;
+}
 }
 
 /* Toast Alert styling */

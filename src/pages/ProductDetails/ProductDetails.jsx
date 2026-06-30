@@ -230,7 +230,7 @@ const ProductDetails = () => {
         {/* You May Also Like Section */}
         {related.length > 0 && (
           <section className="pd-related-section">
-            <h2 className="pd-related-headline">More Wigs You'll Love</h2>
+            <p className="pd-related-headline">More Wigs You'll Love</p>
             <div className="pd-related-grid">
               {related.map(p => {
                 const cardProduct = {
