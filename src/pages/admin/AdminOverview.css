@@ -261,3 +261,74 @@
   border-color: rgba(153, 85, 68, 0.4) !important;
   box-shadow: 0 10px 30px rgba(153, 85, 68, 0.15);
 }
+
+@media (max-width: 768px) {
+  .overview-page {
+    padding: 20px 16px;
+  }
+  .overview-header {
+    margin-bottom: 24px;
+  }
+  .overview-headline {
+    font-size: 1.75rem;
+  }
+  .overview-grid {
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    gap: 14px;
+    margin-bottom: 28px;
+  }
+  .metric-card {
+    padding: 16px;
+    gap: 14px;
+  }
+  .card-icon {
+    width: 40px;
+    height: 40px;
+    font-size: 1.25rem;
+  }
+  .card-label {
+    font-size: 0.78rem;
+  }
+  .card-value {
+    font-size: 1.25rem;
+  }
+  .details-box {
+    padding: 18px 14px;
+  }
+  .overview-table th {
+    padding: 10px 12px;
+    font-size: 0.75rem;
+  }
+  .overview-table td {
+    padding: 12px;
+    font-size: 0.85rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .overview-page {
+    padding: 16px 12px;
+  }
+  .overview-grid {
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+  }
+  .metric-card {
+    padding: 14px 10px;
+    gap: 8px;
+    border-radius: 10px;
+  }
+  .card-icon {
+    width: 34px;
+    height: 34px;
+    font-size: 1.05rem;
+  }
+  .card-label {
+    font-size: 0.7rem;
+  }
+  .card-value {
+    font-size: 1.05rem;
+    word-break: break-word;
+  }
+}
+

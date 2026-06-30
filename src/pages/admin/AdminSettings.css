@@ -161,3 +161,15 @@
   background: rgba(255, 255, 255, 0.05);
   border-color: rgba(255, 255, 255, 0.3);
 }
+
+@media (max-width: 768px) {
+  .settings-page { padding: 20px 16px; }
+  .settings-card { padding: 20px; }
+  .settings-headline { font-size: 1.75rem; }
+}
+
+@media (max-width: 480px) {
+  .settings-page { padding: 16px 12px; }
+  .settings-card { padding: 16px 14px; }
+}
+

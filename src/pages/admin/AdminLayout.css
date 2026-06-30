@@ -36,7 +36,7 @@
 .admin-logout-btn svg { font-size:1.15rem; }
 
 /* Main content */
-.admin-main { flex:1; overflow:auto; }
+.admin-main { flex:1; overflow-y:auto; overflow-x:hidden; min-width:0; }
 
 /* Responsive Burger Menu */
 .admin-mobile-header {

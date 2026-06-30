@@ -65,4 +65,16 @@
 .ap-save-btn:hover { background:transparent; color:#995544; }
 .ap-save-btn:disabled { opacity:0.6; cursor:not-allowed; }
 
-@media (max-width:480px) { .ap-form-row { grid-template-columns:1fr; } .ap-page { padding:24px 20px 48px; } }
+@media (max-width: 768px) {
+  .ap-page { padding: 20px 16px 48px; }
+  .ap-modal { padding: 24px 20px; max-width: 95%; }
+  .ap-form-row { grid-template-columns: 1fr; }
+}
+
+@media (max-width: 480px) {
+  .ap-page { padding: 16px 12px 36px; }
+  .ap-header { flex-direction: column; align-items: flex-start; gap: 12px; }
+  .ap-add-btn { width: 100%; justify-content: center; }
+  .ap-modal { padding: 20px 16px; width: 100%; }
+}
+

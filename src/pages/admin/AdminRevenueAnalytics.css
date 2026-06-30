@@ -342,8 +342,47 @@
   .ra-page {
     padding: 20px 16px;
   }
-
   .ra-headline {
     font-size: 1.5rem;
   }
+  .ra-summary-grid {
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap: 12px;
+  }
+  .ra-summary-card {
+    padding: 16px;
+  }
+  .ra-summary-value {
+    font-size: 1.2rem;
+  }
+  .ra-chart-card {
+    padding: 18px 16px;
+  }
 }
+
+@media (max-width: 480px) {
+  .ra-page {
+    padding: 16px 12px;
+  }
+  .ra-summary-grid {
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+  }
+  .ra-summary-card {
+    padding: 14px 12px;
+  }
+  .ra-summary-label {
+    font-size: 0.75rem;
+  }
+  .ra-summary-value {
+    font-size: 1.05rem;
+  }
+  .ra-details-box {
+    padding: 16px 12px;
+  }
+  .ra-table th, .ra-table td {
+    padding: 10px 8px;
+    font-size: 0.82rem;
+  }
+}
+

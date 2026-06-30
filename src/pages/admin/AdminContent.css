@@ -443,6 +443,9 @@ select option {
 }
 
 @media (max-width: 768px) {
+  .content-page { padding: 20px 16px; }
+  .config-card { padding: 20px; }
+  .content-headline { font-size: 1.75rem; }
   .file-upload-row {
     flex-direction: column;
     gap: 10px;
@@ -459,6 +462,8 @@ select option {
 }
 
 @media (max-width: 576px) {
+  .content-page { padding: 16px 12px; }
+  .config-card { padding: 16px 14px; }
   .uploaded-video-card {
     flex-direction: column;
     align-items: stretch;
@@ -468,3 +473,4 @@ select option {
     height: 150px;
   }
 }
+

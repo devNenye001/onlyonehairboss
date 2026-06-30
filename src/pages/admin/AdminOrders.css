@@ -45,4 +45,15 @@
 .ao-status-btn.current { font-weight:500; }
 .ao-status-btn:disabled { opacity:0.6; cursor:not-allowed; }
 
-@media (max-width:480px) { .ao-page { padding:24px 20px 48px; } .ao-modal { max-width:100%; } }
+@media (max-width: 768px) {
+  .ao-page { padding: 20px 16px 48px; }
+  .ao-modal { max-width: 100%; padding: 24px 20px; }
+}
+
+@media (max-width: 480px) {
+  .ao-page { padding: 16px 12px 36px; }
+  .ao-modal { padding: 20px 16px; }
+  .ao-status-btns { gap: 6px; }
+  .ao-status-btn { padding: 6px 10px; font-size: 0.78rem; }
+}
+
