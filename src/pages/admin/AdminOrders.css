@@ -21,11 +21,26 @@
 .ao-view-btn:hover { background:#995544; color:#FFF1EA; border-color:#995544; }
 
 /* Modal */
-.ao-modal-backdrop { position:fixed; inset:0; background:rgba(0,0,0,0.5); z-index:300; display:flex; align-items:flex-start; justify-content:flex-end; }
-.ao-modal { background:#FFF1EA; width:100%; max-width:480px; height:100vh; overflow-y:auto; padding:32px; }
+.ao-modal-backdrop { position:fixed; inset:0; background:rgba(0,0,0,0.5); z-index:1100; display:flex; align-items:flex-start; justify-content:flex-end; }
+.ao-modal { background:#FFF1EA; width:100%; max-width:480px; height:100vh; overflow-y:auto; padding:32px; box-sizing:border-box; }
 .ao-modal-header { display:flex; justify-content:space-between; align-items:center; margin-bottom:24px; }
 .ao-modal-header h2 { font-family:'Taprom',serif; font-size:1.3rem; font-weight:400; color:#000; margin:0; }
-.ao-close-btn { background:none; border:none; font-size:1.5rem; color:#995544; cursor:pointer; padding:0; }
+.ao-close-btn {
+  background: rgba(153, 85, 68, 0.08);
+  border: none;
+  font-size: 1.3rem;
+  color: #995544;
+  cursor: pointer;
+  padding: 8px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+}
+.ao-close-btn:hover {
+  background: rgba(153, 85, 68, 0.16);
+}
 
 .ao-detail-section { margin-bottom:24px; border-bottom:1px solid rgba(153,85,68,0.12); padding-bottom:20px; }
 .ao-detail-section:last-child { border-bottom:none; }

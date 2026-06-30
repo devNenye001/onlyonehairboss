@@ -39,11 +39,26 @@
 .star-filled { color:#f39c12; }
 
 /* Modal */
-.ap-modal-backdrop { position:fixed; inset:0; background:rgba(0,0,0,0.5); z-index:300; display:flex; align-items:center; justify-content:center; padding:20px; }
-.ap-modal { background:#FFF1EA; width:100%; max-width:600px; max-height:90vh; overflow-y:auto; padding:32px; }
+.ap-modal-backdrop { position:fixed; inset:0; background:rgba(0,0,0,0.5); z-index:1100; display:flex; align-items:center; justify-content:center; padding:20px; }
+.ap-modal { background:#FFF1EA; width:100%; max-width:600px; max-height:90vh; overflow-y:auto; padding:32px; box-sizing:border-box; }
 .ap-modal-header { display:flex; justify-content:space-between; align-items:center; margin-bottom:24px; }
 .ap-modal-header h2 { font-family:'Taprom',serif; font-size:1.4rem; font-weight:400; color:#000; margin:0; }
-.ap-close-btn { background:none; border:none; font-size:1.5rem; color:#995544; cursor:pointer; padding:0; line-height:1; }
+.ap-close-btn {
+  background: rgba(153, 85, 68, 0.08);
+  border: none;
+  font-size: 1.3rem;
+  color: #995544;
+  cursor: pointer;
+  padding: 8px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+}
+.ap-close-btn:hover {
+  background: rgba(153, 85, 68, 0.16);
+}
 
 .ap-form { display:flex; flex-direction:column; gap:16px; }
 .ap-form-row { display:grid; grid-template-columns:1fr 1fr; gap:16px; }
