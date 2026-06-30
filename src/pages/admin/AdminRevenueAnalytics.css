@@ -318,9 +318,16 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  min-height: 80vh;
+  min-height: 100vh;
   color: #fff;
   background-color: #0c0806;
+}
+
+@media (max-width: 768px) {
+  .ra-loading,
+  .ra-error {
+    min-height: calc(100vh - 60px);
+  }
 }
 
 .ra-retry-btn {

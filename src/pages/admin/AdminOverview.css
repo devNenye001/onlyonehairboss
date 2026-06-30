@@ -231,9 +231,15 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  min-height: 80vh;
+  min-height: 100vh;
   color: #fff;
   background-color: #0c0806;
+}
+
+@media (max-width: 768px) {
+  .ao-loading-container, .ao-error-container {
+    min-height: calc(100vh - 60px);
+  }
 }
 
 .ao-retry-btn {
@@ -314,20 +320,22 @@
     gap: 10px;
   }
   .metric-card {
-    padding: 14px 10px;
-    gap: 8px;
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 14px 12px;
+    gap: 10px;
     border-radius: 10px;
   }
   .card-icon {
-    width: 34px;
-    height: 34px;
-    font-size: 1.05rem;
+    width: 36px;
+    height: 36px;
+    font-size: 1.15rem;
   }
   .card-label {
-    font-size: 0.7rem;
+    font-size: 0.72rem;
   }
   .card-value {
-    font-size: 1.05rem;
+    font-size: 1.15rem;
     word-break: break-word;
   }
 }
