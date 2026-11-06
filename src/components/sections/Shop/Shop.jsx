@@ -4,20 +4,12 @@ import { motion as Motion } from 'framer-motion';
 import './Shop.css';
 import ProductCard, { ProductCardSkeleton } from '../../ProductCard/ProductCard';
 import { supabase } from '../../../utils/supabase/client';
+import { FALLBACK_PRODUCTS } from '../../../utils/fallbackProducts';
 
-const FALLBACK = [
-  { id: '1', name: "Layered bone straight", price: 270000, image: "/wig1.svg" },
-  { id: '2', name: "Short wavy", price: 270000, image: "/wig2.svg" },
-  { id: '3', name: "Pixie Curls", price: 270000, image: "/wig3.svg" },
-  { id: '4', name: "Bone Straight", price: 270000, image: "/wig4.svg" },
-  { id: '5', name: "Layered bone straight", price: 270000, image: "/wig5.svg" },
-  { id: '6', name: "Short wavy", price: 270000, image: "/wig6.svg" },
-  { id: '7', name: "Pixie Curls", price: 270000, image: "/wig7.svg" },
-  { id: '8', name: "Bone Straight", price: 270000, image: "/wig8.svg" },
-];
+const INITIAL_FALLBACK = FALLBACK_PRODUCTS.slice(0, 8);
 
 const Shop = () => {
-  const [products, setProducts] = useState(FALLBACK);
+  const [products, setProducts] = useState(INITIAL_FALLBACK);
   const [loading, setLoading] = useState(true);
   const [colConfig, setColConfig] = useState({
     title: 'Our Collection',
@@ -36,7 +28,7 @@ const Shop = () => {
         // 2. Load products
         const { data: prodData } = await supabase.from('products').select('id, name, price, images, created_at').eq('in_stock', true);
         if (prodData && prodData.length > 0) {
-          const mapped = prodData.map(p => ({ ...p, image: Array.isArray(p.images) ? p.images[0] : p.images || '/wig1.svg' }));
+          const mapped = prodData.map(p => ({ ...p, image: Array.isArray(p.images) ? p.images[0] : (p.images || p.image || '/wig1.jpg') }));
           
           if (config.product_ids && config.product_ids.length > 0) {
             const ordered = config.product_ids
@@ -50,10 +42,13 @@ const Shop = () => {
           
           // Fallback to latest 8 products
           const sorted = [...prodData].sort((a,b) => new Date(b.created_at || 0) - new Date(a.created_at || 0));
-          setProducts(sorted.map(p => ({ ...p, image: Array.isArray(p.images) ? p.images[0] : p.images || '/wig1.svg' })).slice(0, 8));
+          setProducts(sorted.map(p => ({ ...p, image: Array.isArray(p.images) ? p.images[0] : (p.images || p.image || '/wig1.jpg') })).slice(0, 8));
+        } else {
+          setProducts(INITIAL_FALLBACK);
         }
       } catch (err) {
         console.error('Failed to load shop section data:', err);
+        setProducts(INITIAL_FALLBACK);
       } finally {
         setLoading(false);
       }

@@ -7,18 +7,10 @@ import Footer from '../../components/Footer/Footer';
 import ProductCard from '../../components/ProductCard/ProductCard';
 import { supabase } from '../../utils/supabase/client';
 import { useCart } from '../../context/CartContext';
+import { FALLBACK_PRODUCTS } from '../../utils/fallbackProducts';
 import './ProductDetails.css';
 
-const FALLBACK = [
-  { id: '1', name: 'Layered Bone Straight', price: 270000, images: ['/wig1.svg'], description: 'Premium quality layered bone straight wig crafted for a flawless, natural look.', category: 'Bone Straight', in_stock: true },
-  { id: '2', name: 'Short Wavy', price: 270000, images: ['/wig2.svg'], description: 'Effortlessly chic short wavy wig with rich volume.', category: 'Wavy', in_stock: true },
-  { id: '3', name: 'Pixie Curls', price: 270000, images: ['/wig3.svg'], description: 'Bold and beautiful pixie curls for a statement look.', category: 'Curly', in_stock: true },
-  { id: '4', name: 'Bone Straight', price: 270000, images: ['/wig4.svg'], description: 'Classic bone straight wig with silky finish.', category: 'Bone Straight', in_stock: true },
-  { id: '5', name: 'Layered Frontal', price: 270000, images: ['/wig5.svg'], description: 'Luxurious layered frontal wig for a natural hairline.', category: 'Frontal', in_stock: true },
-  { id: '6', name: 'Short Wavy Bob', price: 270000, images: ['/wig6.svg'], description: 'Trendy short wavy bob for everyday elegance.', category: 'Bob', in_stock: true },
-  { id: '7', name: 'Deep Wave Curls', price: 270000, images: ['/wig7.svg'], description: 'Rich deep wave curls with full body volume.', category: 'Deep Wave', in_stock: true },
-  { id: '8', name: 'Bone Straight Lace', price: 270000, images: ['/wig8.svg'], description: 'Premium bone straight lace wig for a seamless blend.', category: 'Bone Straight', in_stock: true },
-];
+const FALLBACK = FALLBACK_PRODUCTS;
 
 const formatPrice = (price) => `₦${Number(price || 0).toLocaleString()}`;
 
@@ -48,7 +40,7 @@ const ProductDetails = () => {
       if (data) {
         setProduct(data);
       } else {
-        const fallbackProd = FALLBACK.find(p => p.id === id) ?? null;
+        const fallbackProd = FALLBACK.find(p => String(p.id) === String(id)) ?? null;
         setProduct(fallbackProd);
       }
     };
@@ -65,7 +57,7 @@ const ProductDetails = () => {
         const sourceList = allProds && allProds.length > 0 ? allProds : FALLBACK;
         
         // Filter out current
-        const others = sourceList.filter(p => p.id !== product.id);
+        const others = sourceList.filter(p => String(p.id) !== String(product.id));
         
         // Prioritize same category, then featured
         const sameCat = others.filter(p => p.category?.toLowerCase() === product.category?.toLowerCase());
@@ -92,7 +84,7 @@ const ProductDetails = () => {
       id: product.id,
       name: product.name,
       price: product.price,
-      image: (Array.isArray(product.images) ? product.images[0] : product.images) ?? product.image ?? '/wig1.svg',
+      image: (Array.isArray(product.images) && product.images.length > 0 ? product.images[0] : product.images) ?? product.image ?? '/wig1.jpg',
     });
     setAdded(true);
     setToastMsg(`${product.name} added to cart!`);
@@ -108,7 +100,7 @@ const ProductDetails = () => {
       id: quickViewProduct.id,
       name: quickViewProduct.name,
       price: quickViewProduct.price,
-      image: (Array.isArray(quickViewProduct.images) ? quickViewProduct.images[0] : quickViewProduct.images) ?? quickViewProduct.image ?? '/wig1.svg',
+      image: (Array.isArray(quickViewProduct.images) && quickViewProduct.images.length > 0 ? quickViewProduct.images[0] : quickViewProduct.images) ?? quickViewProduct.image ?? '/wig1.jpg',
     });
     setQvAdded(true);
     setToastMsg(`${quickViewProduct.name} added to cart!`);
@@ -125,7 +117,7 @@ const ProductDetails = () => {
       id: p.id,
       name: p.name,
       price: p.price,
-      image: (Array.isArray(p.images) ? p.images[0] : p.images) ?? p.image ?? '/wig1.svg',
+      image: (Array.isArray(p.images) && p.images.length > 0 ? p.images[0] : p.images) ?? p.image ?? '/wig1.jpg',
     });
     setToastMsg(`${p.name} added to cart!`);
     setTimeout(() => {
@@ -151,12 +143,12 @@ const ProductDetails = () => {
 
   const images = Array.isArray(product.images) ? product.images
     : product.images ? [product.images]
-    : [product.image ?? '/wig1.svg'];
+    : [product.image ?? '/wig1.jpg'];
 
   const qvImages = quickViewProduct
     ? (Array.isArray(quickViewProduct.images) ? quickViewProduct.images
       : quickViewProduct.images ? [quickViewProduct.images]
-      : [quickViewProduct.image ?? '/wig1.svg'])
+      : [quickViewProduct.image ?? '/wig1.jpg'])
     : [];
 
   return (
@@ -221,7 +213,11 @@ const ProductDetails = () => {
  
             <div className="pd-meta">
               <p>Category: <span>{product.category || '—'}</span></p>
-              <p>Weight: <span>{product.weight_g ? `${product.weight_g}g` : '1000g'}</span></p>
+              {product.length && <p>Length: <span>{product.length}</span></p>}
+              {product.texture && <p>Texture: <span>{product.texture}</span></p>}
+              {product.color && <p>Color: <span>{product.color}</span></p>}
+              {product.lace && <p>Lace Type: <span>{product.lace}</span></p>}
+              <p>Weight: <span>{product.weight_g ? `${product.weight_g}g` : '350g'}</span></p>
               <p>Note: <span>Order processing takes 3 working days.</span></p>
             </div>
           </Motion.div>
@@ -237,7 +233,7 @@ const ProductDetails = () => {
                   id: p.id,
                   name: p.name,
                   price: p.price,
-                  image: (Array.isArray(p.images) ? p.images[0] : p.images) || p.image || '/wig1.svg',
+                  image: (Array.isArray(p.images) && p.images.length > 0 ? p.images[0] : p.images) || p.image || '/wig1.jpg',
                 };
                 return <ProductCard key={p.id} product={cardProduct} />;
               })}

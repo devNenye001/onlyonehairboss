@@ -4,13 +4,9 @@ import { motion as Motion } from 'framer-motion';
 import './FeaturedCollection.css';
 import { supabase } from '../../../utils/supabase/client';
 import { useCart } from '../../../context/CartContext';
+import { FALLBACK_FEATURED } from '../../../utils/fallbackProducts';
 
-const FALLBACK = {
-  id: 'luxury-deep-wave',
-  name: 'Luxury Deep Wave Wig',
-  description:
-    'Soft, full, and effortlessly beautiful — our Luxury Deep Wave Wig is crafted to give you a flawless, natural look with rich volume and a silky finish. Perfect for everyday elegance or special occasions, this wig is designed for confident women who love luxury, comfort, and attention-grabbing beauty.',
-};
+const FALLBACK = FALLBACK_FEATURED;
 
 const FeaturedCollection = () => {
   const [featured, setFeatured] = useState(FALLBACK);
@@ -18,7 +14,15 @@ const FeaturedCollection = () => {
   const { addItem } = useCart();
 
   const handleAddToCart = () => {
-    addItem({ id: featured.id, name: featured.name, price: featured.price, image: featured.images });
+    const img = Array.isArray(featured.images) && featured.images.length > 0
+      ? featured.images[0]
+      : (featured.image || '/featured.jpg');
+    addItem({
+      id: featured.id || 'luxury-deep-wave',
+      name: featured.name || 'Luxury Deep Wave Frontal Wig',
+      price: featured.price || 350000,
+      image: img
+    });
     setAdded(true);
     setTimeout(() => setAdded(false), 1800);
   };
@@ -114,6 +118,7 @@ const FeaturedCollection = () => {
             playsInline
             muted
             controls
+            poster="/featured.jpg"
             src={featured.video_url || "/featured1.mp4"}
           />
         </Motion.div>

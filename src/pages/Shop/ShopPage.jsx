@@ -6,20 +6,12 @@ import Navbar from '../../components/Navbar/Navbar';
 import Footer from '../../components/Footer/Footer';
 import ProductCard, { ProductCardSkeleton } from '../../components/ProductCard/ProductCard';
 import { supabase } from '../../utils/supabase/client';
+import { FALLBACK_PRODUCTS } from '../../utils/fallbackProducts';
 import './ShopPage.css';
 
 const CATEGORIES = ['All', 'Frontal', 'Bob', 'Deep Wave', 'Bone Straight', 'Curly', 'Wavy'];
 
-const FALLBACK = [
-  { id: '1', name: 'Layered Bone Straight', price: 270000, images: ['/wig1.svg'], category: 'Bone Straight' },
-  { id: '2', name: 'Short Wavy', price: 270000, images: ['/wig2.svg'], category: 'Wavy' },
-  { id: '3', name: 'Pixie Curls', price: 270000, images: ['/wig3.svg'], category: 'Curly' },
-  { id: '4', name: 'Bone Straight', price: 270000, images: ['/wig4.svg'], category: 'Bone Straight' },
-  { id: '5', name: 'Layered Frontal', price: 270000, images: ['/wig5.svg'], category: 'Frontal' },
-  { id: '6', name: 'Short Wavy Bob', price: 270000, images: ['/wig6.svg'], category: 'Bob' },
-  { id: '7', name: 'Deep Wave Curls', price: 270000, images: ['/wig7.svg'], category: 'Deep Wave' },
-  { id: '8', name: 'Bone Straight Lace', price: 270000, images: ['/wig8.svg'], category: 'Bone Straight' },
-];
+const FALLBACK = FALLBACK_PRODUCTS;
 
 const ShopPage = () => {
   const [products, setProducts] = useState([]);
@@ -41,13 +33,18 @@ const ShopPage = () => {
 
   const filtered = activeCategory === 'All'
     ? products
-    : products.filter(p => p.category?.toLowerCase() === activeCategory.toLowerCase());
+    : products.filter(p => {
+        const cat = (p.category || '').toLowerCase();
+        const target = activeCategory.toLowerCase();
+        const tags = Array.isArray(p.tags) ? p.tags.map(t => t.toLowerCase()) : [];
+        return cat === target || tags.includes(target) || (p.lace && p.lace.toLowerCase().includes(target));
+      });
 
   const toCard = (p) => ({
     id: p.id,
     name: p.name,
     price: p.price,
-    image: Array.isArray(p.images) ? p.images[0] : p.images || p.image || '/wig1.svg',
+    image: Array.isArray(p.images) && p.images.length > 0 ? p.images[0] : (p.image || p.images || '/wig1.jpg'),
   });
 
   return (

@@ -3,16 +3,10 @@ import { useState, useEffect } from 'react';
 import './NewIn.css';
 import ProductCard, { ProductCardSkeleton } from '../../ProductCard/ProductCard';
 import { supabase } from '../../../utils/supabase/client';
-
-const FALLBACK = [
-  { id: '1', name: "Layered bone straight", price: 270000, image: "/wig3.svg" },
-  { id: '2', name: "Short wavy", price: 270000, image: "/wig4.svg" },
-  { id: '3', name: "Pixie Curls", price: 270000, image: "/wig5.svg" },
-  { id: '4', name: "Bone Straight", price: 270000, image: "/wig6.svg" },
-];
+import { FALLBACK_NEW_IN } from '../../../utils/fallbackProducts';
 
 const NewIn = () => {
-  const [newArrivals, setNewArrivals] = useState(FALLBACK);
+  const [newArrivals, setNewArrivals] = useState(FALLBACK_NEW_IN);
   const [loading, setLoading] = useState(true);
   const [heading, setHeading] = useState('New Ins');
   const [description, setDescription] = useState('');
@@ -29,7 +23,7 @@ const NewIn = () => {
         // Fetch products
         const { data: prodData } = await supabase.from('products').select('id, name, price, images, created_at').eq('in_stock', true);
         if (prodData && prodData.length > 0) {
-          const mapped = prodData.map(p => ({ ...p, image: Array.isArray(p.images) ? p.images[0] : p.images || '/wig1.svg' }));
+          const mapped = prodData.map(p => ({ ...p, image: Array.isArray(p.images) ? p.images[0] : (p.images || p.image || '/wig1.jpg') }));
           
           if (config.product_ids && config.product_ids.length > 0) {
             // Filter products matching configured ids in order
@@ -44,10 +38,13 @@ const NewIn = () => {
           
           // Default fallback to latest 4 products
           const sorted = [...prodData].sort((a,b) => new Date(b.created_at || 0) - new Date(a.created_at || 0));
-          setNewArrivals(sorted.map(p => ({ ...p, image: Array.isArray(p.images) ? p.images[0] : p.images || '/wig1.svg' })).slice(0, 4));
+          setNewArrivals(sorted.map(p => ({ ...p, image: Array.isArray(p.images) ? p.images[0] : (p.images || p.image || '/wig1.jpg') })).slice(0, 4));
+        } else {
+          setNewArrivals(FALLBACK_NEW_IN);
         }
       } catch (err) {
         console.error('Failed to load New Ins dynamic configuration:', err);
+        setNewArrivals(FALLBACK_NEW_IN);
       } finally {
         setLoading(false);
       }

@@ -26,7 +26,17 @@ const ProductCard = ({ product }) => {
       transition={{ duration: 0.5 }}
     >
       <Link to={`/product/${product.id}`} className="product-image-container">
-        <img src={product.image} alt={product.name} className="product-image" />
+        <img
+          src={product.image || '/wig1.jpg'}
+          alt={product.name}
+          className="product-image"
+          loading="lazy"
+          onError={(e) => {
+            if (!e.currentTarget.src.includes('wig1.jpg') && !e.currentTarget.src.includes('wig1.svg')) {
+              e.currentTarget.src = '/wig1.jpg';
+            }
+          }}
+        />
       </Link>
 
       <div className="product-info">
