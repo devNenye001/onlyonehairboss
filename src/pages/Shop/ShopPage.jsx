@@ -28,6 +28,7 @@ const ShopPage = () => {
     id: p.id,
     name: p.name,
     price: p.price,
+    compare_at_price: p.compare_at_price,
     image: Array.isArray(p.images) && p.images.length > 0 ? p.images[0] : (p.image || p.images || ''),
   });
 

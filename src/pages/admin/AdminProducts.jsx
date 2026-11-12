@@ -5,7 +5,7 @@ import AdminLayout from './AdminLayout';
 import { supabase } from '../../utils/supabase/client';
 import './AdminProducts.css';
 
-const EMPTY_FORM = { name: '', price: '', description: '', stock: 10, category: 'General', weight_g: 1000 };
+const EMPTY_FORM = { name: '', price: '', compare_at_price: '', description: '', stock: 10, category: 'General', weight_g: 1000 };
 
 const getProductImage = (images) => {
   if (Array.isArray(images)) {
@@ -63,6 +63,7 @@ const AdminProducts = () => {
     setForm({
       name: p.name,
       price: p.price,
+      compare_at_price: p.compare_at_price ?? '',
       description: p.description ?? '',
       stock: p.stock_count ?? 0,
       category: p.category ?? 'General',
@@ -105,6 +106,16 @@ const AdminProducts = () => {
       return;
     }
 
+    let compareAtPrice = null;
+    if (form.compare_at_price !== '' && form.compare_at_price !== null && form.compare_at_price !== undefined) {
+      const parsedCompare = parseFloat(form.compare_at_price);
+      if (isNaN(parsedCompare) || parsedCompare <= 0) {
+        setMsg('Please enter a valid positive number for compare-at price, or leave it empty.');
+        return;
+      }
+      compareAtPrice = parsedCompare;
+    }
+
     setSaving(true);
     try {
       const imageUrl = imageFiles.length ? await uploadImage() : null;
@@ -112,6 +123,7 @@ const AdminProducts = () => {
       const payload = {
         name: form.name,
         price: price,
+        compare_at_price: compareAtPrice,
         description: form.description,
         category: form.category,
         is_featured: false,
@@ -189,7 +201,12 @@ const AdminProducts = () => {
                   <tr key={p.id}>
                     <td><img src={getProductImage(p.images)} alt={p.name} className="ap-thumb" /></td>
                     <td className="ap-name">{p.name}</td>
-                    <td>₦{p.price?.toLocaleString()}</td>
+                    <td>
+                      {Number(p.compare_at_price) > Number(p.price) && (
+                        <span className="ap-price-old">₦{Number(p.compare_at_price).toLocaleString()}</span>
+                      )}
+                      ₦{Number(p.price || 0).toLocaleString()}
+                    </td>
                     <td>{p.stock_count ?? 0}</td>
                     <td><span className={`ap-badge ${p.stock_count > 0 ? 'in' : 'out'}`}>{p.stock_count > 0 ? 'In Stock' : 'Out'}</span></td>
                     <td className="ap-actions-cell">
@@ -254,7 +271,8 @@ const AdminProducts = () => {
                     <input name="weight_g" type="number" value={form.weight_g} onChange={handleChange} min="1" placeholder="1000" required />
                   </div>
                   <div className="ap-form-field">
-                    {/* Placeholder for layout */}
+                    <label>Compare-at Price (₦)</label>
+                    <input name="compare_at_price" type="number" value={form.compare_at_price} onChange={handleChange} placeholder="Optional original price" />
                   </div>
                 </div>
                 <div className="ap-form-field">

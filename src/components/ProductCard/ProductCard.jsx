@@ -12,10 +12,12 @@ const ProductCard = ({ product }) => {
 
   const handleAddToCart = (e) => {
     e.preventDefault();
-    addItem({ id: product.id, name: product.name, price: product.price, image: product.image });
+    addItem({ id: product.id, name: product.name, price: Number(product.price), image: product.image });
     setAdded(true);
     setTimeout(() => setAdded(false), 1800);
   };
+
+  const hasDiscount = Number(product.compare_at_price) > Number(product.price);
 
   return (
     <Motion.div
@@ -36,7 +38,12 @@ const ProductCard = ({ product }) => {
 
       <div className="product-info">
         <h3 className="product-name" onClick={() => navigate(`/product/${product.id}`)}>{product.name}</h3>
-        <p className="product-price">₦{product.price?.toLocaleString()}</p>
+        <p className="product-price">
+          {hasDiscount && (
+            <span className="product-price-old">₦{Number(product.compare_at_price).toLocaleString()}</span>
+          )}
+          <span>₦{Number(product.price || 0).toLocaleString()}</span>
+        </p>
         <button className={`pc-cart-btn ${added ? 'pc-cart-btn--added' : ''}`} onClick={handleAddToCart}>
           {added ? 'Added!' : 'Add to Cart'}
         </button>

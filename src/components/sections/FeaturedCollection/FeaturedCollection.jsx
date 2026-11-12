@@ -18,7 +18,7 @@ const FeaturedCollection = () => {
     addItem({
       id: featured.id,
       name: featured.name,
-      price: featured.price,
+      price: Number(featured.price),
       image: img
     });
     setAdded(true);

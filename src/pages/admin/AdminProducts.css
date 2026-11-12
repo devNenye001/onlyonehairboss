@@ -28,6 +28,7 @@
 
 .ap-thumb { width:50px; height:60px; object-fit:cover; display:block; }
 .ap-name { font-weight:500; color:#000; max-width:200px; }
+.ap-price-old { color:#8e8e8e; text-decoration:line-through; margin-right:6px; font-size:0.84rem; }
 .ap-badge { display:inline-block; padding:3px 10px; border-radius:20px; font-size:0.78rem; font-weight:500; }
 .ap-badge.in { background:rgba(153,85,68,0.1); color:#995544; }
 .ap-badge.out { background:#f2f2f2; color:#888; }

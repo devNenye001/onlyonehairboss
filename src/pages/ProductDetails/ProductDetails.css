@@ -48,7 +48,14 @@
   font-weight: 400; color: #000; margin: 0 0 16px; line-height: 1.15;
 }
 .pd-price {
+  display: flex; align-items: baseline; gap: 12px; flex-wrap: wrap;
   font-size: 1.4rem; font-weight: 500; color: #995544; margin: 0 0 20px;
+}
+.pd-price-old {
+  color: #8c8c8c;
+  text-decoration: line-through;
+  font-weight: 400;
+  font-size: 1.1rem;
 }
 .pd-desc {
   font-size: 0.97rem; color: #333; line-height: 1.7; margin: 0 0 24px;
@@ -317,10 +324,21 @@
 }
 
 .qv-price {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  flex-wrap: wrap;
   font-size: 1.2rem;
   font-weight: 500;
   color: #995544;
   margin-bottom: 12px;
+}
+
+.qv-price-old {
+  color: #8c8c8c;
+  text-decoration: line-through;
+  font-weight: 400;
+  font-size: 0.98rem;
 }
 
 .qv-desc {

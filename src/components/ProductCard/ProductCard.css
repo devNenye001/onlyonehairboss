@@ -39,10 +39,21 @@
 }
 
 .product-price {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  flex-wrap: wrap;
   font-size: 0.9rem;
   font-weight: 500;
   color: #995544;
   margin-bottom: 12px;
+}
+
+.product-price-old {
+  color: #8c8c8c;
+  text-decoration: line-through;
+  font-weight: 400;
+  font-size: 0.84rem;
 }
 
 .pc-cart-btn {

@@ -86,7 +86,7 @@ const ProductDetails = () => {
     addItem({
       id: product.id,
       name: product.name,
-      price: product.price,
+      price: Number(product.price),
       image: (Array.isArray(product.images) && product.images.length > 0 ? product.images[0] : product.images) ?? product.image ?? '',
     });
     setAdded(true);
@@ -102,7 +102,7 @@ const ProductDetails = () => {
     addItem({
       id: quickViewProduct.id,
       name: quickViewProduct.name,
-      price: quickViewProduct.price,
+      price: Number(quickViewProduct.price),
       image: (Array.isArray(quickViewProduct.images) && quickViewProduct.images.length > 0 ? quickViewProduct.images[0] : quickViewProduct.images) ?? quickViewProduct.image ?? '',
     });
     setQvAdded(true);
@@ -212,7 +212,12 @@ const ProductDetails = () => {
             transition={{ duration: 0.6 }}
           >
             <h1 className="pd-name">{product.name}</h1>
-            <p className="pd-price">{formatPrice(product.price)}</p>
+            <p className="pd-price">
+              {Number(product.compare_at_price) > Number(product.price) && (
+                <span className="pd-price-old">{formatPrice(product.compare_at_price)}</span>
+              )}
+              <span>{formatPrice(product.price)}</span>
+            </p>
             <p className="pd-desc">{product.description || 'Premium quality wig crafted for a flawless, natural look with rich volume and a silky finish.'}</p>
  
             <div className="pd-stock">
@@ -252,6 +257,7 @@ const ProductDetails = () => {
                   id: p.id,
                   name: p.name,
                   price: p.price,
+                  compare_at_price: p.compare_at_price,
                   image: (Array.isArray(p.images) && p.images.length > 0 ? p.images[0] : p.images) || p.image || '',
                 };
                 return <ProductCard key={p.id} product={cardProduct} />;
@@ -293,7 +299,12 @@ const ProductDetails = () => {
               <div className="qv-details">
                 <p className="qv-category">{quickViewProduct.category}</p>
                 <h2 className="qv-name" id="quick-view-title">{quickViewProduct.name}</h2>
-                <p className="qv-price">{formatPrice(quickViewProduct.price)}</p>
+                <p className="qv-price">
+                  {Number(quickViewProduct.compare_at_price) > Number(quickViewProduct.price) && (
+                    <span className="qv-price-old">{formatPrice(quickViewProduct.compare_at_price)}</span>
+                  )}
+                  <span>{formatPrice(quickViewProduct.price)}</span>
+                </p>
                 <p className="qv-desc">{quickViewProduct.description || 'Premium quality wig crafted for a flawless, natural look with rich volume and a silky finish.'}</p>
                 
                 <div className="qv-stock">
