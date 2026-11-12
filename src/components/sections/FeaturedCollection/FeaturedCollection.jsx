@@ -1,26 +1,24 @@
-
 import { useState, useEffect } from 'react';
 import { motion as Motion } from 'framer-motion';
 import './FeaturedCollection.css';
 import { supabase } from '../../../utils/supabase/client';
 import { useCart } from '../../../context/CartContext';
-import { FALLBACK_FEATURED } from '../../../utils/fallbackProducts';
-
-const FALLBACK = FALLBACK_FEATURED;
 
 const FeaturedCollection = () => {
-  const [featured, setFeatured] = useState(FALLBACK);
+  const [featured, setFeatured] = useState(null);
+  const [loading, setLoading] = useState(true);
   const [added, setAdded] = useState(false);
   const { addItem } = useCart();
 
   const handleAddToCart = () => {
+    if (!featured) return;
     const img = Array.isArray(featured.images) && featured.images.length > 0
       ? featured.images[0]
-      : (featured.image || '/featured.jpg');
+      : (featured.image || '');
     addItem({
-      id: featured.id || 'luxury-deep-wave',
-      name: featured.name || 'Luxury Deep Wave Frontal Wig',
-      price: featured.price || 350000,
+      id: featured.id,
+      name: featured.name,
+      price: featured.price,
       image: img
     });
     setAdded(true);
@@ -45,7 +43,7 @@ const FeaturedCollection = () => {
         }
 
         if (!targetProduct) {
-          // Fallback to query database for any product marked is_featured
+          // Query database for any product marked is_featured
           const { data: prod } = await supabase.from('products').select('id, name, description, images, price').eq('is_featured', true).eq('in_stock', true).limit(1).maybeSingle();
           if (prod) {
             targetProduct = prod;
@@ -59,14 +57,23 @@ const FeaturedCollection = () => {
             description: config.description || targetProduct.description,
             video_url: config.video_url || ''
           });
+        } else {
+          setFeatured(null);
         }
       } catch (err) {
         console.error('Failed to load Featured Collection dynamic config:', err);
+        setFeatured(null);
+      } finally {
+        setLoading(false);
       }
     };
 
     loadFeatured();
   }, []);
+
+  if (loading || !featured) {
+    return null;
+  }
 
   const fadeUp = {
     hidden: { opacity: 0, y: 20 },
@@ -118,21 +125,22 @@ const FeaturedCollection = () => {
             playsInline
             muted
             controls
-            poster="/featured.jpg"
             src={featured.video_url || "/featured1.mp4"}
           />
         </Motion.div>
 
-        <Motion.p
-          className="featured-description"
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true }}
-          variants={fadeUp}
-          custom={3}
-        >
-          {featured.description || FALLBACK.description}
-        </Motion.p>
+        {featured.description && (
+          <Motion.p
+            className="featured-description"
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true }}
+            variants={fadeUp}
+            custom={3}
+          >
+            {featured.description}
+          </Motion.p>
+        )}
 
         <Motion.div
           className="featured-action-wrap"

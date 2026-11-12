@@ -1,12 +1,10 @@
-
 import { useState, useEffect } from 'react';
 import './NewIn.css';
 import ProductCard, { ProductCardSkeleton } from '../../ProductCard/ProductCard';
 import { supabase } from '../../../utils/supabase/client';
-import { FALLBACK_NEW_IN } from '../../../utils/fallbackProducts';
 
 const NewIn = () => {
-  const [newArrivals, setNewArrivals] = useState(FALLBACK_NEW_IN);
+  const [newArrivals, setNewArrivals] = useState([]);
   const [loading, setLoading] = useState(true);
   const [heading, setHeading] = useState('New Ins');
   const [description, setDescription] = useState('');
@@ -23,7 +21,7 @@ const NewIn = () => {
         // Fetch products
         const { data: prodData } = await supabase.from('products').select('id, name, price, images, created_at').eq('in_stock', true);
         if (prodData && prodData.length > 0) {
-          const mapped = prodData.map(p => ({ ...p, image: Array.isArray(p.images) ? p.images[0] : (p.images || p.image || '/wig1.jpg') }));
+          const mapped = prodData.map(p => ({ ...p, image: Array.isArray(p.images) ? p.images[0] : (p.images || p.image || '') }));
           
           if (config.product_ids && config.product_ids.length > 0) {
             // Filter products matching configured ids in order
@@ -36,15 +34,15 @@ const NewIn = () => {
             }
           }
           
-          // Default fallback to latest 4 products
-          const sorted = [...prodData].sort((a,b) => new Date(b.created_at || 0) - new Date(a.created_at || 0));
-          setNewArrivals(sorted.map(p => ({ ...p, image: Array.isArray(p.images) ? p.images[0] : (p.images || p.image || '/wig1.jpg') })).slice(0, 4));
+          // Default to latest 4 products
+          const sorted = [...prodData].sort((a, b) => new Date(b.created_at || 0) - new Date(a.created_at || 0));
+          setNewArrivals(sorted.map(p => ({ ...p, image: Array.isArray(p.images) ? p.images[0] : (p.images || p.image || '') })).slice(0, 4));
         } else {
-          setNewArrivals(FALLBACK_NEW_IN);
+          setNewArrivals([]);
         }
       } catch (err) {
         console.error('Failed to load New Ins dynamic configuration:', err);
-        setNewArrivals(FALLBACK_NEW_IN);
+        setNewArrivals([]);
       } finally {
         setLoading(false);
       }
@@ -52,6 +50,10 @@ const NewIn = () => {
 
     loadNewIns();
   }, []);
+
+  if (!loading && newArrivals.length === 0) {
+    return null;
+  }
 
   return (
     <section className="new-in-section">

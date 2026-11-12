@@ -1,50 +1,34 @@
 import { useEffect, useState } from 'react';
-import { useSearchParams } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { motion as Motion } from 'framer-motion';
 import { HiOutlineShoppingBag } from 'react-icons/hi';
 import Navbar from '../../components/Navbar/Navbar';
 import Footer from '../../components/Footer/Footer';
 import ProductCard, { ProductCardSkeleton } from '../../components/ProductCard/ProductCard';
 import { supabase } from '../../utils/supabase/client';
-import { FALLBACK_PRODUCTS } from '../../utils/fallbackProducts';
 import './ShopPage.css';
-
-const CATEGORIES = ['All', 'Frontal', 'Bob', 'Deep Wave', 'Bone Straight', 'Curly', 'Wavy'];
-
-const FALLBACK = FALLBACK_PRODUCTS;
 
 const ShopPage = () => {
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [searchParams, setSearchParams] = useSearchParams();
-  const activeCategory = searchParams.get('category') || 'All';
 
   useEffect(() => {
     let cancelled = false;
     supabase.from('products').select('*').order('created_at', { ascending: false })
       .then(({ data, error }) => {
         if (!cancelled) {
-          setProducts(error || !data?.length ? FALLBACK : data);
+          setProducts(error || !data?.length ? [] : data);
           setLoading(false);
         }
       });
     return () => { cancelled = true; };
   }, []);
 
-  const filtered = activeCategory === 'All'
-    ? products
-    : products.filter(p => {
-        const cat = (p.category || '').toLowerCase();
-        const target = activeCategory.toLowerCase();
-        const tags = Array.isArray(p.tags) ? p.tags.map(t => t.toLowerCase()) : [];
-        return cat === target || tags.includes(target) || (p.lace && p.lace.toLowerCase().includes(target));
-      });
-
   const toCard = (p) => ({
     id: p.id,
     name: p.name,
     price: p.price,
-    image: Array.isArray(p.images) && p.images.length > 0 ? p.images[0] : (p.image || p.images || '/wig1.jpg'),
+    image: Array.isArray(p.images) && p.images.length > 0 ? p.images[0] : (p.image || p.images || ''),
   });
 
   return (
@@ -56,34 +40,22 @@ const ShopPage = () => {
           <h1 className="shop-full-headline">Our Collection</h1>
         </div>
 
-        <div className="shop-filter-bar">
-          {CATEGORIES.map(cat => (
-            <button
-              key={cat}
-              className={`filter-btn ${activeCategory === cat ? 'active' : ''}`}
-              onClick={() => setSearchParams(cat === 'All' ? {} : { category: cat })}
-            >
-              {cat}
-            </button>
-          ))}
-        </div>
-
         {loading ? (
           <div className="shop-full-grid" aria-label="Loading products">
             {Array.from({ length: 8 }, (_, i) => <ProductCardSkeleton key={i} />)}
           </div>
-        ) : filtered.length === 0 ? (
+        ) : products.length === 0 ? (
           <div className="shop-empty-container">
             <div className="shop-empty-icon-wrap">
               <HiOutlineShoppingBag />
             </div>
-            <h2 className="shop-empty-title">No wigs in this category yet</h2>
+            <h2 className="shop-empty-title">No wigs available yet</h2>
             <p className="shop-empty-text">
-              We’re preparing something beautiful for this collection. Check back soon or explore other styles.
+              We’re preparing something beautiful for our collection. Check back soon.
             </p>
-            <button className="shop-empty-btn" onClick={() => setSearchParams({})}>
-              Explore All Wigs
-            </button>
+            <Link to="/" className="shop-empty-btn">
+              Back to Home
+            </Link>
           </div>
         ) : (
           <Motion.div
@@ -92,7 +64,7 @@ const ShopPage = () => {
             animate={{ opacity: 1 }}
             transition={{ duration: 0.4 }}
           >
-            {filtered.map(p => (
+            {products.map(p => (
               <ProductCard key={p.id} product={toCard(p)} />
             ))}
           </Motion.div>

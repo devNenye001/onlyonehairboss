@@ -52,6 +52,7 @@
 }
 .pd-desc {
   font-size: 0.97rem; color: #333; line-height: 1.7; margin: 0 0 24px;
+  white-space: pre-line;
 }
 
 .pd-stock { margin-bottom: 28px; }
@@ -327,6 +328,7 @@
   color: #444;
   line-height: 1.6;
   margin-bottom: 16px;
+  white-space: pre-line;
 }
 
 .qv-stock {

@@ -7,10 +7,7 @@ import Footer from '../../components/Footer/Footer';
 import ProductCard from '../../components/ProductCard/ProductCard';
 import { supabase } from '../../utils/supabase/client';
 import { useCart } from '../../context/CartContext';
-import { FALLBACK_PRODUCTS } from '../../utils/fallbackProducts';
 import './ProductDetails.css';
-
-const FALLBACK = FALLBACK_PRODUCTS;
 
 const formatPrice = (price) => `₦${Number(price || 0).toLocaleString()}`;
 
@@ -20,6 +17,7 @@ const ProductDetails = () => {
   const { addItem } = useCart();
   
   const [product, setProduct] = useState(null);
+  const [loading, setLoading] = useState(true);
   const [activeImg, setActiveImg] = useState(0);
   const [added, setAdded] = useState(false);
   
@@ -35,18 +33,23 @@ const ProductDetails = () => {
   const [toastMsg, setToastMsg] = useState('');
 
   useEffect(() => {
+    let cancelled = false;
     const fetchProduct = async () => {
-      const { data } = await supabase.from('products').select('*').eq('id', id).single();
-      if (data) {
-        setProduct(data);
-      } else {
-        const fallbackProd = FALLBACK.find(p => String(p.id) === String(id)) ?? null;
-        setProduct(fallbackProd);
+      setLoading(true);
+      try {
+        const { data } = await supabase.from('products').select('*').eq('id', id).single();
+        if (!cancelled) {
+          setProduct(data ?? null);
+          setActiveImg(0);
+        }
+      } catch {
+        if (!cancelled) setProduct(null);
+      } finally {
+        if (!cancelled) setLoading(false);
       }
     };
     fetchProduct();
-    // eslint-disable-next-line react-hooks/set-state-in-effect
-    setActiveImg(0);
+    return () => { cancelled = true; };
   }, [id]);
 
   useEffect(() => {
@@ -54,7 +57,7 @@ const ProductDetails = () => {
     const fetchRelated = async () => {
       try {
         const { data: allProds } = await supabase.from('products').select('*').eq('in_stock', true);
-        const sourceList = allProds && allProds.length > 0 ? allProds : FALLBACK;
+        const sourceList = allProds && allProds.length > 0 ? allProds : [];
         
         // Filter out current
         const others = sourceList.filter(p => String(p.id) !== String(product.id));
@@ -84,7 +87,7 @@ const ProductDetails = () => {
       id: product.id,
       name: product.name,
       price: product.price,
-      image: (Array.isArray(product.images) && product.images.length > 0 ? product.images[0] : product.images) ?? product.image ?? '/wig1.jpg',
+      image: (Array.isArray(product.images) && product.images.length > 0 ? product.images[0] : product.images) ?? product.image ?? '',
     });
     setAdded(true);
     setToastMsg(`${product.name} added to cart!`);
@@ -100,7 +103,7 @@ const ProductDetails = () => {
       id: quickViewProduct.id,
       name: quickViewProduct.name,
       price: quickViewProduct.price,
-      image: (Array.isArray(quickViewProduct.images) && quickViewProduct.images.length > 0 ? quickViewProduct.images[0] : quickViewProduct.images) ?? quickViewProduct.image ?? '/wig1.jpg',
+      image: (Array.isArray(quickViewProduct.images) && quickViewProduct.images.length > 0 ? quickViewProduct.images[0] : quickViewProduct.images) ?? quickViewProduct.image ?? '',
     });
     setQvAdded(true);
     setToastMsg(`${quickViewProduct.name} added to cart!`);
@@ -117,7 +120,7 @@ const ProductDetails = () => {
       id: p.id,
       name: p.name,
       price: p.price,
-      image: (Array.isArray(p.images) && p.images.length > 0 ? p.images[0] : p.images) ?? p.image ?? '/wig1.jpg',
+      image: (Array.isArray(p.images) && p.images.length > 0 ? p.images[0] : p.images) ?? p.image ?? '',
     });
     setToastMsg(`${p.name} added to cart!`);
     setTimeout(() => {
@@ -133,7 +136,7 @@ const ProductDetails = () => {
     setQvAdded(false);
   };
 
-  if (!product) return (
+  if (loading) return (
     <div className="pd-page">
       <Navbar />
       <div className="pd-loading">Loading product...</div>
@@ -141,14 +144,30 @@ const ProductDetails = () => {
     </div>
   );
 
+  if (!product) return (
+    <div className="pd-page">
+      <Navbar />
+      <main className="pd-container" style={{ textAlign: 'center', padding: '80px 5%' }}>
+        <h1 className="pd-name" style={{ marginBottom: '12px' }}>Product not found</h1>
+        <p className="pd-desc" style={{ marginBottom: '28px' }}>
+          This product is not currently available. Please check our shop for available wigs.
+        </p>
+        <Link to="/shop" className="pd-cart-btn" style={{ maxWidth: '240px', margin: '0 auto', textDecoration: 'none' }}>
+          Explore Shop
+        </Link>
+      </main>
+      <Footer />
+    </div>
+  );
+
   const images = Array.isArray(product.images) ? product.images
     : product.images ? [product.images]
-    : [product.image ?? '/wig1.jpg'];
+    : product.image ? [product.image] : [];
 
   const qvImages = quickViewProduct
     ? (Array.isArray(quickViewProduct.images) ? quickViewProduct.images
       : quickViewProduct.images ? [quickViewProduct.images]
-      : [quickViewProduct.image ?? '/wig1.jpg'])
+      : quickViewProduct.image ? [quickViewProduct.image] : [])
     : [];
 
   return (
@@ -233,7 +252,7 @@ const ProductDetails = () => {
                   id: p.id,
                   name: p.name,
                   price: p.price,
-                  image: (Array.isArray(p.images) && p.images.length > 0 ? p.images[0] : p.images) || p.image || '/wig1.jpg',
+                  image: (Array.isArray(p.images) && p.images.length > 0 ? p.images[0] : p.images) || p.image || '',
                 };
                 return <ProductCard key={p.id} product={cardProduct} />;
               })}
